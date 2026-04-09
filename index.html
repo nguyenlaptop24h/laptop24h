@@ -379,7 +379,7 @@ tr:last-child td{border-bottom:none}
 <div class="pg" id="pg-history">
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="hist-search" placeholder="Tìm tên khách, số bill..." oninput="renderHistory()">
+      <input type="text" id="hist-search" placeholder="Tìm tên khách, SĐT, số bill..." oninput="renderHistory()">
     </div>
     <button class="btn bd2 bsm" onclick="if(confirm('Xóa toàn bộ lịch sử?')){DB.sales=[];renderHistory();toast('Đã xóa')}">🗑️ Xóa hết</button>
   </div>
@@ -1054,7 +1054,8 @@ function printSaleBill(sale){
     <div class="pb-dyn">
     <div class="sn">${BS.logo?BS.logo+' ':''} ${BS.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
     <div class="ss">${BS.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
-    <div class="ss">ĐC: ${BS.addr||'Vĩnh Long'} &nbsp;|&nbsp; ĐT: ${BS.phone||'0xxx.xxx.xxx'}${BS.social?' &nbsp;|&nbsp; FB: '+BS.social:''}${BS.web?' &nbsp;|&nbsp; '+BS.web:''}</div>
+    <div class="ss">ĐC: ${BS.addr||'Vĩnh Long'}</div>
+    <div class="ss">ĐT: ${BS.phone||'0xxx.xxx.xxx'}${BS.social?' &nbsp;|&nbsp; FB/Zalo: '+BS.social:''}${BS.web?' &nbsp;|&nbsp; '+BS.web:''}</div>
     <hr>
     <div class="bt2">HÓA ĐƠN BÁN HÀNG</div>
     <div class="ir"><span>Số bill:</span><strong>${bn}</strong></div>
@@ -1091,10 +1092,6 @@ function printSaleBill(sale){
         </div>
       </div>
     </div>`:''}
-    <div class="sg">
-      <div>Khách hàng<br><br><br>(Ký, ghi rõ họ tên)</div>
-      <div>Người bán<br><br><br>(Ký, ghi rõ họ tên)</div>
-    </div>
     <div class="tk" style="white-space:pre-line">${(BS.footerSale||BILL_DEFAULTS.footerSale)}</div>
     </div></div>`;
 
@@ -1136,7 +1133,8 @@ function printRepairBill(rep){
     <div class="pb-dyn2">
     <div class="sn">${BSr.logo?BSr.logo+' ':''} ${BSr.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
     <div class="ss">${BSr.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
-    <div class="ss">ĐC: ${BSr.addr||'Vĩnh Long'} &nbsp;|&nbsp; ĐT: ${BSr.phone||'0xxx.xxx.xxx'}${BSr.social?' &nbsp;|&nbsp; FB: '+BSr.social:''}</div>
+    <div class="ss">ĐC: ${BSr.addr||'Vĩnh Long'}</div>
+    <div class="ss">ĐT: ${BSr.phone||'0xxx.xxx.xxx'}${BSr.social?' &nbsp;|&nbsp; FB/Zalo: '+BSr.social:''}</div>
     <hr>
     <div class="bt2">PHIẾU SỬA CHỮA${wm>0?' + BẢO HÀNH':''}</div>
     <div class="ir"><span>Mã phiếu:</span><strong>${rep.id}</strong></div>
@@ -1170,10 +1168,6 @@ function printRepairBill(rep){
         </div>
       </div>
     </div>`:''}
-    <div class="sg">
-      <div>Khách hàng<br><br><br>(Ký nhận máy)</div>
-      <div>Cửa hàng<br><br><br>(Ký giao máy)</div>
-    </div>
     <div class="tk" style="white-space:pre-line">${BSr.footerRepair||BILL_DEFAULTS.footerRepair}</div>
     </div></div>`;
   const pa=document.getElementById('pa');
@@ -1587,7 +1581,7 @@ function renderProds(){
 // ══════════════════════════════════════════════
 function renderHistory(){
   const q=(document.getElementById('hist-search')?.value||'').toLowerCase();
-  const sales=DB.sales.filter(s=>!q||s.customer.toLowerCase().includes(q)||s.billNo.toLowerCase().includes(q));
+  const sales=DB.sales.filter(s=>!q||s.customer.toLowerCase().includes(q)||s.billNo.toLowerCase().includes(q)||(s.phone||'').includes(q));
   const tbody=document.getElementById('hist-tbody');
   if(!sales.length){tbody.innerHTML=`<tr><td colspan="6" class="tc" style="padding:28px;color:var(--gy)">Chưa có giao dịch</td></tr>`;return}
   tbody.innerHTML=sales.map((s,i)=>`<tr>
