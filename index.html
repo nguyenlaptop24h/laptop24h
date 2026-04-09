@@ -184,6 +184,7 @@ tr:last-child td{border-bottom:none}
     <button class="tb"     onclick="go('history',this)">📋 Lịch Sử</button>
     <button class="tb"     onclick="go('stats',this)">📈 Thống Kê</button>
     <button class="tb admin-only" id="tab-users" style="display:none" onclick="go('users',this)">👤 Người Dùng</button>
+    <button class="tb admin-only" id="tab-settings" style="display:none" onclick="go('settings',this)">⚙️ Cài Đặt Bill</button>
   </div>
 </nav>
 
@@ -275,7 +276,7 @@ tr:last-child td{border-bottom:none}
 <div class="pg" id="pg-repair">
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="rep-search" placeholder="Tìm tên KH, thiết bị, mã phiếu..." oninput="renderRepairs()">
+      <input type="text" id="rep-search" placeholder="Tìm tên KH, SĐT, thiết bị, mã phiếu..." oninput="renderRepairs()">
     </div>
     <select id="rep-filter" onchange="renderRepairs()" style="width:auto;padding:9px 11px">
       <option value="">Tất cả trạng thái</option>
@@ -302,6 +303,7 @@ tr:last-child td{border-bottom:none}
     <div class="sw" style="flex:1;margin:0">
       <input type="text" id="cust-search" placeholder="Tìm tên, SĐT..." oninput="renderCustomers()">
     </div>
+    <button class="btn bpu" onclick="quickPhoneLookup()">📞 Tra SĐT</button>
     <button class="btn bp" onclick="openCustModal()">➕ Thêm KH</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
@@ -435,6 +437,94 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
+<!-- ══════════════════════════════════════════ -->
+<!-- CÀI ĐẶT BILL                              -->
+<!-- ══════════════════════════════════════════ -->
+<div class="pg" id="pg-settings">
+  <div class="card">
+    <div class="ct">🏪 Thông tin cửa hàng trên bill</div>
+    <div class="fr c2">
+      <div class="fg"><label>Tên cửa hàng</label><input id="set-shopname" placeholder="CỬA HÀNG LAPTOP 24H"></div>
+      <div class="fg"><label>Slogan / Dịch vụ</label><input id="set-slogan" placeholder="Chuyên: Mua bán, sửa chữa Laptop..."></div>
+    </div>
+    <div class="fr c2">
+      <div class="fg"><label>Địa chỉ</label><input id="set-addr" placeholder="123 Đường ABC, Vĩnh Long"></div>
+      <div class="fg"><label>Số điện thoại</label><input id="set-phone" placeholder="0901 234 567" type="tel"></div>
+    </div>
+    <div class="fr c2">
+      <div class="fg"><label>Facebook / Zalo</label><input id="set-social" placeholder="fb.com/laptop24h"></div>
+      <div class="fg"><label>Website (tuỳ chọn)</label><input id="set-web" placeholder="laptop24h.com"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">📄 Nội dung cuối bill</div>
+    <div class="fr c2">
+      <div class="fg"><label>Lời cảm ơn bill bán hàng</label><textarea id="set-footer-sale" rows="2" placeholder="Cảm ơn quý khách! Hàng đã mua không đổi trả."></textarea></div>
+      <div class="fg"><label>Lời cảm ơn bill sửa chữa</label><textarea id="set-footer-repair" rows="2" placeholder="Cảm ơn quý khách! Liên hệ ngay nếu có vấn đề."></textarea></div>
+    </div>
+    <div class="fr c2">
+      <div class="fg"><label>Điều khoản bảo hành bán hàng</label><textarea id="set-wterm-sale" rows="3" placeholder="✔ Bảo hành miễn phí lỗi nhà sản xuất&#10;✔ Không BH: va đập, vào nước...&#10;✔ Xuất trình phiếu này khi bảo hành"></textarea></div>
+      <div class="fg"><label>Điều khoản bảo hành sửa chữa</label><textarea id="set-wterm-repair" rows="3" placeholder="✔ Bảo hành lỗi phát sinh từ sửa chữa&#10;✔ Không BH: va đập, vào nước...&#10;✔ Xuất trình phiếu này khi bảo hành"></textarea></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="ct">🖋️ Font chữ & Định dạng bill</div>
+    <div class="fr c3">
+      <div class="fg"><label>Font chữ bill</label>
+        <select id="set-font">
+          <option value="Arial,sans-serif">Arial (mặc định)</option>
+          <option value="'Times New Roman',serif">Times New Roman</option>
+          <option value="'Courier New',monospace">Courier New</option>
+          <option value="Georgia,serif">Georgia</option>
+          <option value="Tahoma,sans-serif">Tahoma</option>
+          <option value="Verdana,sans-serif">Verdana</option>
+        </select>
+      </div>
+      <div class="fg"><label>Cỡ chữ nội dung</label>
+        <select id="set-fontsize">
+          <option value="10px">Nhỏ (10px)</option>
+          <option value="11px" selected>Trung bình (11px)</option>
+          <option value="12px">Hơi lớn (12px)</option>
+          <option value="13px">Lớn (13px)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Màu chủ đạo bill</label>
+        <select id="set-billcolor">
+          <option value="#1e3a8a">Xanh đậm (mặc định)</option>
+          <option value="#1a56db">Xanh nhạt</option>
+          <option value="#065f46">Xanh lá</option>
+          <option value="#7c3aed">Tím</option>
+          <option value="#b45309">Nâu vàng</option>
+          <option value="#111111">Đen trắng</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr c3" style="margin-top:10px">
+      <div class="fg"><label>Hiển thị logo emoji</label>
+        <select id="set-logo"><option value="💻">💻 Laptop</option><option value="🖥️">🖥️ Màn hình</option><option value="🛒">🛒 Giỏ hàng</option><option value="🏪">🏪 Cửa hàng</option><option value="">Không logo</option></select>
+      </div>
+      <div class="fg"><label>Chiều rộng bill (mm)</label>
+        <select id="set-billwidth"><option value="420px">A4 (420px)</option><option value="320px" selected>Khổ 80mm (320px)</option><option value="380px">Khổ A5 (380px)</option></select>
+      </div>
+      <div class="fg" style="justify-content:flex-end;padding-top:18px">
+        <button class="btn bs bbl" onclick="saveBillSettings()">💾 Lưu cài đặt</button>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px;background:var(--pr-l);border-radius:var(--rs);font-size:12px">
+      <b>Xem trước:</b> Font <span id="prev-font">Arial</span>, Cỡ <span id="prev-size">11px</span>, Màu <span id="prev-color" style="font-weight:700">#1e3a8a</span>
+      &nbsp;|&nbsp; <button class="btn bg2 bsm" onclick="printSaleBill(null)">🖨️ In thử bill bán hàng</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ MODAL: LỊCH SỬ KHÁCH HÀNG ═══════ -->
+<div class="mo" id="mo-cust-hist">
+  <div class="mw" style="max-width:680px">
+    <div class="mh"><div class="mt2" id="mo-cust-hist-title">📋 Lịch sử giao dịch</div><button class="btn bg2 bsm" onclick="closeMo('mo-cust-hist')">✕</button></div>
+    <div class="mb2" id="mo-cust-hist-body"></div>
+  </div>
+</div>
+
 <!-- ═══════ LOGIN OVERLAY ═══════ -->
 <div class="login-ov" id="login-overlay">
   <div class="login-box">
@@ -537,7 +627,11 @@ tr:last-child td{border-bottom:none}
         <div class="fg"><label>Giá nhập (đ)</label><input id="pm-cost" type="number" value="0" min="0"></div>
         <div class="fg"><label>Giá bán (đ)</label><input id="pm-price" type="number" value="0" min="0"></div>
       </div>
-      <div class="fr c2"><div class="fg"><label>Tồn kho</label><input id="pm-stock" type="number" value="0" min="0"></div><div class="fg"><label>Ghi chú</label><input id="pm-note" placeholder="Bảo hành, màu..."></div></div>
+      <div class="fr c3">
+        <div class="fg"><label>Tồn kho</label><input id="pm-stock" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Bảo hành (tháng)</label><select id="pm-warranty"><option value="0">Không BH</option><option value="1">1 tháng</option><option value="3">3 tháng</option><option value="6">6 tháng</option><option value="12">12 tháng</option><option value="18">18 tháng</option><option value="24">24 tháng</option></select></div>
+        <div class="fg"><label>Ghi chú</label><input id="pm-note" placeholder="Màu sắc, đặc tính..."></div>
+      </div>
     </div>
     <div class="mf"><button class="btn bg2" onclick="closeMo('mo-prod')">Hủy</button><button class="btn bp" onclick="saveProd()">💾 Lưu</button></div>
   </div>
@@ -810,6 +904,7 @@ function go(name, btn){
   if(name==='debt'){refreshCustLists();renderDebts();renderDebtStats();}
   if(name==='repair'){refreshCustLists();renderRepairs();}
   if(name==='users'){renderUsers();}
+  if(name==='settings'){loadBillSettings();}
 }
 
 // ══════════════════════════════════════════════
@@ -851,8 +946,8 @@ function renderItems(){
 function updCode(i,code){
   items[i].code=code;
   const p=DB.products.find(p=>p.id.toUpperCase()===code.toUpperCase());
-  if(p){items[i].name=p.name;items[i].unit=p.unit;items[i].price=p.price;}
-  else items[i].name='';
+  if(p){items[i].name=p.name;items[i].unit=p.unit;items[i].price=p.price;items[i].prodWarranty=p.warranty||0;}
+  else{items[i].name='';items[i].prodWarranty=0;}
   renderItems();calcT();
 }
 function updQty(i,v){items[i].qty=parseFloat(v)||1;calcT();updTotCol(i)}
@@ -934,19 +1029,32 @@ function printSaleBill(sale){
   const wm  = sale?sale.warranty:(parseInt(document.getElementById('s-warranty')?.value)||0);
   const pm  = sale?sale.paymethod:(document.getElementById('s-paymethod')?.value||'');
 
-  // Warranty expiry
-  let wExp='';
-  if(wm>0){
-    const parts=dt.split('/');
+  // Per-product warranty: get max warranty from items with individual product warranty
+  function calcExp(months, fromDate){
+    if(!months) return '';
+    const parts=fromDate.split('/');
     const d=new Date(+parts[2],+parts[1]-1,+parts[0]);
-    d.setMonth(d.getMonth()+wm);
-    wExp=`${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`;
+    d.setMonth(d.getMonth()+months);
+    return `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`;
   }
+  // Items with individual warranty from product catalog
+  const itemsWithWarranty = vi.filter(it=>(it.prodWarranty||0)>0);
+  // Global warranty (from selector, for backward compat)
+  let wExp='';
+  if(wm>0) wExp=calcExp(wm,dt);
 
-  const html=`<div class="pb">
-    <div class="sn">💻 CỬA HÀNG LAPTOP 24H</div>
-    <div class="ss">Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện</div>
-    <div class="ss">ĐC: Vĩnh Long &nbsp;|&nbsp; ĐT: 0xxx.xxx.xxx &nbsp;|&nbsp; FB: laptop24hstore</div>
+  const BS = getBillSettings();
+  const billStyle = `font-family:${BS.font};`;
+  const billColor = BS.billcolor||'#1e3a8a';
+  const billWidth = BS.billwidth||'320px';
+  const billFontSize = BS.fontsize||'11px';
+
+  const html=`<div class="pb" style="${billStyle}max-width:${billWidth}">
+    <style>.pb-dyn .sn{color:${billColor}}.pb-dyn hr{border-color:${billColor}}.pb-dyn th{background:${billColor}}.pb-dyn .tf{background:${billColor}}.pb-dyn .wbox{border-color:${billColor}}.pb-dyn .wt{color:${billColor}}.pb-dyn .ir{font-size:${billFontSize}}.pb-dyn .sr2{font-size:${billFontSize}}</style>
+    <div class="pb-dyn">
+    <div class="sn">${BS.logo?BS.logo+' ':''} ${BS.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
+    <div class="ss">${BS.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
+    <div class="ss">ĐC: ${BS.addr||'Vĩnh Long'} &nbsp;|&nbsp; ĐT: ${BS.phone||'0xxx.xxx.xxx'}${BS.social?' &nbsp;|&nbsp; FB: '+BS.social:''}${BS.web?' &nbsp;|&nbsp; '+BS.web:''}</div>
     <hr>
     <div class="bt2">HÓA ĐƠN BÁN HÀNG</div>
     <div class="ir"><span>Số bill:</span><strong>${bn}</strong></div>
@@ -969,17 +1077,17 @@ function printSaleBill(sale){
     <div class="sr2" style="margin-top:6px"><span>Khách trả:</span><span>${fmtN(paid)} đ</span></div>
     <div class="sr2"><span>Tiền thừa:</span><strong>${fmtN(Math.max(0,ch))} đ</strong></div>
     ${nt?`<div style="font-size:10px;color:#555;margin-top:5px">📝 ${nt}</div>`:''}
-    ${wm>0?`<div class="wbox">
+    ${(wm>0||itemsWithWarranty.length>0)?`<div class="wbox">
       <div class="wt">🛡️ PHIẾU BẢO HÀNH</div>
       <div class="wi">
-        <b>Khách hàng:</b> ${cust} – ${ph}<br>
-        <b>Sản phẩm:</b> ${vi.map(it=>it.name||it.code).join(', ')}<br>
-        <b>Ngày mua:</b> ${dt} &nbsp;&nbsp; <b>Hạn BH:</b> ${wExp} (${wm} tháng)<br>
-        <b>Số bill:</b> ${bn}<br>
-        <div style="margin-top:5px;color:#555">
-        ✔ Bảo hành miễn phí lỗi nhà sản xuất trong ${wm} tháng<br>
-        ✔ Không BH: va đập, vào nước, hết pin, tự ý sửa chỗ khác<br>
-        ✔ Xuất trình phiếu này khi bảo hành
+        <b>Khách hàng:</b> ${cust}${ph?' – '+ph:''}<br>
+        <b>Ngày mua:</b> ${dt} &nbsp;&nbsp; <b>Số bill:</b> ${bn}<br>
+        ${itemsWithWarranty.length>0?
+          itemsWithWarranty.map(it=>`<div style="margin:3px 0;padding:3px 0;border-bottom:1px dashed #ccc"><b>${it.name||it.code}:</b> Bảo hành <b>${it.prodWarranty} tháng</b> – Hạn đến: <b>${calcExp(it.prodWarranty,dt)}</b></div>`).join('')
+          :`<b>Sản phẩm:</b> ${vi.map(it=>it.name||it.code).join(', ')}<br><b>Hạn BH:</b> ${wExp} (${wm} tháng)<br>`
+        }
+        <div style="margin-top:5px;color:#555;white-space:pre-line">
+        ${(BS.wtermSale||BILL_DEFAULTS.wtermSale)}
         </div>
       </div>
     </div>`:''}
@@ -987,8 +1095,8 @@ function printSaleBill(sale){
       <div>Khách hàng<br><br><br>(Ký, ghi rõ họ tên)</div>
       <div>Người bán<br><br><br>(Ký, ghi rõ họ tên)</div>
     </div>
-    <div class="tk">Cảm ơn quý khách! Hàng đã mua không đổi trả.<br>Liên hệ cửa hàng khi cần hỗ trợ.</div>
-  </div>`;
+    <div class="tk" style="white-space:pre-line">${(BS.footerSale||BILL_DEFAULTS.footerSale)}</div>
+    </div></div>`;
 
   const pa=document.getElementById('pa');
   pa.style.display='block'; pa.innerHTML=html;
@@ -1021,10 +1129,14 @@ function printRepairBill(rep){
       <td style="text-align:right"><strong>${fmtN(it.qty*it.price)}</strong></td>
     </tr>`).join('')}</tbody></table>`:
     `<div class="sr2"><span>Chi phí sửa chữa:</span><strong>${fmtN(cost)} đ</strong></div>`;
-  const html=`<div class="pb">
-    <div class="sn">💻 CỬA HÀNG LAPTOP 24H</div>
-    <div class="ss">Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện</div>
-    <div class="ss">ĐC: Vĩnh Long &nbsp;|&nbsp; ĐT: 0xxx.xxx.xxx</div>
+  const BSr = getBillSettings();
+  const billColorR = BSr.billcolor||'#1e3a8a';
+  const html=`<div class="pb" style="font-family:${BSr.font||'Arial,sans-serif'};max-width:${BSr.billwidth||'320px'}">
+    <style>.pb-dyn2 .sn{color:${billColorR}}.pb-dyn2 hr{border-color:${billColorR}}.pb-dyn2 th{background:${billColorR}}.pb-dyn2 .tf{background:${billColorR}}.pb-dyn2 .wbox{border-color:${billColorR}}.pb-dyn2 .wt{color:${billColorR}}.pb-dyn2 .ir{font-size:${BSr.fontsize||'11px'}}.pb-dyn2 .sr2{font-size:${BSr.fontsize||'11px'}}</style>
+    <div class="pb-dyn2">
+    <div class="sn">${BSr.logo?BSr.logo+' ':''} ${BSr.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
+    <div class="ss">${BSr.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
+    <div class="ss">ĐC: ${BSr.addr||'Vĩnh Long'} &nbsp;|&nbsp; ĐT: ${BSr.phone||'0xxx.xxx.xxx'}${BSr.social?' &nbsp;|&nbsp; FB: '+BSr.social:''}</div>
     <hr>
     <div class="bt2">PHIẾU SỬA CHỮA${wm>0?' + BẢO HÀNH':''}</div>
     <div class="ir"><span>Mã phiếu:</span><strong>${rep.id}</strong></div>
@@ -1053,10 +1165,8 @@ function printRepairBill(rep){
         <b>Nội dung sửa:</b> ${rep.issue}<br>
         ${items.length?`<b>Linh kiện thay thế:</b> ${items.map(it=>it.desc).join(', ')}<br>`:''}
         <b>Ngày giao:</b> ${isoToDisplay(delivDate)||'—'} &nbsp; <b>Hạn BH:</b> ${wExp||'—'} (${wm} tháng)<br>
-        <div style="margin-top:5px;color:#555">
-        ✔ Bảo hành lỗi phát sinh từ sửa chữa trong ${wm} tháng<br>
-        ✔ Không BH: va đập, vào nước, sử dụng sai cách<br>
-        ✔ Xuất trình phiếu này khi bảo hành
+        <div style="margin-top:5px;color:#555;white-space:pre-line">
+        ${BSr.wtermRepair||BILL_DEFAULTS.wtermRepair}
         </div>
       </div>
     </div>`:''}
@@ -1064,8 +1174,8 @@ function printRepairBill(rep){
       <div>Khách hàng<br><br><br>(Ký nhận máy)</div>
       <div>Cửa hàng<br><br><br>(Ký giao máy)</div>
     </div>
-    <div class="tk">Cảm ơn quý khách! Liên hệ ngay nếu có vấn đề.</div>
-  </div>`;
+    <div class="tk" style="white-space:pre-line">${BSr.footerRepair||BILL_DEFAULTS.footerRepair}</div>
+    </div></div>`;
   const pa=document.getElementById('pa');
   pa.style.display='block'; pa.innerHTML=html;
   window.print();
@@ -1164,7 +1274,7 @@ function renderRepairs(){
   const sf=document.getElementById('rep-filter')?.value||'';
   const sort=document.getElementById('rep-sort')?.value||'desc';
   let reps=DB.repairs.filter(r=>{
-    const mq=!q||r.customerName.toLowerCase().includes(q)||r.device.toLowerCase().includes(q)||r.id.toLowerCase().includes(q);
+    const mq=!q||r.customerName.toLowerCase().includes(q)||r.device.toLowerCase().includes(q)||r.id.toLowerCase().includes(q)||(r.phone||'').includes(q);
     const ms=!sf||r.status===sf;
     return mq&&ms;
   });
@@ -1274,6 +1384,7 @@ function renderCustomers(){
       <td class="tr">${fmtN(totalBuy)} đ</td>
       <td class="tr" style="color:${totalDebt>0?'var(--er)':'var(--ok)'}"><strong>${totalDebt>0?fmtN(totalDebt)+' đ':'—'}</strong></td>
       <td class="tc" style="white-space:nowrap">
+        <button class="btn bp bsm" onclick="showCustHistory('${c.phone||c.name}')" style="margin-right:3px" title="Lịch sử GD">📋</button>
         <button class="btn bg2 bsm" onclick="openCustModal('${c.id}')" style="margin-right:3px">✏️</button>
         <button class="btn bd2 bsm" onclick="deleteCust('${c.id}')">🗑️</button>
       </td>
@@ -1417,6 +1528,7 @@ function openProdModal(id){
     document.getElementById('pm-cost').value=p.cost;
     document.getElementById('pm-price').value=p.price;
     document.getElementById('pm-stock').value=p.stock;
+    document.getElementById('pm-warranty').value=p.warranty||0;
     document.getElementById('pm-note').value=p.note||'';
   } else {
     ['pm-code','pm-name','pm-note'].forEach(f=>document.getElementById(f).value='');
@@ -1424,6 +1536,7 @@ function openProdModal(id){
     document.getElementById('pm-cost').value=0;
     document.getElementById('pm-price').value=0;
     document.getElementById('pm-stock').value=0;
+    document.getElementById('pm-warranty').value=0;
   }
   openMo('mo-prod');
 }
@@ -1437,6 +1550,7 @@ function saveProd(){
     cost:parseFloat(document.getElementById('pm-cost').value)||0,
     price:parseFloat(document.getElementById('pm-price').value)||0,
     stock:parseInt(document.getElementById('pm-stock').value)||0,
+    warranty:parseInt(document.getElementById('pm-warranty').value)||0,
     note:document.getElementById('pm-note').value};
   const idx=prods.findIndex(x=>x.id===code);
   if(idx>=0) prods[idx]=p; else prods.unshift(p);
@@ -1746,6 +1860,7 @@ function applyRoleUI(){
     el.style.display=isAdmin?'inline-flex':'none';
   });
   document.getElementById('tab-users').style.display=isAdmin?'flex':'none';
+  document.getElementById('tab-settings').style.display=isAdmin?'flex':'none';
   // Hide cost price column from staff
   if(!isAdmin){
     document.querySelectorAll('.cost-col').forEach(el=>el.style.display='none');
@@ -1850,7 +1965,151 @@ function reRenderCurrent(){
   else if(id==='debt'){     refreshCustLists(); renderDebts(); renderDebtStats(); }
   else if(id==='repair'){   refreshCustLists(); renderRepairs(); }
   else if(id==='users'){    renderUsers(); }
+  else if(id==='settings'){ loadBillSettings(); }
   // 'sale' page: don't auto-refresh to avoid losing form input
+}
+
+// ══════════════════════════════════════════════
+// TRA SĐT NHANH
+// ══════════════════════════════════════════════
+function quickPhoneLookup(){
+  const phone = prompt('Nhập số điện thoại cần tra:','');
+  if(!phone||!phone.trim()) return;
+  showCustHistory(phone.trim());
+}
+
+// ══════════════════════════════════════════════
+// CÀI ĐẶT BILL
+// ══════════════════════════════════════════════
+const BILL_SETTINGS_KEY = 'l24_bill_settings';
+const BILL_DEFAULTS = {
+  shopname: 'CỬA HÀNG LAPTOP 24H',
+  slogan: 'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện',
+  addr: 'Vĩnh Long',
+  phone: '0xxx.xxx.xxx',
+  social: 'laptop24hstore',
+  web: '',
+  footerSale: 'Cảm ơn quý khách! Hàng đã mua không đổi trả.\nLiên hệ cửa hàng khi cần hỗ trợ.',
+  footerRepair: 'Cảm ơn quý khách! Liên hệ ngay nếu có vấn đề.',
+  wtermSale: '✔ Bảo hành miễn phí lỗi nhà sản xuất\n✔ Không BH: va đập, vào nước, hết pin, tự ý sửa chỗ khác\n✔ Xuất trình phiếu này khi bảo hành',
+  wtermRepair: '✔ Bảo hành lỗi phát sinh từ sửa chữa\n✔ Không BH: va đập, vào nước, sử dụng sai cách\n✔ Xuất trình phiếu này khi bảo hành',
+  font: 'Arial,sans-serif',
+  fontsize: '11px',
+  billcolor: '#1e3a8a',
+  logo: '💻',
+  billwidth: '320px',
+};
+
+function getBillSettings(){
+  try{ return Object.assign({},BILL_DEFAULTS,JSON.parse(localStorage.getItem(BILL_SETTINGS_KEY)||'{}')); }
+  catch{ return Object.assign({},BILL_DEFAULTS); }
+}
+
+function loadBillSettings(){
+  const s = getBillSettings();
+  const map = {
+    'set-shopname':'shopname','set-slogan':'slogan','set-addr':'addr','set-phone':'phone',
+    'set-social':'social','set-web':'web','set-footer-sale':'footerSale','set-footer-repair':'footerRepair',
+    'set-wterm-sale':'wtermSale','set-wterm-repair':'wtermRepair','set-font':'font',
+    'set-fontsize':'fontsize','set-billcolor':'billcolor','set-logo':'logo','set-billwidth':'billwidth',
+  };
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el) el.value=s[key]||'';
+  });
+  updateBillPreview();
+}
+
+function saveBillSettings(){
+  const map = {
+    'set-shopname':'shopname','set-slogan':'slogan','set-addr':'addr','set-phone':'phone',
+    'set-social':'social','set-web':'web','set-footer-sale':'footerSale','set-footer-repair':'footerRepair',
+    'set-wterm-sale':'wtermSale','set-wterm-repair':'wtermRepair','set-font':'font',
+    'set-fontsize':'fontsize','set-billcolor':'billcolor','set-logo':'logo','set-billwidth':'billwidth',
+  };
+  const s = {};
+  Object.entries(map).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(el) s[key]=el.value;
+  });
+  try{ localStorage.setItem(BILL_SETTINGS_KEY,JSON.stringify(s)); }catch{}
+  updateBillPreview();
+  toast('✅ Đã lưu cài đặt bill','ok');
+}
+
+function updateBillPreview(){
+  const font=(document.getElementById('set-font')?.value||'Arial').split(',')[0];
+  const size=document.getElementById('set-fontsize')?.value||'11px';
+  const color=document.getElementById('set-billcolor')?.value||'#1e3a8a';
+  if(document.getElementById('prev-font')) document.getElementById('prev-font').textContent=font;
+  if(document.getElementById('prev-size')) document.getElementById('prev-size').textContent=size;
+  if(document.getElementById('prev-color')){
+    document.getElementById('prev-color').textContent=color;
+    document.getElementById('prev-color').style.color=color;
+  }
+}
+
+// ══════════════════════════════════════════════
+// LỊCH SỬ GIAO DỊCH KHÁCH HÀNG
+// ══════════════════════════════════════════════
+function showCustHistory(nameOrPhone){
+  const q = nameOrPhone.toLowerCase();
+  const sales = DB.sales.filter(s=>s.customer.toLowerCase()===q||s.phone===nameOrPhone||(s.customer+'').toLowerCase().includes(q));
+  const repairs = DB.repairs.filter(r=>r.customerName.toLowerCase()===q||r.phone===nameOrPhone||(r.customerName+'').toLowerCase().includes(q));
+  const cust = DB.customers.find(c=>c.name.toLowerCase()===q||c.phone===nameOrPhone);
+
+  const totalBuy = sales.reduce((s,x)=>s+x.total,0);
+  const totalRepair = repairs.reduce((s,r)=>{
+    const items=r.deliveryItems||[];
+    return s+(items.length?items.reduce((a,it)=>a+it.qty*it.price,0):(+r.cost||0));
+  },0);
+
+  let html = `<div style="background:var(--pr-l);padding:12px;border-radius:var(--rs);margin-bottom:14px;font-size:13px">
+    <b>👤 ${cust?cust.name:nameOrPhone}</b>${cust&&cust.phone?' &nbsp;|&nbsp; 📞 '+cust.phone:''}
+    ${cust&&cust.address?'<br>📍 '+cust.address:''}
+    <div style="margin-top:6px;display:flex;gap:16px;font-size:12px">
+      <span>🛒 Mua hàng: <b>${sales.length} lần</b> – Tổng: <b style="color:var(--pr-d)">${fmtN(totalBuy)} đ</b></span>
+      <span>🔧 Sửa chữa: <b>${repairs.length} lần</b> – Tổng: <b style="color:var(--pu)">${fmtN(totalRepair)} đ</b></span>
+    </div>
+  </div>`;
+
+  if(sales.length>0){
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pr-d);margin-bottom:8px">🛒 Lịch sử mua hàng (${sales.length})</div>`;
+    html += `<div class="tw" style="margin-bottom:14px"><table>
+      <thead><tr><th>Ngày</th><th>Số bill</th><th>Sản phẩm</th><th class="tr">Tổng tiền</th><th>Thanh toán</th><th class="tc">In</th></tr></thead>
+      <tbody>${sales.map(s=>`<tr>
+        <td>${s.date}</td>
+        <td><span class="bx b-bl">${s.billNo}</span></td>
+        <td style="font-size:11px">${(s.items||[]).map(it=>it.name||it.code).join(', ')}</td>
+        <td class="tr"><strong>${fmtN(s.total)} đ</strong></td>
+        <td><span class="bx ${s.paymethod==='Công nợ'?'b-rd':'b-gn'}">${s.paymethod||'TM'}</span></td>
+        <td class="tc"><button class="btn bg2 bsm" onclick="printSaleBill(DB.sales.find(x=>x.billNo==='${s.billNo}'))">🖨️</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  if(repairs.length>0){
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pu);margin-bottom:8px">🔧 Lịch sử sửa chữa (${repairs.length})</div>`;
+    html += `<div class="tw"><table>
+      <thead><tr><th>Ngày nhận</th><th>Mã phiếu</th><th>Thiết bị</th><th>Tình trạng</th><th>Trạng thái</th><th class="tc">In</th></tr></thead>
+      <tbody>${repairs.map(r=>`<tr>
+        <td>${isoToDisplay(r.receivedDate)}</td>
+        <td><span class="bx b-pu">${r.id}</span></td>
+        <td style="font-size:11px"><strong>${r.device}</strong>${r.serial?'<br>'+r.serial:''}</td>
+        <td style="font-size:11px">${r.issue}</td>
+        <td><span class="bx ${ST_CLASS[r.status]||'b-gy'}">${r.status}</span></td>
+        <td class="tc">${r.status==='Đã giao'?`<button class="btn bg2 bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️</button>`:'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  if(!sales.length&&!repairs.length){
+    html += `<div style="text-align:center;padding:40px;color:var(--gy)">Chưa có giao dịch nào</div>`;
+  }
+
+  document.getElementById('mo-cust-hist-title').textContent = `📋 Lịch sử: ${cust?cust.name:nameOrPhone}`;
+  document.getElementById('mo-cust-hist-body').innerHTML = html;
+  openMo('mo-cust-hist');
 }
 
 // ══════════════════════════════════════════════
