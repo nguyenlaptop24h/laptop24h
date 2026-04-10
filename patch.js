@@ -1,83 +1,224 @@
-// patch.js - pagination + dropdown trang thai noi bat
 (function(){
-var _STS=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
-var _SC={'Mới nhận':'#7c3aed','Đang kiểm tra':'#1a56db','Đang sửa':'#e67e22','Chờ linh kiện':'#6b7280','Hoàn thành':'#10b981','Đã giao':'#10b981'};
-window._repPage=window._repPage||1;
-window._repPF=window._repPF||'';
-// Fix chieu rong filter selects
-(function(){
-  var s=document.getElementById('_pSty');
-  if(!s){s=document.createElement('style');s.id='_pSty';document.head.appendChild(s);}
-  s.textContent='#rsf-select{width:auto!important;max-width:140px;min-width:100px}#rep-filter{width:auto!important;max-width:160px}';
-})();
-function _gDB(){try{return typeof DB!=='undefined'?DB:null;}catch(e){return null;}}
-function _gCU(){try{return typeof currentUser!=='undefined'?currentUser:null;}catch(e){return null;}}
-function _gSTS(){try{return typeof STATUSES!=='undefined'?STATUSES:_STS;}catch(e){return _STS;}}
-function _toD(s){if(!s)return'';var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
-function _aM(ds,m){if(!ds||!m)return null;var d=new Date(ds);d.setMonth(d.getMonth()+m);return d.toISOString().slice(0,10);}
-function _fN(n){return(n||0).toLocaleString('vi-VN');}
-window.renderRepairs=function(){
-  var db=_gDB();if(!db)return;
-  var q=(document.getElementById('rep-search')||{value:''}).value.toLowerCase();
-  var sf=(document.getElementById('rep-filter')||{value:''}).value;
-  var rsf=(document.getElementById('rsf-select')||{value:''}).value;
-  var fKey=q+'|'+sf+'|'+rsf;
-  if(fKey!==window._repPF){window._repPage=1;window._repPF=fKey;}
-  var today=new Date().toISOString().slice(0,10);
-  function inR(ds){if(!rsf)return true;if(!ds)return false;if(rsf==='day')return ds===today;if(rsf==='month')return ds.slice(0,7)===today.slice(0,7);if(rsf==='year')return ds.slice(0,4)===today.slice(0,4);if(rsf==='week'){var d=new Date(ds),t=new Date(today),df=(t-d)/86400000,dw=t.getDay()===0?6:t.getDay()-1;return df>=0&&df<=dw;}return true;}
-  var reps=(db.repairs||[]).filter(function(r){if(!r)return false;var mq=!q||(r.customerName||'').toLowerCase().indexOf(q)>=0||(r.device||'').toLowerCase().indexOf(q)>=0||(r.id||'').toLowerCase().indexOf(q)>=0||(r.phone||'').indexOf(q)>=0;return mq&&(!sf||r.status===sf)&&inR(r.receivedDate);});
-  reps.sort(function(a,b){return(a.receivedDate||'')<(b.receivedDate||'')?1:-1;});
-  var tot=reps.length,PS=50,tp=Math.max(1,Math.ceil(tot/PS));
-  var pg=Math.max(1,Math.min(window._repPage||1,tp));window._repPage=pg;
-  var rows=reps.slice((pg-1)*PS,pg*PS);
-  var list=document.getElementById('repair-list');if(!list)return;
-  if(!tot){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">&#128295;</div><div>Kh&#244;ng c&#243; phi&#7871;u n&#224;o</div></div>';return;}
-  var sts=_gSTS(),cu=_gCU(),isAdmin=cu&&cu.role==='admin';
-  var html=rows.map(function(r){
-    var cost=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
-    var rem=Math.max(0,cost-(r.deposit||0)-(r.deliveryPaid||0));
-    var dg=r.status==='Đã giao',locked=!isAdmin&&dg;
-    var wd=_aM(r.deliveredDate,r.warrantyMonths);
-    var dRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+_toD(r.deliveredDate)+(wd?' &bull; &#128737;&#65039; BH &#273;&#7871;n '+_toD(wd):'')+' </div>':'';
-    var sc=_SC[r.status]||'#6b7280';
-    var opts=sts.map(function(s){return '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('');
-    var sel=!locked?'<div style="margin-top:10px"><select style="width:100%;padding:5px 10px;border-radius:6px;border:2px solid '+sc+';font-size:13px;font-weight:700;color:'+sc+';background:#fff;cursor:pointer" onchange="setRepairStatus(\''+r.id+'\',this.value)">'+opts+'</select></div>':'';
-    return '<div class="card" style="border-left:4px solid '+(dg?'var(--ok)':'var(--pr)')+'">'+
-    '<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'+
-    '<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'+
-    '<div style="display:flex;gap:6px;flex-wrap:wrap">'+
-    (!locked&&!dg?'<button class="btn bs bsm" title="Giao m&#225;y" onclick="openDeliverModal(\''+r.id+'\')" >&#128640;</button>':'')+
-    (!locked?'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\')" >&#9999;&#65039;</button>':'')+
-    '<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\';}))">&#128424;&#65039;</button>'+
-    (!locked?'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\')" >&#128465;&#65039;</button>':'')+
-    '</div></div>'+
-    '<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">'+
-    '<div><b>&#128100;</b> '+r.customerName+' &ndash; '+r.phone+'</div>'+
-    '<div><b>&#128187;</b> '+r.device+(r.serial?' ('+r.serial+')':'')+' </div>'+
-    '<div><b>&#128296;</b> '+r.issue+'</div>'+
-    '<div><b>&#128197;</b> Nh&#7853;n: '+_toD(r.receivedDate)+'</div>'+
-    dRow+
-    '<div><b>&#128176;</b> Ph&#237;: '+_fN(cost)+' &#273; | C&#7885;c: '+_fN(r.deposit||0)+' &#273; | C&#242;n: <strong style="color:'+(rem>0?'var(--er)':'var(--ok)')+'" >'+_fN(rem)+' &#273;</strong></div>'+
-    (r.techName?'<div><b>&#128104;&#8205;&#128295;</b> KTV: '+r.techName+'</div>':'')+
-    (r.deliveryItems&&r.deliveryItems.length?'<div style="grid-column:1/-1"><b>&#128203;</b> '+r.deliveryItems.length+' h&#7841;ng m&#7909;c</div>':'')+
-    (r.processNote?'<div style="grid-column:1/-1"><b>&#128296;</b> '+r.processNote+'</div>':'')+
-    '</div>'+sel+'</div>';
-  }).join('');
-  var nav=tp>1?'<div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:18px 0;flex-wrap:wrap"><button class="btn bp" style="padding:7px 16px;opacity:'+(pg<=1?.4:1)+'" '+(pg<=1?'disabled':'')+' onclick="window._repPage='+(pg-1)+';renderRepairs();window.scrollTo(0,0)">&#9664; Tr&#432;&#7899;c</button><span style="font-size:13px;color:var(--gy)">Trang <b>'+pg+'</b> / '+tp+' &nbsp;&middot;&nbsp; <b>'+tot+'</b> phi&#7871;u</span><button class="btn bp" style="padding:7px 16px;opacity:'+(pg>=tp?.4:1)+'" '+(pg>=tp?'disabled':'')+' onclick="window._repPage='+(pg+1)+';renderRepairs();window.scrollTo(0,0)">Sau &#9654;</button></div>':'<div style="text-align:center;padding:10px 0;font-size:13px;color:var(--gy)"><b>'+tot+'</b> phi&#7871;u</div>';
-  list.innerHTML=html+nav;
-};
-function _addBtns(){
-  if(document.getElementById('_btnTop'))return;
-  var t=document.createElement('button'),b=document.createElement('button');
-  t.id='_btnTop';t.innerHTML='&#8593;';b.id='_btnBot';b.innerHTML='&#8595;';
-  var bs='position:fixed;right:18px;z-index:9999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:var(--pr,#1a56db);color:#fff;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25);display:none';
-  t.style.cssText=bs+';bottom:80px';b.style.cssText=bs+';bottom:28px';
-  t.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
-  b.onclick=function(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
-  document.body.appendChild(t);document.body.appendChild(b);
-  window.addEventListener('scroll',function(){t.style.display=window.scrollY>200?'block':'none';b.style.display=(window.innerHeight+window.scrollY)>=document.body.scrollHeight-50?'none':'block';},{passive:true});
-  setTimeout(function(){if(document.body.scrollHeight>window.innerHeight)b.style.display='block';},300);
-}
-function _act(){var db=_gDB();if(!db)return false;window._patchActivated=true;_addBtns();var l=document.getElementById('repair-list');if(l&&l.children.length>0)window.renderRepairs();return true;}
-if(!_act()){var _a=0,_iv=setInterval(function(){_a++;if(_act()||_a>=120)clearInterval(_iv);},500);}
+  /* ====== patch.js — Laptop24H repair tab enhancements ====== */
+
+  /* ---- helpers: access consts that are not on window ---- */
+  function _gDB(){try{return typeof DB\!=='undefined'?DB:null;}catch(e){return null;}}
+  function _gSTS(){
+    try{if(typeof STATUSES\!=='undefined')return STATUSES;}catch(e){}
+    return ['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
+  }
+  function _gSTC(){
+    try{if(typeof ST_CLASS\!=='undefined')return ST_CLASS;}catch(e){}
+    return {
+      'Mới nhận':'badge-new','Đang kiểm tra':'badge-check',
+      'Đang sửa':'badge-fix','Chờ linh kiện':'badge-wait',
+      'Hoàn thành':'badge-done','Đã giao':'badge-delivered'
+    };
+  }
+  function _gCU(){try{return typeof currentUser\!=='undefined'?currentUser:null;}catch(e){return null;}}
+
+  /* ---- inject CSS: compact filters + scroll-btn styles ---- */
+  if(\!document.getElementById('_pSty')){
+    var sty=document.createElement('style');
+    sty.id='_pSty';
+    sty.textContent=[
+      '#rsf-select{width:auto\!important;max-width:160px}',
+      '.rep-filter{width:auto\!important;max-width:160px}',
+      '#_btnTop,#_btnBot{position:fixed;right:18px;width:40px;height:40px;border-radius:50%;',
+        'border:none;background:var(--pr,#1976d2);color:#fff;font-size:20px;cursor:pointer;',
+        'box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:9999;display:none;',
+        'align-items:center;justify-content:center;transition:opacity .2s}',
+      '#_btnTop{bottom:72px}',
+      '#_btnBot{bottom:22px}'
+    ].join('');
+    document.head.appendChild(sty);
+  }
+
+  /* ---- pagination state ---- */
+  var PAGE_SIZE = 50;
+  window._repPage = window._repPage || 1;
+  window._repPF   = window._repPF   || {q:'',status:'',date:''};
+
+  /* ---- scroll buttons ---- */
+  function addScrollBtns(){
+    if(document.getElementById('_btnTop')) return;
+    var t=document.createElement('button');
+    t.id='_btnTop'; t.innerHTML='&#8679;'; t.title='Lên đầu';
+    t.style.cssText='display:none;position:fixed;right:18px;bottom:72px;width:40px;height:40px;border-radius:50%;border:none;background:var(--pr,#1976d2);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:9999;align-items:center;justify-content:center';
+    t.onclick=function(){window.scrollTo({top:0,behavior:'smooth'});};
+
+    var b=document.createElement('button');
+    b.id='_btnBot'; b.innerHTML='&#8681;'; b.title='Xuống cuối';
+    b.style.cssText='display:none;position:fixed;right:18px;bottom:22px;width:40px;height:40px;border-radius:50%;border:none;background:var(--pr,#1976d2);color:#fff;font-size:22px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);z-index:9999;align-items:center;justify-content:center';
+    b.onclick=function(){window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
+
+    document.body.appendChild(t);
+    document.body.appendChild(b);
+
+    window.addEventListener('scroll',function(){
+      var y=window.scrollY||document.documentElement.scrollTop;
+      var max=document.documentElement.scrollHeight-window.innerHeight;
+      t.style.display= y>200 ? 'flex' : 'none';
+      b.style.display= y<max-200 ? 'flex' : 'none';
+    },{passive:true});
+  }
+
+  /* ---- renderRepairs override ---- */
+  function installRender(){
+    var db=_gDB();
+    if(\!db) return false;
+
+    window._rpRender = function(){
+      var container=document.getElementById('repair-list');
+      if(\!container) return;
+
+      var sts  = _gSTS();
+      var stc  = _gSTC();
+      var cu   = _gCU();
+      var isAdmin = cu && cu.role==='admin';
+
+      /* read filter bar values */
+      var qEl  = document.getElementById('repair-search');
+      var stEl = document.getElementById('rsf-select');
+      var dtEl = document.querySelector('.rep-filter');  /* date filter */
+      var q    = (qEl?qEl.value:'').toLowerCase().trim();
+      var sfSt = stEl?stEl.value:'';
+      var sfDt = dtEl?dtEl.value:'';
+
+      /* compare with last filter state to reset page */
+      var pfKey = q+'|'+sfSt+'|'+sfDt;
+      if(window._repPF._key \!== pfKey){
+        window._repPage = 1;
+        window._repPF._key = pfKey;
+      }
+
+      db.ref('/repairs').once('value').then(function(snap){
+        var all = [];
+        snap.forEach(function(c){ var v=c.val(); v._key=c.key; all.push(v); });
+
+        /* sort newest first */
+        all.sort(function(a,b){
+          return ((b.createdAt||b.timestamp||0)-(a.createdAt||a.timestamp||0));
+        });
+
+        /* filter */
+        var filtered = all.filter(function(r){
+          if(sfSt && r.status\!==sfSt) return false;
+          if(sfDt){
+            var d=new Date(r.createdAt||r.timestamp||0);
+            var rd=[d.getFullYear(),('0'+(d.getMonth()+1)).slice(-2),('0'+d.getDate()).slice(-2)].join('-');
+            if(rd\!==sfDt) return false;
+          }
+          if(q){
+            var hay=(r.id||'')+(r.customerName||'')+(r.deviceName||'')+(r.phone||'')+(r.status||'');
+            if(hay.toLowerCase().indexOf(q)<0) return false;
+          }
+          return true;
+        });
+
+        /* pagination */
+        var pg = window._repPage;
+        var totalPages = Math.max(1, Math.ceil(filtered.length/PAGE_SIZE));
+        if(pg > totalPages) pg = window._repPage = totalPages;
+        var slice = filtered.slice((pg-1)*PAGE_SIZE, pg*PAGE_SIZE);
+
+        /* build cards */
+        var grid = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px">';
+        if(slice.length===0){
+          grid += '<p style="color:#888;padding:24px 0">Không có phiếu nào.</p>';
+        }
+        slice.forEach(function(r){
+          var cls = stc[r.status]||'badge-new';
+          var locked = (r.status==='Đã giao') && \!isAdmin;
+          var opts = sts.map(function(s){
+            return '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s.toUpperCase()+'</option>';
+          }).join('');
+          var sel = \!locked
+            ? '<div style="margin-top:14px;display:flex;justify-content:center">'+
+              '<select style="width:auto;padding:7px 14px;border:1.5px solid var(--bd,#ddd);border-radius:var(--rs,6px);font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;font-family:inherit;cursor:pointer;background:#fff;color:var(--pr-d,#333)" onchange="setRepairStatus(\''+r._key+'\',this.value)">'+
+              opts+'</select></div>'
+            : '<div style="margin-top:14px;text-align:center;font-size:11px;color:#999">Đã khóa</div>';
+
+          grid += '<div class="rep-card" style="background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 6px rgba(0,0,0,.08)">';
+          grid += '<div style="display:flex;justify-content:space-between;align-items:center">';
+          grid += '<span class="bx b-bl" style="font-size:13px;font-weight:700">#'+r.id+'</span>';
+          grid += '<span class="badge '+cls+'" style="font-size:11px;padding:2px 8px;border-radius:20px">'+r.status+'</span>';
+          grid += '</div>';
+          grid += '<div style="margin:8px 0;font-size:14px;font-weight:600">'+( r.customerName||'')+'</div>';
+          grid += '<div style="font-size:12px;color:#666">'+( r.deviceName||'')+'</div>';
+          if(r.phone) grid+='<div style="font-size:12px;color:#666">&#128222; '+ r.phone+'</div>';
+          if(r.issue) grid+='<div style="font-size:12px;color:#555;margin-top:4px">'+r.issue+'</div>';
+          grid += '<div style="margin-top:8px;display:flex;gap:8px;justify-content:flex-end">';
+          if(\!locked){
+            grid += '<button onclick="editRepair(\''+r._key+'\')" style="background:none;border:1.5px solid var(--bd,#ddd);border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px" title="Sửa">&#9998;</button>';
+            if(isAdmin) grid += '<button onclick="deleteRepair(\''+r._key+'\')" style="background:none;border:1.5px solid #f44;border-radius:6px;padding:5px 10px;cursor:pointer;font-size:13px;color:#f44" title="Xóa">&#128465;</button>';
+            if(r.status==='Hoàn thành'){
+              grid += '<button onclick="markDelivered(\''+r._key+'\')" style="background:var(--pr,#1976d2);border:none;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;color:#fff" title="Giao máy">&#128640;</button>';
+            }
+          }
+          grid += '</div>';
+          grid += sel;
+          grid += '</div>';
+        });
+        grid += '</div>';
+
+        /* pagination nav */
+        var btnSty = 'padding:6px 16px;border:1.5px solid var(--bd,#ddd);border-radius:6px;background:#fff;cursor:pointer;font-size:13px';
+        var nav = '<div style="display:flex;align-items:center;justify-content:center;gap:12px;padding:20px 0;font-size:13px">';
+        nav += '<button style="'+btnSty+'"'+(pg<=1?' disabled':'')+' onclick="window._repPage=Math.max(1,window._repPage-1);window._rpRender()">◀ Trước</button>';
+        nav += '<span>Trang <b>'+pg+'/'+totalPages+'</b> &middot; <b>'+filtered.length+'</b> phiếu</span>';
+        nav += '<button style="'+btnSty+'"'+(pg>=totalPages?' disabled':'')+' onclick="window._repPage=Math.min('+totalPages+',window._repPage+1);window._rpRender()">Sau ▶</button>';
+        nav += '</div>';
+
+        container.innerHTML = grid + nav;
+      }).catch(function(e){ console.error('_rpRender:',e); });
+    };
+
+    /* hook filter inputs to re-render */
+    function hookFilter(el){
+      if(\!el||el._rpHooked) return;
+      el._rpHooked=true;
+      el.addEventListener('input',  function(){ window._repPage=1; window._rpRender(); });
+      el.addEventListener('change', function(){ window._repPage=1; window._rpRender(); });
+    }
+    hookFilter(document.getElementById('repair-search'));
+    hookFilter(document.getElementById('rsf-select'));
+    hookFilter(document.querySelector('.rep-filter'));
+
+    /* override original renderRepairs if present */
+    if(typeof renderRepairs==='function'){
+      try{ window.renderRepairs = window._rpRender; }catch(e){}
+    }
+
+    addScrollBtns();
+    window._rpRender();
+    return true;
+  }
+
+  /* ---- activation: poll until repair page is ready ---- */
+  function tryActivate(){
+    if(window._patchActive) return;
+    var container=document.getElementById('repair-list');
+    if(\!container) return;
+    var db=_gDB();
+    if(\!db) return;
+    if(installRender()){
+      window._patchActive=true;
+      console.log('[patch] activated');
+    }
+  }
+
+  /* watch for page navigation (SPA) and re-activate */
+  var _lastPg='';
+  setInterval(function(){
+    var pg = window.location.href + (document.getElementById('repair-list')?'1':'0');
+    if(pg\!==_lastPg){
+      _lastPg=pg;
+      window._patchActive=false;
+      setTimeout(tryActivate,300);
+    }
+    if(\!window._patchActive) tryActivate();
+  }, 800);
+
+  tryActivate();
 })();
