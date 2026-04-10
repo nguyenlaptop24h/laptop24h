@@ -1082,16 +1082,7 @@ function doPrint(html){
 .pb .sg{display:flex;justify-content:space-around;margin-top:16px;font-size:10px;text-align:center;color:#555}
 .pb .tk{text-align:center;font-size:10px;color:#555;margin-top:10px;font-style:italic}`;
   var w=window.open('','_blank','width=600,height=900,left=100,top=100');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>'+css+'</style></head><body>'+html+'
-<!-- Nút cuộn trang nhanh -->
-<div id="_scrollBtns">
-  <button id="_btnTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" style="display:none;position:fixed;bottom:80px;right:18px;z-index:9999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:var(--pr,#5c6bc0);color:#fff;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25)">↑</button>
-  <button id="_btnBot" onclick="window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'})" style="position:fixed;bottom:28px;right:18px;z-index:9999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:var(--pr,#5c6bc0);color:#fff;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25)">↓</button>
-</div>
-<script>
-window.addEventListener('scroll',function(){var t=document.getElementById('_btnTop'),b=document.getElementById('_btnBot');if(!t||!b)return;t.style.display=window.scrollY>200?'block':'none';b.style.display=(window.innerHeight+window.scrollY)>=document.body.scrollHeight-50?'none':'block';},{passive:true});
-</script>
-</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>'+css+'</style></head><body>'+html+'</body></html>');
   w.document.close();
   setTimeout(function(){w.focus();w.print();setTimeout(function(){w.close();},800);},300);
 }
@@ -1385,54 +1376,38 @@ function setRepFilter(v){
   var sel=document.getElementById('rsf-select');if(sel)sel.value=v;
   renderRepairs();
 }
-let _repPage=1,_repPrevFilter='';
 function renderRepairs(){
   const q=(document.getElementById('rep-search')?.value||'').toLowerCase();
   const sf=document.getElementById('rep-filter')?.value||'';
-  const rsf=(document.getElementById('rsf-select')?.value)||'';
-  const fKey=q+'|'+sf+'|'+rsf;
-  if(fKey!==_repPrevFilter){_repPage=1;_repPrevFilter=fKey;}
-  const todayStr=new Date().toISOString().slice(0,10);
-  function inRange(ds){
-    if(!rsf)return true;if(!ds)return false;
-    if(rsf==='day')return ds===todayStr;
-    if(rsf==='month')return ds.slice(0,7)===todayStr.slice(0,7);
-    if(rsf==='year')return ds.slice(0,4)===todayStr.slice(0,4);
-    if(rsf==='week'){const d=new Date(ds),t=new Date(todayStr),diff=(t-d)/86400000,dow=t.getDay()===0?6:t.getDay()-1;return diff>=0&&diff<=dow;}
-    return true;
-  }
+  const _now=new Date();
   let reps=DB.repairs.filter(r=>{
-    if(!r)return false;
-    const mq=!q||(r.customerName||'').toLowerCase().includes(q)||(r.device||'').toLowerCase().includes(q)||(r.id||'').toLowerCase().includes(q)||(r.phone||'').includes(q);
-    return mq&&(!sf||r.status===sf)&&inRange(r.receivedDate);
+    const mq=!q||r.customerName.toLowerCase().includes(q)||r.device.toLowerCase().includes(q)||r.id.toLowerCase().includes(q)||(r.phone||'').includes(q);
+    const ms=!sf||r.status===sf;
+    var md=true;
+    if(_repRecFilter){var _rs=r.receivedDate||'';if(!_rs){md=false;}else if(_repRecFilter==='day'){md=_rs===todayISO();}else if(_repRecFilter==='week'){var _mon=new Date(_now);_mon.setDate(_now.getDate()-((_now.getDay()||7)-1));_mon.setHours(0,0,0,0);var _sun=new Date(_mon);_sun.setDate(_mon.getDate()+6);_sun.setHours(23,59,59,999);var _dd=new Date(_rs);md=_dd>=_mon&&_dd<=_sun;}else if(_repRecFilter==='month'){var _dd2=new Date(_rs);md=_dd2.getMonth()===_now.getMonth()&&_dd2.getFullYear()===_now.getFullYear();}else if(_repRecFilter==='year'){var _dd3=new Date(_rs);md=_dd3.getFullYear()===_now.getFullYear();}}
+    return mq&&ms&&md;
   });
-  reps.sort((a,b)=>((a.receivedDate||'')<(b.receivedDate||'')?1:-1));
-  const total=reps.length;
-  const PAGE_SIZE=50;
-  const totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
-  const page=Math.max(1,Math.min(_repPage,totalPages));
-  _repPage=page;
-  const pageReps=reps.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
+  reps.sort((a,b)=>{const da=a.receivedDate||'';const db2=b.receivedDate||'';return da<db2?1:-1;});
   const list=document.getElementById('repair-list');
-  if(!total){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">🔧</div><div>Không có phiếu nào</div></div>`;return;}
-  function addMonths(ds,m){if(!ds||!m)return null;const d=new Date(ds);d.setMonth(d.getMonth()+m);return d.toISOString().slice(0,10);}
-  function toDisp(s){if(!s)return'';const p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
-  const cardsHTML=pageReps.map(r=>{
-    const stCls=(ST_CLASS||{})[r.status]||'b-gy';
+  if(!reps.length){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">🔧</div><div>Không có phiếu nào</div></div>`;return}
+  list.innerHTML=reps.map(r=>{
+    const stCls=ST_CLASS[r.status]||'b-gy';
     const repCost=r.deliveryItems?r.deliveryItems.reduce((s,it)=>s+it.qty*it.price,0):(r.cost||0);
     const remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
     const canDeliver=r.status!=='Đã giao';
     const isAdmin=currentUser?.role==='admin';
     const locked=!isAdmin&&r.status==='Đã giao';
-    const wDate=addMonths(r.deliveredDate,r.warrantyMonths);
-    const delivRow=r.deliveredDate?`<div><b>📆</b> Giao: ${toDisp(r.deliveredDate)}${wDate?' • 🛡️ BH đến '+toDisp(wDate):''}</div>`:'';
     return `<div class="card" style="border-left:4px solid ${r.status==='Đã giao'?'var(--ok)':'var(--pr)'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
-        <div><span class="bx b-bl">${r.id}</span><span class="bx ${stCls}" style="margin-left:6px">${r.status}</span>${locked?'<span class="bx b-gy" style="margin-left:4px">🔒 Đã khóa</span>':''}</div>
+        <div>
+          <span class="bx b-bl">${r.id}</span>
+          <span class="bx ${stCls}" style="margin-left:6px">${r.status}</span>
+          ${locked?'<span class="bx b-gy" style="margin-left:4px">🔒 Đã khóa</span>':''}
+        </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
           ${(!locked&&canDeliver)?`<button class="btn bs bsm" onclick="openDeliverModal('${r.id}')">🚀 Giao máy</button>`:''}
           ${!locked?`<button class="btn bg2 bsm" onclick="openRepairModal('${r.id}')">✏️</button>`:''}
-          <button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(x=>x&&x.id==='${r.id}'))">🖨️ In</button>
+          <button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️ In</button>
           ${!locked?`<button class="btn bd2 bsm" onclick="deleteRepair('${r.id}')">🗑️</button>`:''}
         </div>
       </div>
@@ -1440,24 +1415,19 @@ function renderRepairs(){
         <div><b>👤</b> ${r.customerName} – ${r.phone}</div>
         <div><b>💻</b> ${r.device}${r.serial?` (${r.serial})`:''}</div>
         <div><b>🛠</b> ${r.issue}</div>
-        <div><b>📅</b> Nhận: ${toDisp(r.receivedDate)}</div>
-        ${delivRow}
+        <div><b>📅</b> Nhận: ${isoToDisplay(r.receivedDate)}</div>
+        ${r.deliveredDate?'<div><b>📆</b> Giao: '+isoToDisplay(r.deliveredDate)+(r.warrantyMonths>0?' • '+wBadge(r):'')+' </div>':''}
         <div><b>💰</b> Phí: ${fmtN(repCost)} đ | Cọc: ${fmtN(r.deposit||0)} đ | Còn: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} đ</strong></div>
         ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
         ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
-        ${r.processNote?`<div style="grid-column:1/-1"><b>🔧</b> ${r.processNote}</div>`:''}
+        ${r.processNote?`<div style="grid-column:1/-1"><b>🔧</b> <span style="color:var(--gy);font-style:italic">${r.processNote}</span></div>`:''}
       </div>
-      ${!locked?`<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">CẬP NHẬT TRẠNG THÁI:</div><div class="steps">${(STATUSES||[]).map(s=>`<button class="step${r.status===s?' on':''}" onclick="setRepairStatus('${r.id}','${s}')">${s}</button>`).join('')}</div></div>`:''}
+      ${!locked?`<div style="margin-top:12px">
+        <div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">CẬP NHẬT TRẠNG THÁI:</div>
+        <div class="steps">${STATUSES.map(s=>`<button class="step${r.status===s?' on':''}" onclick="setRepairStatus('${r.id}','${s}')">${s}</button>`).join('')}</div>
+      </div>`:''}
     </div>`;
   }).join('');
-  const pg=page;
-  const paginHTML=totalPages>1?`
-    <div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:18px 0;flex-wrap:wrap">
-      <button class="btn bp" style="padding:7px 16px;opacity:${pg<=1?.4:1}" ${pg<=1?'disabled':''} onclick="_repPage=${pg-1};renderRepairs();window.scrollTo(0,0)">◀ Trước</button>
-      <span style="font-size:13px;color:var(--gy)">Trang <b>${pg}</b> / ${totalPages} &nbsp;·&nbsp; <b>${total}</b> phiếu</span>
-      <button class="btn bp" style="padding:7px 16px;opacity:${pg>=totalPages?.4:1}" ${pg>=totalPages?'disabled':''} onclick="_repPage=${pg+1};renderRepairs();window.scrollTo(0,0)">Sau ▶</button>
-    </div>`:`<div style="text-align:center;padding:10px 0;font-size:13px;color:var(--gy)"><b>${total}</b> phiếu</div>`;
-  list.innerHTML=cardsHTML+paginHTML;
 }
 
 // ══════════════════════════════════════════════
