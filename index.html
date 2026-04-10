@@ -129,11 +129,7 @@ tr:last-child td{border-bottom:none}
 .sw input{padding-left:34px}
 .sw::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px}
 /* TOAST */
-.pw-wrap{position:relative;display:flex;align-items:center}
-.pw-wrap input{flex:1;padding-right:38px}
-.pw-eye{position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:var(--gy);padding:0;line-height:1}
-.pw-eye:hover{color:var(--pr)}
-.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1f2937;color:#fff;padding:11px 22px;border-radius:99px;font-size:13px;font-weight:600;z-index:99999;transition:transform .3s;white-space:nowrap;box-shadow:var(--sh-lg)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1f2937;color:#fff;padding:11px 22px;border-radius:99px;font-size:13px;font-weight:600;z-index:999;transition:transform .3s;white-space:nowrap;box-shadow:var(--sh-lg)}
 .toast.on{transform:translateX(-50%) translateY(0)}
 .toast.ok{background:var(--ok)}.toast.er{background:var(--er)}
 /* STATUS STEPS */
@@ -165,6 +161,7 @@ tr:last-child td{border-bottom:none}
 }
 ::-webkit-scrollbar{width:5px;height:5px}
 ::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+.pw-wrap{position:relative;display:flex;align-items:center}.pw-wrap input{flex:1;padding-right:38px}.pw-eye{position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:16px;color:#999;padding:0;line-height:1}.pw-eye:hover{color:#c0392b}
 </style>
 </head>
 <body>
@@ -307,6 +304,7 @@ tr:last-child td{border-bottom:none}
     <div class="sw" style="flex:1;margin:0">
       <input type="text" id="cust-search" placeholder="Tìm tên, SĐT..." oninput="renderCustomers()">
     </div>
+    <button class="btn bpu" onclick="quickPhoneLookup()">📞 Tra SĐT</button>
     <button class="btn bp" onclick="openCustModal()">➕ Thêm KH</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
@@ -536,7 +534,7 @@ tr:last-child td{border-bottom:none}
     <div class="login-sub">Đăng nhập để tiếp tục</div>
     <div class="fg" style="margin-bottom:10px;text-align:left">
       <label>Tên đăng nhập</label>
-      <input id="li-user" type="text" placeholder="admin" onkeydown="if(event.key==='Enter')login()">
+      <input id="li-user" type="text" placeholder="" onkeydown="if(event.key==='Enter')login()">
     </div>
     <div class="fg" style="margin-bottom:18px;text-align:left">
       <label>Mật khẩu</label>
@@ -546,6 +544,7 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
     <button class="btn bp bbl" onclick="login()" style="padding:12px">🔐 Đăng nhập</button>
+    <div style="font-size:10px;color:var(--gy);margin-top:12px">Mặc định: admin / admin123</div>
   </div>
 </div>
 
@@ -610,12 +609,7 @@ tr:last-child td{border-bottom:none}
       <input type="hidden" id="um-oid">
       <div class="fg" style="margin-bottom:10px"><label>Tên hiển thị *</label><input id="um-name" placeholder="Nguyễn Văn A"></div>
       <div class="fg" style="margin-bottom:10px"><label>Tên đăng nhập *</label><input id="um-username" placeholder="nhanvien1"></div>
-      <div class="fg" style="margin-bottom:10px"><label>Mật khẩu *</label>
-        <div class="pw-wrap">
-          <input id="um-pass" type="password" placeholder="••••••">
-          <button class="pw-eye" type="button" onclick="togglePw('um-pass',this)" tabindex="-1">👁️</button>
-        </div>
-      </div>
+      <div class="fg" style="margin-bottom:10px"><label>Mật khẩu *</label><input id="um-pass" type="password" placeholder="••••••"></div>
       <div class="fg"><label>Phân quyền</label>
         <select id="um-role"><option value="staff">Nhân viên</option><option value="admin">Admin</option></select>
       </div>
@@ -827,25 +821,6 @@ const DB = {
           try { localStorage.setItem('l24_' + this._LS[k], JSON.stringify(this._d[k])); } catch(e){}
           reRenderCurrent();
         });
-      });
-      // Real-time listener cho users – đồng bộ mọi thiết bị
-      this._fb.ref('users').on('value', snap => {
-        const val = snap.val();
-        const users = Array.isArray(val) ? val : (val ? Object.values(val) : []);
-        if(users && users.length){
-          _usersCache = users;
-          try{localStorage.setItem('l24_users', JSON.stringify(users));}catch(e){}
-        } else {
-          // Firebase chưa có users → đẩy defaults lên
-          const defs = DEFAULT_USERS.map(u=>Object.assign({},u));
-          _usersCache = defs;
-          try{localStorage.setItem('l24_users', JSON.stringify(defs));}catch(e){}
-          this._fb.ref('users').set(defs).catch(()=>{});
-        }
-      }, err => {
-        // Lỗi quyền truy cập Firebase → dùng localStorage thay thế
-        console.warn('Firebase users lỗi (dùng localStorage):', err.code, err.message);
-        if(!_usersCache) initDefaultUsers();
       });
     } catch(e){
       console.warn('Firebase lỗi:', e);
@@ -1197,9 +1172,6 @@ function printRepairBill(rep){
         </div>
       </div>
     </div>`:''}
-    <div style="margin:8px 0;padding:6px 8px;border:1px dashed #aaa;border-radius:4px;font-size:10px;color:#555;line-height:1.5;text-align:center">
-      ⚠️ Dữ liệu cá nhân quí khách vui lòng tự sao lưu, hoặc thông báo cho nhân viên tiếp nhận.
-    </div>
     <div class="tk" style="white-space:pre-line">${BSr.footerRepair||BILL_DEFAULTS.footerRepair}</div>
     </div></div>`;
   const pa=document.getElementById('pa');
@@ -1839,78 +1811,38 @@ function printDeliverBill(){
 // ══════════════════════════════════════════════
 let currentUser=null;
 
-const DEFAULT_USERS=[
-  {id:'u1',name:'Admin',username:'admin',password:'admin123',role:'admin'},
-  {id:'u2',name:'Nhân viên',username:'nhanvien',password:'nv123',role:'staff'},
-];
-let _usersCache=null; // in-memory cache, populated from Firebase or localStorage
-
 function getUsers(){
-  if(_usersCache&&_usersCache.length) return _usersCache;
-  try{
-    const d=JSON.parse(localStorage.getItem('l24_users')||'null');
-    if(Array.isArray(d)&&d.length){_usersCache=d;return d;}
-    return null;
-  }catch{return null;}
+  try{return JSON.parse(localStorage.getItem('l24_users')||'null');}catch{return null;}
 }
 function setUsers(arr){
-  _usersCache=arr;
-  try{localStorage.setItem('l24_users',JSON.stringify(arr));}catch(e){console.warn('localStorage không khả dụng:',e);}
-  // Đồng bộ lên Firebase giống dữ liệu bán hàng
-  if(DB._fb&&DB._online){
-    DB._fb.ref('users').set(arr).catch(e=>console.warn('Sync users lỗi:',e));
-  }
+  try{localStorage.setItem('l24_users',JSON.stringify(arr));}catch{}
 }
 function initDefaultUsers(){
   if(!getUsers()){
-    const defs=DEFAULT_USERS.map(u=>Object.assign({},u));
-    setUsers(defs);
+    setUsers([
+      {id:'u1',name:'Admin',username:'admin',password:'admin123',role:'admin'},
+      {id:'u2',name:'Nhân viên',username:'nhanvien',password:'nv123',role:'staff'},
+    ]);
   }
 }
 
-function togglePw(id, btn){
-  const inp=document.getElementById(id);
-  const show=inp.type==='password';
+function togglePw(id,btn){
+  var inp=document.getElementById(id);
+  var show=inp.type==='password';
   inp.type=show?'text':'password';
-  btn.textContent=show?'🙈':'👁️';
-}
-
-function doLogin(uname, pass){
-  const users=getUsers()||DEFAULT_USERS;
-  const matched=users.find(x=>x.username===uname);
-  if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
-  if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
-  currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
-  try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch{}
-  document.getElementById('login-overlay').style.display='none';
-  applyRoleUI();
+  btn.textContent=show?'🙈':'👁';
 }
 
 function login(){
   const uname=(document.getElementById('li-user').value||'').trim();
   const pass=document.getElementById('li-pass').value||'';
-  if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
-
-  // Nếu cache chưa có (Firebase chưa kịp trả về) → đọc thẳng từ Firebase 1 lần
-  if(!_usersCache && DB._fb){
-    toast('⏳ Đang xác thực...','');
-    DB._fb.ref('users').once('value')
-      .then(snap=>{
-        const val=snap.val();
-        const arr=Array.isArray(val)?val:(val?Object.values(val):[]);
-        if(arr&&arr.length) _usersCache=arr;
-        else initDefaultUsers();
-        doLogin(uname,pass);
-      })
-      .catch(()=>{
-        initDefaultUsers();
-        doLogin(uname,pass);
-      });
-    return;
-  }
-
-  initDefaultUsers();
-  doLogin(uname,pass);
+  const users=getUsers()||[];
+  const u=users.find(x=>x.username===uname&&x.password===pass);
+  if(!u){toast('Sai tên đăng nhập hoặc mật khẩu!','er');return;}
+  currentUser={id:u.id,name:u.name,username:u.username,role:u.role};
+  try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch{}
+  document.getElementById('login-overlay').style.display='none';
+  applyRoleUI();
 }
 
 function logout(){
@@ -2139,3 +2071,59 @@ function showCustHistory(nameOrPhone){
 
   let html = `<div style="background:var(--pr-l);padding:12px;border-radius:var(--rs);margin-bottom:14px;font-size:13px">
     <b>👤 ${cust?cust.name:nameOrPhone}</b>${cust&&cust.phone?' &nbsp;|&nbsp; 📞 '+cust.phone:''}
+    ${cust&&cust.address?'<br>📍 '+cust.address:''}
+    <div style="margin-top:6px;display:flex;gap:16px;font-size:12px">
+      <span>🛒 Mua hàng: <b>${sales.length} lần</b> – Tổng: <b style="color:var(--pr-d)">${fmtN(totalBuy)} đ</b></span>
+      <span>🔧 Sửa chữa: <b>${repairs.length} lần</b> – Tổng: <b style="color:var(--pu)">${fmtN(totalRepair)} đ</b></span>
+    </div>
+  </div>`;
+
+  if(sales.length>0){
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pr-d);margin-bottom:8px">🛒 Lịch sử mua hàng (${sales.length})</div>`;
+    html += `<div class="tw" style="margin-bottom:14px"><table>
+      <thead><tr><th>Ngày</th><th>Số bill</th><th>Sản phẩm</th><th class="tr">Tổng tiền</th><th>Thanh toán</th><th class="tc">In</th></tr></thead>
+      <tbody>${sales.map(s=>`<tr>
+        <td>${s.date}</td>
+        <td><span class="bx b-bl">${s.billNo}</span></td>
+        <td style="font-size:11px">${(s.items||[]).map(it=>it.name||it.code).join(', ')}</td>
+        <td class="tr"><strong>${fmtN(s.total)} đ</strong></td>
+        <td><span class="bx ${s.paymethod==='Công nợ'?'b-rd':'b-gn'}">${s.paymethod||'TM'}</span></td>
+        <td class="tc"><button class="btn bg2 bsm" onclick="printSaleBill(DB.sales.find(x=>x.billNo==='${s.billNo}'))">🖨️</button></td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  if(repairs.length>0){
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pu);margin-bottom:8px">🔧 Lịch sử sửa chữa (${repairs.length})</div>`;
+    html += `<div class="tw"><table>
+      <thead><tr><th>Ngày nhận</th><th>Mã phiếu</th><th>Thiết bị</th><th>Tình trạng</th><th>Trạng thái</th><th class="tc">In</th></tr></thead>
+      <tbody>${repairs.map(r=>`<tr>
+        <td>${isoToDisplay(r.receivedDate)}</td>
+        <td><span class="bx b-pu">${r.id}</span></td>
+        <td style="font-size:11px"><strong>${r.device}</strong>${r.serial?'<br>'+r.serial:''}</td>
+        <td style="font-size:11px">${r.issue}</td>
+        <td><span class="bx ${ST_CLASS[r.status]||'b-gy'}">${r.status}</span></td>
+        <td class="tc">${r.status==='Đã giao'?`<button class="btn bg2 bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️</button>`:'—'}</td>
+      </tr>`).join('')}</tbody>
+    </table></div>`;
+  }
+
+  if(!sales.length&&!repairs.length){
+    html += `<div style="text-align:center;padding:40px;color:var(--gy)">Chưa có giao dịch nào</div>`;
+  }
+
+  document.getElementById('mo-cust-hist-title').textContent = `📋 Lịch sử: ${cust?cust.name:nameOrPhone}`;
+  document.getElementById('mo-cust-hist-body').innerHTML = html;
+  openMo('mo-cust-hist');
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+DB.initFirebase();           // Load local cache + connect Firebase
+initSale();
+refreshCustLists();
+checkSession();              // Login check (must be after DB init)
+</script>
+</body>
+</html>
