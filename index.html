@@ -295,6 +295,9 @@ tr:last-child td{border-bottom:none}
       <option value="asc">📅 Cũ nhất</option>
     </select>
     <button class="btn bp" onclick="openRepairModal()">➕ Nhận máy</button>
+  <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">📥 Nhập CSV</button>
+  <button class="btn b-gy bsm" onclick="downloadImportTemplate()">📋 Mẫu</button>
+  <input type="file" id="import-rep-inp" accept=".csv,.xlsx" style="display:none" onchange="importRepairsCSV(this)">
   <button class="btn bd2 bsm" onclick="exportRepairs()">📊 Xuất Excel</button>
   </div>
 
@@ -1344,6 +1347,7 @@ function renderRepairs(){
         <div><b>💻</b> ${r.device}${r.serial?` (${r.serial})`:''}</div>
         <div><b>🛠</b> ${r.issue}</div>
         <div><b>📅</b> Nhận: ${isoToDisplay(r.receivedDate)}</div>
+        ${r.deliveredDate?'<div><b>📆</b> Giao: '+isoToDisplay(r.deliveredDate)+(r.warrantyMonths>0?' • '+wBadge(r):'')+' </div>':''}
         <div><b>💰</b> Phí: ${fmtN(repCost)} đ | Cọc: ${fmtN(r.deposit||0)} đ | Còn: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} đ</strong></div>
         ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
         ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
@@ -2255,6 +2259,73 @@ function exportRepairs(){
   var d=new Date(),dn=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
   XLSX.writeFile(wb,"SuaChua_"+dn+".xlsx");
   toast("Đã xuất Excel sữa chữa!");
+}
+
+function wBadge(r){
+  if(!r.deliveredDate||!r.warrantyMonths||r.warrantyMonths<=0)return '';
+  var exp=new Date(r.deliveredDate);
+  exp.setMonth(exp.getMonth()+parseInt(r.warrantyMonths));
+  var d=Math.ceil((exp-new Date())/(864e5));
+  if(d<=0)return '<span style="color:var(--gy)">🛡️ Hết BH</span>';
+  if(d<=30)return '<span style="color:var(--ac)">🛡️ Còn '+d+' ngày BH</span>';
+  return '<span style="color:var(--ok)">🛡️ BH đến '+isoToDisplay(exp.toISOString().slice(0,10))+'</span>';
+}
+function importRepairsCSV(inp){
+  var f=inp.files[0];if(!f)return;inp.value='';
+  var reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length){toast('File trống hoặc không đọc được!','er');return;}
+      var imported=0,skipped=0;
+      rows.forEach(function(row){
+        var name=String(row['Khách Hàng']||row['Ho Ten']||row['Ten KH']||row['customerName']||'').trim();
+        var phone=String(row['SĐT']||row['SDT']||row['phone']||row['So DT']||'').trim();
+        if(!name&&!phone){skipped++;return;}
+        var r={};
+        r.id='SC'+Date.now()+String(Math.floor(Math.random()*9000)+1000);
+        r.customerName=name;
+        r.phone=phone;
+        r.address=String(row['Địa Chỉ']||row['Dia Chi']||row['address']||'').trim();
+        r.device=String(row['Thiết Bị']||row['Thiet Bi']||row['device']||'').trim();
+        r.serial=String(row['Serial']||row['serial']||'').trim();
+        r.issue=String(row['Tình Trạng']||row['Tinh Trang']||row['issue']||'').trim();
+        r.status=String(row['Trạng Thái']||row['Trang Thai']||row['status']||'Mới nhận').trim();
+        var validSt=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
+        if(!validSt.includes(r.status))r.status='Mới nhận';
+        r.receivedDate=parseDateImport(row['Ngày Nhận']||row['Ngay Nhan']||row['receivedDate']||'');
+        r.deliveredDate=parseDateImport(row['Ngày Giao']||row['Ngay Giao']||row['deliveredDate']||'');
+        r.cost=parseFloat(String(row['Chi Phí (đ)']||row['Chi Phi']||row['cost']||0).replace(/[^\d.]/g,''))||0;
+        r.deposit=parseFloat(String(row['Tiền Cọ (đ)']||row['Tien Coc']||row['deposit']||0).replace(/[^\d.]/g,''))||0;
+        r.warrantyMonths=parseInt(String(row['BH (tháng)']||row['Bao Hanh']||row['warrantyMonths']||0))||0;
+        r.techName=String(row['KTV']||row['techName']||'').trim();
+        r.note=String(row['Ghi Chú']||row['Ghi Chu']||row['note']||'').trim();
+        r.deliveryItems=r.cost>0?[{name:'Dịch vụ',qty:1,price:r.cost}]:[];
+        DB.repairs.push(r);imported++;
+      });
+      if(imported>0){saveDB();renderRepairs();toast('Đã nhập '+imported+' phiếu'+(skipped>0?', bỏ qua '+skipped+' dòng trống':'')+'!');}
+      else toast('Không có dữ liệu hợp lệ! Cột cần có: Khách Hàng, SĐT','er');
+    }catch(err){toast('Lỗi đọc file: '+err.message,'er');}
+  };
+  reader.readAsArrayBuffer(f);
+}
+function parseDateImport(v){
+  if(!v)return '';
+  var s=String(v).trim();
+  var m=s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if(m){var y=m[3].length===2?'20'+m[3]:m[3];return y+'-'+m[2].padStart(2,'0')+'-'+m[1].padStart(2,'0');}
+  if(s.match(/^\d{4}-\d{2}-\d{2}$/))return s;
+  if(!isNaN(Number(s))&&Number(s)>40000){var d=new Date((Number(s)-25569)*86400*1000);return d.toISOString().slice(0,10);}
+  return '';
+}
+function downloadImportTemplate(){
+  var ws=XLSX.utils.json_to_sheet([{'Khách Hàng':'Nguyễn Văn A','SĐT':'0901234567','Địa Chỉ':'123 Đường ABC','Thiết Bị':'Laptop Dell','Serial':'ABC123','Tình Trạng':'Màn hình vỡ','Ngày Nhận':'01/04/2026','Ngày Giao':'05/04/2026','Trạng Thái':'Đã giao','Chi Phí (đ)':500000,'Tiền Cọ (đ)':200000,'BH (tháng)':3,'KTV':'','Ghi Chú':''}]);
+  ws['!cols']=[{wch:22},{wch:14},{wch:22},{wch:20},{wch:14},{wch:25},{wch:13},{wch:13},{wch:14},{wch:13},{wch:13},{wch:10},{wch:10},{wch:20}];
+  var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'PhieuSuaChua');
+  XLSX.writeFile(wb,'Mau_NhapPhieu.xlsx');
+  toast('Tải mẫu thành công!');
 }
 </script>
 </body>
