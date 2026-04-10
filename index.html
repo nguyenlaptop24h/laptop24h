@@ -609,7 +609,7 @@ tr:last-child td{border-bottom:none}
       <input type="hidden" id="um-oid">
       <div class="fg" style="margin-bottom:10px"><label>Tên hiển thị *</label><input id="um-name" placeholder="Nguyễn Văn A"></div>
       <div class="fg" style="margin-bottom:10px"><label>Tên đăng nhập *</label><input id="um-username" placeholder="nhanvien1"></div>
-      <div class="fg" style="margin-bottom:10px"><label>Mật khẩu *</label><input id="um-pass" type="password" placeholder="••••••"></div>
+      <div class="fg" style="margin-bottom:10px"><label>Mật khẩu *</label><div class="pw-wrap"><input id="um-pass" type="password" placeholder="••••••"><button class="pw-eye" type="button" onclick="togglePw('um-pass',this)" tabindex="-1">👁️</button></div></div>
       <div class="fg"><label>Phân quyền</label>
         <select id="um-role"><option value="staff">Nhân viên</option><option value="admin">Admin</option></select>
       </div>
