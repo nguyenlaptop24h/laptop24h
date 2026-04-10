@@ -1840,17 +1840,28 @@ function login(){
   var remember=document.getElementById('li-remember').checked;
   if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
   if(!pass){toast('Vui lòng nhập mật khẩu!','er');return;}
-  initDefaultUsers();
-  var users=getUsers();
-  var matched=users?users.find(function(x){return x.username===uname;}):null;
-  if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
-  if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
-  if(remember){localStorage.setItem('l24_rem_u',uname);localStorage.setItem('l24_rem_p',pass);}
-  else{localStorage.removeItem('l24_rem_u');localStorage.removeItem('l24_rem_p');}
-  currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
-  try{localStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
-  document.getElementById('login-overlay').style.display='none';
-  applyRoleUI();
+  function doLogin(users){
+    var matched=users?users.find(function(x){return x.username===uname;}):null;
+    if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
+    if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
+    if(remember){localStorage.setItem('l24_rem_u',uname);localStorage.setItem('l24_rem_p',pass);}
+    else{localStorage.removeItem('l24_rem_u');localStorage.removeItem('l24_rem_p');}
+    currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
+    try{localStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
+    document.getElementById('login-overlay').style.display='none';
+    applyRoleUI();
+  }
+  try{
+    toast('⏳ Đang xác thực...','');
+    firebase.database().ref('users').once('value')
+      .then(function(snap){
+        var val=snap.val();
+        var arr=Array.isArray(val)?val:(val?Object.values(val):[]);
+        if(arr&&arr.length){setUsers(arr);doLogin(arr);}
+        else{initDefaultUsers();doLogin(getUsers());}
+      })
+      .catch(function(){initDefaultUsers();doLogin(getUsers());});
+  }catch(e){initDefaultUsers();doLogin(getUsers());}
 }
 
 function logout(){
