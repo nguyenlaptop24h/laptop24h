@@ -543,6 +543,7 @@ tr:last-child td{border-bottom:none}
         <button class="pw-eye" type="button" onclick="togglePw('li-pass',this)" tabindex="-1">👁️</button>
       </div>
     </div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;text-align:left"><input type="checkbox" id="li-remember" style="width:15px;height:15px;cursor:pointer;accent-color:var(--pr)"><label for="li-remember" style="font-size:12px;color:#666;cursor:pointer;margin:0">Lưu tài khoản</label></div>
     <button class="btn bp bbl" onclick="login()" style="padding:12px">🔐 Đăng nhập</button>
     
   </div>
@@ -1836,6 +1837,7 @@ function togglePw(id,btn){
 function login(){
   var uname=(document.getElementById('li-user').value||'').trim();
   var pass=document.getElementById('li-pass').value||'';
+  var remember=document.getElementById('li-remember').checked;
   if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
   if(!pass){toast('Vui lòng nhập mật khẩu!','er');return;}
   initDefaultUsers();
@@ -1843,6 +1845,8 @@ function login(){
   var matched=users?users.find(function(x){return x.username===uname;}):null;
   if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
   if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
+  if(remember){localStorage.setItem('l24_rem_u',uname);localStorage.setItem('l24_rem_p',pass);}
+  else{localStorage.removeItem('l24_rem_u');localStorage.removeItem('l24_rem_p');}
   currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
   try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
   document.getElementById('login-overlay').style.display='none';
@@ -1889,6 +1893,16 @@ function checkSession(){
 // USER MANAGEMENT
 // ══════════════════════════════════════════════
 let editUserId=null;
+function autoFillLogin(){
+  var u=localStorage.getItem('l24_rem_u');
+  var p=localStorage.getItem('l24_rem_p');
+  if(u){
+    document.getElementById('li-user').value=u;
+    document.getElementById('li-pass').value=p||'';
+    document.getElementById('li-remember').checked=true;
+  }
+}
+
 function openUserModal(id){
   editUserId=id||null;
   document.getElementById('mo-user-title').textContent=id?'✏️ Sửa người dùng':'➕ Thêm người dùng';
@@ -2127,7 +2141,8 @@ function showCustHistory(nameOrPhone){
 DB.initFirebase();           // Load local cache + connect Firebase
 initSale();
 refreshCustLists();
-checkSession();              // Login check (must be after DB init)
+checkSession();
+autoFillLogin();              // Login check (must be after DB init)
 </script>
 </body>
 </html>
