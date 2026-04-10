@@ -1020,6 +1020,33 @@ function saveSale(){
 }
 
 // ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// PRINT HELPER – popup window (loại bỏ header/footer của Chrome)
+// ══════════════════════════════════════════════
+function doPrint(html){
+  var css=`@page{size:A5 portrait;margin:0}body{margin:8mm;font-family:Arial,sans-serif}
+.pb{font-family:Arial,sans-serif;color:#111;max-width:100%}
+.pb .sn{font-size:19px;font-weight:800;text-align:center;color:#1e3a8a}
+.pb .ss{font-size:10px;text-align:center;color:#555;margin-bottom:3px}
+.pb hr{border:1.5px solid #1e3a8a;margin:7px 0}
+.pb .bt2{text-align:center;font-size:15px;font-weight:800;letter-spacing:1px;margin:6px 0}
+.pb .ir{display:flex;justify-content:space-between;font-size:11px;margin:2px 0}
+.pb table{width:100%;border-collapse:collapse;margin:6px 0;font-size:11px}
+.pb th{background:#1e3a8a;color:#fff;padding:5px 7px}
+.pb td{padding:4px 7px;border-bottom:1px dashed #ddd}
+.pb .sr2{display:flex;justify-content:space-between;font-size:12px;padding:3px 0}
+.pb .tf{background:#1e3a8a;color:#fff;padding:7px 11px;border-radius:5px;display:flex;justify-content:space-between;font-size:14px;font-weight:800;margin-top:5px}
+.pb .wbox{border:2px solid #1e3a8a;border-radius:7px;padding:10px;margin-top:10px}
+.pb .wt{font-size:12px;font-weight:800;color:#1e3a8a;margin-bottom:4px}
+.pb .wi{font-size:10px;color:#333;line-height:1.5}
+.pb .sg{display:flex;justify-content:space-around;margin-top:16px;font-size:10px;text-align:center;color:#555}
+.pb .tk{text-align:center;font-size:10px;color:#555;margin-top:10px;font-style:italic}`;
+  var w=window.open('','_blank','width=600,height=900,left=100,top=100');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>'+css+'</style></head><body>'+html+'</body></html>');
+  w.document.close();
+  setTimeout(function(){w.focus();w.print();setTimeout(function(){w.close();},800);},300);
+}
+// ══════════════════════════════════════════════
 // PRINT BILLS
 // ══════════════════════════════════════════════
 function printSaleBill(sale){
@@ -1104,10 +1131,7 @@ function printSaleBill(sale){
     <div class="tk" style="white-space:pre-line">${(BS.footerSale||BILL_DEFAULTS.footerSale)}</div>
     </div></div>`;
 
-  const pa=document.getElementById('pa');
-  pa.style.display='block'; pa.innerHTML=html;
-  window.print();
-  setTimeout(()=>{pa.style.display='none'},500);
+  doPrint(html);
 }
 
 function printRepairBill(rep){
@@ -1179,10 +1203,7 @@ function printRepairBill(rep){
     </div>`:''}
     <div class="tk" style="white-space:pre-line">${BSr.footerRepair||BILL_DEFAULTS.footerRepair}</div>
     </div></div>`;
-  const pa=document.getElementById('pa');
-  pa.style.display='block'; pa.innerHTML=html;
-  window.print();
-  setTimeout(()=>{pa.style.display='none'},500);
+  doPrint(html);
 }
 
 // ══════════════════════════════════════════════
