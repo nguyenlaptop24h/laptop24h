@@ -1082,7 +1082,8 @@ function doPrint(html){
 .pb .sg{display:flex;justify-content:space-around;margin-top:16px;font-size:10px;text-align:center;color:#555}
 .pb .tk{text-align:center;font-size:10px;color:#555;margin-top:10px;font-style:italic}`;
   var w=window.open('','_blank','width=600,height=900,left=100,top=100');
-  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>'+css+'</style></head><body>'+html+'</body></html>');
+  w.document.write('<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill</title><style>'+css+'</style></head><body>'+html+'<script src="patch.js"></script>
+</body></html>');
   w.document.close();
   setTimeout(function(){w.focus();w.print();setTimeout(function(){w.close();},800);},300);
 }
