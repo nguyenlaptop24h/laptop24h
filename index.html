@@ -736,6 +736,7 @@ tr:last-child td{border-bottom:none}
         <div class="fg"><label>Kỹ thuật viên</label><input id="rm-tech" placeholder="Tên KTV..."></div>
       </div>
       <div class="fg"><label>Ghi chú nội bộ</label><textarea id="rm-note" placeholder="Chỉ nhân viên thấy..."></textarea></div>
+      <div class="fg admin-only"><label>🔧 Mô tả xử lí (nội bộ)</label><textarea id="rm-process" placeholder="Quy trình xử lí, linh kiện thay, lỗi phát sinh..."></textarea></div>
     </div>
     <div class="mf"><button class="btn bg2" onclick="closeMo('mo-repair')">Hủy</button><button class="btn bp" onclick="saveRepair()">💾 Lưu phiếu</button></div>
   </div>
@@ -1251,6 +1252,7 @@ function openRepairModal(id){
     document.getElementById('rm-warranty').value=r.warrantyMonths||0;
     document.getElementById('rm-tech').value=r.techName||'';
     document.getElementById('rm-note').value=r.note||'';
+    document.getElementById('rm-process').value=r.processNote||'';
   } else {
     fields.forEach(f=>document.getElementById(f).value='');
     document.getElementById('rm-in').value=todayISO();
@@ -1284,6 +1286,7 @@ function saveRepair(){
     warrantyMonths:parseInt(document.getElementById('rm-warranty').value)||0,
     techName:document.getElementById('rm-tech').value,
     note:document.getElementById('rm-note').value,
+    processNote:document.getElementById('rm-process').value,
     ts:Date.now(),
   };
   const idx=reps.findIndex(r=>r.id===rep.id);
