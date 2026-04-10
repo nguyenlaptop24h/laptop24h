@@ -1894,16 +1894,17 @@ function applyRoleUI(){
 function checkSession(){
   initDefaultUsers();
   try{
-    const s=localStorage.getItem('l24_session');
-    if(s){currentUser=JSON.parse(s);applyRoleUI();return;}
-  }catch{}
+    var s=localStorage.getItem('l24_session');
+    if(s){
+      currentUser=JSON.parse(s);
+      document.getElementById('login-overlay').style.display='none';
+      applyRoleUI();
+      return;
+    }
+  }catch(e){}
   document.getElementById('login-overlay').style.display='flex';
 }
 
-// ══════════════════════════════════════════════
-// USER MANAGEMENT
-// ══════════════════════════════════════════════
-let editUserId=null;
 function autoFillLogin(){
   var u=localStorage.getItem('l24_rem_u');
   var p=localStorage.getItem('l24_rem_p');
