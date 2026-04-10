@@ -290,11 +290,13 @@ tr:last-child td{border-bottom:none}
       <option>Đang sửa</option><option>Chờ linh kiện</option>
       <option>Hoàn thành</option><option>Đã giao</option>
     </select>
-    <button class="btn bsm bp"  id="rsf-all"   onclick="setRepFilter('')">Tất cả</button>
-    <button class="btn bsm bg2" id="rsf-day"   onclick="setRepFilter('day')">Hôm nay</button>
-    <button class="btn bsm bg2" id="rsf-week"  onclick="setRepFilter('week')">Tuần này</button>
-    <button class="btn bsm bg2" id="rsf-month" onclick="setRepFilter('month')">Tháng này</button>
-    <button class="btn bsm bg2" id="rsf-year"  onclick="setRepFilter('year')">Năm nay</button>
+    <select id="rsf-select" onchange="setRepFilter(this.value)" style="height:32px;border-radius:6px;border:1px solid var(--bdr);padding:0 8px;font-size:13px;background:var(--card);color:var(--tx);cursor:pointer">
+      <option value="">Tất cả ngày</option>
+      <option value="day">Hôm nay</option>
+      <option value="week">Tuần này</option>
+      <option value="month">Tháng này</option>
+      <option value="year">Năm nay</option>
+    </select>
     <button class="btn bp" onclick="openRepairModal()">➕ Nhận máy</button>
   <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">📥 Nhập CSV</button>
   <button class="btn b-gy bsm" onclick="downloadImportTemplate()">📋 Mẫu</button>
@@ -1369,7 +1371,7 @@ function deleteRepair(id){
 var _repRecFilter='';
 function setRepFilter(v){
   _repRecFilter=v;
-  ['all','day','week','month','year'].forEach(function(k){var b=document.getElementById('rsf-'+k);if(b)b.className='btn bsm '+((v===''&&k==='all')||(v===k)?'bp':'bg2');});
+  var sel=document.getElementById('rsf-select');if(sel)sel.value=v;
   renderRepairs();
 }
 function renderRepairs(){
