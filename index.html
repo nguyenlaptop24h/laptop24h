@@ -386,7 +386,7 @@ tr:last-child td{border-bottom:none}
     <div class="sw" style="flex:1;margin:0">
       <input type="text" id="hist-search" placeholder="Tìm tên khách, SĐT, số bill..." oninput="renderHistory()">
     </div>
-    <button class="btn bd2 bsm" onclick="if(confirm('Xóa toàn bộ lịch sử?')){DB.sales=[];renderHistory();toast('Đã xóa')}">🗑️ Xóa hết</button>
+    <button class="btn bd2 bsm admin-only" onclick="if(confirm('Xóa toàn bộ lịch sử?')){DB.sales=[];renderHistory();toast('Đã xóa')}">🗑️ Xóa hết</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
@@ -1320,18 +1320,20 @@ function renderRepairs(){
     const repCost=r.deliveryItems?r.deliveryItems.reduce((s,it)=>s+it.qty*it.price,0):(r.cost||0);
     const remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
     const canDeliver=r.status!=='Đã giao';
+    const isAdmin=currentUser?.role==='admin';
+    const locked=!isAdmin&&r.status==='Đã giao';
     return `<div class="card" style="border-left:4px solid ${r.status==='Đã giao'?'var(--ok)':'var(--pr)'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
         <div>
           <span class="bx b-bl">${r.id}</span>
           <span class="bx ${stCls}" style="margin-left:6px">${r.status}</span>
-          ${overdue?'<span class="bx b-rd" style="margin-left:4px">⚠ Trễ hẹn</span>':''}
+          ${locked?'<span class="bx b-gy" style="margin-left:4px">🔒 Đã khóa</span>':''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${canDeliver?`<button class="btn bs bsm" onclick="openDeliverModal('${r.id}')">🚀 Giao máy</button>`:''}
-          <button class="btn bg2 bsm" onclick="openRepairModal('${r.id}')">✏️</button>
+          ${(!locked&&canDeliver)?`<button class="btn bs bsm" onclick="openDeliverModal('${r.id}')">🚀 Giao máy</button>`:''}
+          ${!locked?`<button class="btn bg2 bsm" onclick="openRepairModal('${r.id}')">✏️</button>`:''}
           <button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️ In</button>
-          <button class="btn bd2 bsm" onclick="deleteRepair('${r.id}')">🗑️</button>
+          ${!locked?`<button class="btn bd2 bsm" onclick="deleteRepair('${r.id}')">🗑️</button>`:''}
         </div>
       </div>
       <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">
@@ -1343,10 +1345,10 @@ function renderRepairs(){
         ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
         ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
       </div>
-      <div style="margin-top:12px">
+      ${!locked?`<div style="margin-top:12px">
         <div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">CẬP NHẬT TRẠNG THÁI:</div>
         <div class="steps">${STATUSES.map(s=>`<button class="step${r.status===s?' on':''}" onclick="setRepairStatus('${r.id}','${s}')">${s}</button>`).join('')}</div>
-      </div>
+      </div>`:''}
     </div>`;
   }).join('');
 }
