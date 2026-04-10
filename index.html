@@ -290,23 +290,16 @@ tr:last-child td{border-bottom:none}
       <option>Đang sửa</option><option>Chờ linh kiện</option>
       <option>Hoàn thành</option><option>Đã giao</option>
     </select>
-    <select id="rep-sort" onchange="renderRepairs()" style="width:auto;padding:9px 11px">
-      <option value="desc">📅 Mới nhất</option>
-      <option value="asc">📅 Cũ nhất</option>
-    </select>
+    <button class="btn bsm bp"  id="rsf-all"   onclick="setRepFilter('')">Tất cả</button>
+    <button class="btn bsm bg2" id="rsf-day"   onclick="setRepFilter('day')">Hôm nay</button>
+    <button class="btn bsm bg2" id="rsf-week"  onclick="setRepFilter('week')">Tuần này</button>
+    <button class="btn bsm bg2" id="rsf-month" onclick="setRepFilter('month')">Tháng này</button>
+    <button class="btn bsm bg2" id="rsf-year"  onclick="setRepFilter('year')">Năm nay</button>
     <button class="btn bp" onclick="openRepairModal()">➕ Nhận máy</button>
   <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">📥 Nhập CSV</button>
   <button class="btn b-gy bsm" onclick="downloadImportTemplate()">📋 Mẫu</button>
   <input type="file" id="import-rep-inp" accept=".csv,.xlsx" style="display:none" onchange="importRepairsCSV(this)">
   <button class="btn bd2 bsm" onclick="exportRepairs()">📊 Xuất Excel</button>
-  </div>
-  <div id="rep-date-row" style="display:none;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
-    <span style="font-size:12px;color:var(--gy)">📅 Đã giao:</span>
-    <button class="btn bsm bp"  id="rdf-all"   onclick="setRepDateFilter('')">Tất cả</button>
-    <button class="btn bsm bg2" id="rdf-day"   onclick="setRepDateFilter('day')">Hôm nay</button>
-    <button class="btn bsm bg2" id="rdf-week"  onclick="setRepDateFilter('week')">Tuần này</button>
-    <button class="btn bsm bg2" id="rdf-month" onclick="setRepDateFilter('month')">Tháng này</button>
-    <button class="btn bsm bg2" id="rdf-year"  onclick="setRepDateFilter('year')">Năm nay</button>
   </div>
 
   <!-- Repair cards -->
@@ -444,6 +437,23 @@ tr:last-child td{border-bottom:none}
       </div>
     </div>
     <div id="repair-profit-body"></div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL: MÔ TẢ XỬ LÍ KHI HOÀN THÀNH       -->
+<!-- ══════════════════════════════════════════ -->
+<div class="mo" id="mo-procnote">
+  <div class="mw" style="max-width:460px">
+    <div class="mh"><div class="mt2">✅ Hoàn thành – Mô tả xử lí</div><button class="btn bg2 bsm" onclick="closeMo('mo-procnote')">✕</button></div>
+    <div class="mb2">
+      <input type="hidden" id="pn-repid">
+      <div class="fg"><label>Mô tả công việc đã xử lí (nội bộ)</label><textarea id="pn-note" rows="4" placeholder="VD: Thay màn hình 144Hz, vệ sinh tản nhiệt, cài lại Windows..."></textarea></div>
+    </div>
+    <div class="mf">
+      <button class="btn bg2" onclick="closeMo('mo-procnote')">Hủy</button>
+      <button class="btn bp" onclick="saveProcNote()">✅ Lưu hoàn thành</button>
+    </div>
   </div>
 </div>
 
@@ -1302,7 +1312,26 @@ function saveRepair(){
   renderRepairs();
   toast('✅ Đã lưu phiếu '+rep.id,'ok');
 }
+function saveProcNote(){
+  const id=document.getElementById('pn-repid').value;
+  const note=document.getElementById('pn-note').value;
+  const reps=DB.repairs;
+  const r=reps.find(x=>x.id===id);
+  if(!r)return;
+  r.status='Hoàn thành';
+  r.processNote=note;
+  DB.repairs=reps;
+  closeMo('mo-procnote');
+  renderRepairs();
+  toast('✅ Hoàn thành – đã lưu mô tả','ok');
+}
 function setRepairStatus(id,status){
+  if(status==='Hoàn thành'){
+    const r=DB.repairs.find(x=>x.id===id);if(!r)return;
+    document.getElementById('pn-repid').value=id;
+    document.getElementById('pn-note').value=r.processNote||'';
+    openMo('mo-procnote');return;
+  }
   const reps=DB.repairs;
   const r=reps.find(r=>r.id===id);
   if(!r)return;
@@ -1337,30 +1366,24 @@ function deleteRepair(id){
   showUndoToast('Đã xóa phiếu <b>'+item.id+'</b> – '+item.customerName,function(){const r=DB.repairs;r.splice(idx,0,item);DB.repairs=r;renderRepairs();toast('↩️ Đã hoàn tác','ok');});
 }
 
-var _repDateFilter='';
-function setRepDateFilter(v){
-  _repDateFilter=v;
-  ['all','day','week','month','year'].forEach(function(k){var b=document.getElementById('rdf-'+k);if(b)b.className='btn bsm '+((v===''&&k==='all')||(v===k)?'bp':'bg2');});
+var _repRecFilter='';
+function setRepFilter(v){
+  _repRecFilter=v;
+  ['all','day','week','month','year'].forEach(function(k){var b=document.getElementById('rsf-'+k);if(b)b.className='btn bsm '+((v===''&&k==='all')||(v===k)?'bp':'bg2');});
   renderRepairs();
 }
 function renderRepairs(){
   const q=(document.getElementById('rep-search')?.value||'').toLowerCase();
   const sf=document.getElementById('rep-filter')?.value||'';
-  const sort=document.getElementById('rep-sort')?.value||'desc';
-  const _dRow=document.getElementById('rep-date-row');
-  if(sf==='Đã giao'){if(_dRow)_dRow.style.display='flex';}else{if(_dRow)_dRow.style.display='none';if(_repDateFilter){_repDateFilter='';['all','day','week','month','year'].forEach(function(k){var b=document.getElementById('rdf-'+k);if(b)b.className='btn bsm '+(k==='all'?'bp':'bg2');}); }}
   const _now=new Date();
   let reps=DB.repairs.filter(r=>{
     const mq=!q||r.customerName.toLowerCase().includes(q)||r.device.toLowerCase().includes(q)||r.id.toLowerCase().includes(q)||(r.phone||'').includes(q);
     const ms=!sf||r.status===sf;
     var md=true;
-    if(_repDateFilter&&r.status==='Đã giao'){var _ds=r.deliveredDate||'';if(!_ds){md=false;}else if(_repDateFilter==='day'){md=_ds===todayISO();}else if(_repDateFilter==='week'){var _mon=new Date(_now);_mon.setDate(_now.getDate()-((_now.getDay()||7)-1));_mon.setHours(0,0,0,0);var _sun=new Date(_mon);_sun.setDate(_mon.getDate()+6);_sun.setHours(23,59,59,999);var _dd=new Date(_ds);md=_dd>=_mon&&_dd<=_sun;}else if(_repDateFilter==='month'){var _dd2=new Date(_ds);md=_dd2.getMonth()===_now.getMonth()&&_dd2.getFullYear()===_now.getFullYear();}else if(_repDateFilter==='year'){var _dd3=new Date(_ds);md=_dd3.getFullYear()===_now.getFullYear();}}
+    if(_repRecFilter){var _rs=r.receivedDate||'';if(!_rs){md=false;}else if(_repRecFilter==='day'){md=_rs===todayISO();}else if(_repRecFilter==='week'){var _mon=new Date(_now);_mon.setDate(_now.getDate()-((_now.getDay()||7)-1));_mon.setHours(0,0,0,0);var _sun=new Date(_mon);_sun.setDate(_mon.getDate()+6);_sun.setHours(23,59,59,999);var _dd=new Date(_rs);md=_dd>=_mon&&_dd<=_sun;}else if(_repRecFilter==='month'){var _dd2=new Date(_rs);md=_dd2.getMonth()===_now.getMonth()&&_dd2.getFullYear()===_now.getFullYear();}else if(_repRecFilter==='year'){var _dd3=new Date(_rs);md=_dd3.getFullYear()===_now.getFullYear();}}
     return mq&&ms&&md;
   });
-  reps.sort((a,b)=>{
-    const da=a.receivedDate||''; const db2=b.receivedDate||'';
-    return sort==='asc'?(da>db2?1:-1):(da<db2?1:-1);
-  });
+  reps.sort((a,b)=>{const da=a.receivedDate||'';const db2=b.receivedDate||'';return da<db2?1:-1;});
   const list=document.getElementById('repair-list');
   if(!reps.length){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">🔧</div><div>Không có phiếu nào</div></div>`;return}
   list.innerHTML=reps.map(r=>{
@@ -1393,6 +1416,7 @@ function renderRepairs(){
         <div><b>💰</b> Phí: ${fmtN(repCost)} đ | Cọc: ${fmtN(r.deposit||0)} đ | Còn: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} đ</strong></div>
         ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
         ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
+        ${r.processNote?`<div style="grid-column:1/-1"><b>🔧</b> <span style="color:var(--gy);font-style:italic">${r.processNote}</span></div>`:''}
       </div>
       ${!locked?`<div style="margin-top:12px">
         <div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">CẬP NHẬT TRẠNG THÁI:</div>
