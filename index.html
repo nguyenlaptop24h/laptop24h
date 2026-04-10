@@ -1848,14 +1848,14 @@ function login(){
   if(remember){localStorage.setItem('l24_rem_u',uname);localStorage.setItem('l24_rem_p',pass);}
   else{localStorage.removeItem('l24_rem_u');localStorage.removeItem('l24_rem_p');}
   currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
-  try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
+  try{localStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
   document.getElementById('login-overlay').style.display='none';
   applyRoleUI();
 }
 
 function logout(){
   if(!confirm('Đăng xuất?'))return;
-  try{sessionStorage.removeItem('l24_session');}catch{}
+  try{localStorage.removeItem('l24_session');}catch{}
   currentUser=null;
   document.getElementById('login-overlay').style.display='flex';
   document.getElementById('li-user').value='';
@@ -1883,7 +1883,7 @@ function applyRoleUI(){
 function checkSession(){
   initDefaultUsers();
   try{
-    const s=sessionStorage.getItem('l24_session');
+    const s=localStorage.getItem('l24_session');
     if(s){currentUser=JSON.parse(s);applyRoleUI();return;}
   }catch{}
   document.getElementById('login-overlay').style.display='flex';
