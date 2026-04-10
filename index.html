@@ -1834,13 +1834,17 @@ function togglePw(id,btn){
 }
 
 function login(){
-  const uname=(document.getElementById('li-user').value||'').trim();
-  const pass=document.getElementById('li-pass').value||'';
-  const users=getUsers()||[];
-  const u=users.find(x=>x.username===uname&&x.password===pass);
-  if(!u){toast('Sai tên đăng nhập hoặc mật khẩu!','er');return;}
-  currentUser={id:u.id,name:u.name,username:u.username,role:u.role};
-  try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch{}
+  var uname=(document.getElementById('li-user').value||'').trim();
+  var pass=document.getElementById('li-pass').value||'';
+  if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
+  if(!pass){toast('Vui lòng nhập mật khẩu!','er');return;}
+  var users=getUsers()||DEFAULT_USERS;
+  if(!users||!users.length){users=DEFAULT_USERS;}
+  var matched=users.find(function(x){return x.username===uname;});
+  if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
+  if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
+  currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
+  try{sessionStorage.setItem('l24_session',JSON.stringify(currentUser));}catch(e){}
   document.getElementById('login-overlay').style.display='none';
   applyRoleUI();
 }
