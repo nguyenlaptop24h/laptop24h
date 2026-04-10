@@ -154,7 +154,7 @@ tr:last-child td{border-bottom:none}
 .login-title{font-size:20px;font-weight:800;color:var(--pr-d);margin-bottom:4px}
 .login-sub{font-size:12px;color:var(--gy);margin-bottom:24px}
 /* ADMIN ONLY */
-.admin-only{display:inline-flex}
+.admin-only{display:flex;flex-direction:column;width:100%}
 /* RESPONSIVE */
 @media(max-width:600px){
   .fr.c2,.fr.c3,.fr.c4{grid-template-columns:1fr}
@@ -1304,10 +1304,29 @@ function setRepairStatus(id,status){
   renderRepairs();
   toast('Cập nhật: '+status,'ok');
 }
+function showUndoToast(msg,fn){
+  clearTimeout(window._undoTimer);
+  var t=document.getElementById('undo-toast');
+  if(!t){t=document.createElement('div');t.id='undo-toast';t.style.cssText='position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 16px;border-radius:8px;display:flex;gap:12px;align-items:center;z-index:9999;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.35);white-space:nowrap';document.body.appendChild(t);}
+  t.innerHTML=msg+'&nbsp;<button onclick="undoLast()" style="background:var(--ac);border:none;color:#fff;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700">↩️ Hoàn tác</button>';
+  t.style.display='flex';
+  window._undoFn=fn;
+  window._undoTimer=setTimeout(function(){t.style.display='none';window._undoFn=null;},8000);
+}
+function undoLast(){
+  clearTimeout(window._undoTimer);
+  var t=document.getElementById('undo-toast');
+  if(t)t.style.display='none';
+  if(window._undoFn){window._undoFn();window._undoFn=null;}
+}
 function deleteRepair(id){
   if(!confirm('Xóa phiếu sửa chữa này?'))return;
-  DB.repairs=DB.repairs.filter(r=>r.id!==id);
-  renderRepairs(); toast('Đã xóa phiếu');
+  const reps=DB.repairs;
+  const idx=reps.findIndex(r=>r.id===id);
+  const item={...reps[idx]};
+  DB.repairs=reps.filter(r=>r.id!==id);
+  renderRepairs();
+  showUndoToast('Đã xóa phiếu <b>'+item.id+'</b> – '+item.customerName,function(){const r=DB.repairs;r.splice(idx,0,item);DB.repairs=r;renderRepairs();toast('↩️ Đã hoàn tác','ok');});
 }
 
 function renderRepairs(){
@@ -1603,8 +1622,12 @@ function saveProd(){
 }
 function deleteProd(id){
   if(!confirm('Xóa sản phẩm?'))return;
-  DB.products=DB.products.filter(p=>p.id!==id);
-  renderProds(); toast('Đã xóa');
+  const prods=DB.products;
+  const idx=prods.findIndex(p=>p.id===id);
+  const item={...prods[idx]};
+  DB.products=prods.filter(p=>p.id!==id);
+  renderProds();
+  showUndoToast('Đã xóa SP <b>'+item.name+'</b>',function(){const p=DB.products;p.splice(idx,0,item);DB.products=p;renderProds();toast('↩️ Đã hoàn tác','ok');});
 }
 function renderProds(){
   const q=(document.getElementById('prod-search')?.value||'').toLowerCase();
