@@ -103,11 +103,12 @@ tr:last-child td{border-bottom:none}
 .st-done{background:#d1fae5;color:#065f46}
 .st-del{background:#f3f4f6;color:#374151}
 /* PRINT BILL */
-@page{margin:0}
+@page{size:A5 portrait;margin:8mm}
 @media print{
   body *{visibility:hidden}
   #pa,#pa *{visibility:visible}
-  #pa{position:fixed;inset:0;background:#fff;padding:16px;z-index:9999}
+  #pa{position:fixed;inset:0;background:#fff;padding:0;z-index:9999}
+  .pb{max-width:100%!important}
 }
 .pb{font-family:Arial,sans-serif;color:#111;max-width:420px;margin:0 auto}
 .pb .sn{font-size:19px;font-weight:800;text-align:center;color:#1e3a8a}
