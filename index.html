@@ -614,6 +614,7 @@ tr:last-child td{border-bottom:none}
           <input id="dv-date" type="date">
         </div>
       </div>
+      <div class="fg admin-only" style="margin-top:10px"><label>🔧 Mô tả xử lí (nội bộ)</label><textarea id="dv-process" rows="3" placeholder="Mô tả công việc đã xử lí, linh kiện thay, lưu ý kỹ thuật..."></textarea></div>
     </div>
     <div class="mf">
       <button class="btn bg2" onclick="closeMo('mo-deliver')">Hủy</button>
@@ -736,7 +737,6 @@ tr:last-child td{border-bottom:none}
         <div class="fg"><label>Kỹ thuật viên</label><input id="rm-tech" placeholder="Tên KTV..."></div>
       </div>
       <div class="fg"><label>Ghi chú nội bộ</label><textarea id="rm-note" placeholder="Chỉ nhân viên thấy..."></textarea></div>
-      <div class="fg admin-only"><label>🔧 Mô tả xử lí (nội bộ)</label><textarea id="rm-process" placeholder="Quy trình xử lí, linh kiện thay, lỗi phát sinh..."></textarea></div>
     </div>
     <div class="mf"><button class="btn bg2" onclick="closeMo('mo-repair')">Hủy</button><button class="btn bp" onclick="saveRepair()">💾 Lưu phiếu</button></div>
   </div>
@@ -1252,7 +1252,6 @@ function openRepairModal(id){
     document.getElementById('rm-warranty').value=r.warrantyMonths||0;
     document.getElementById('rm-tech').value=r.techName||'';
     document.getElementById('rm-note').value=r.note||'';
-    document.getElementById('rm-process').value=r.processNote||'';
   } else {
     fields.forEach(f=>document.getElementById(f).value='');
     document.getElementById('rm-in').value=todayISO();
@@ -1286,7 +1285,6 @@ function saveRepair(){
     warrantyMonths:parseInt(document.getElementById('rm-warranty').value)||0,
     techName:document.getElementById('rm-tech').value,
     note:document.getElementById('rm-note').value,
-    processNote:document.getElementById('rm-process').value,
     ts:Date.now(),
   };
   const idx=reps.findIndex(r=>r.id===rep.id);
@@ -1782,6 +1780,7 @@ function openDeliverModal(repId){
   const sel=document.getElementById('dv-prod-pick');
   sel.innerHTML='<option value="">-- Chọn sản phẩm trong kho --</option>'+
     DB.products.filter(p=>p.stock>0||p.type==='Dịch vụ').map(p=>`<option value="${p.id}">[${p.id}] ${p.name} – ${fmtN(p.price)}đ (Tồn: ${p.stock})</option>`).join('');
+  document.getElementById('dv-process').value=r.processNote||'';
   calcDelivery();
   openMo('mo-deliver');
 }
@@ -1857,6 +1856,7 @@ function saveDeliver(){
     if(p&&p.type!=='Dịch vụ')p.stock=Math.max(0,p.stock-it.qty);
   });
   DB.products=DB.products; // trigger save
+  r.processNote=document.getElementById('dv-process').value;
   DB.repairs=reps;
   closeMo('mo-deliver');
   renderRepairs();
