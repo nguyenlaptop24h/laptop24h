@@ -416,9 +416,20 @@ tr:last-child td{border-bottom:none}
       <div id="top-prods"></div>
     </div>
     <div class="card">
-      <div class="ct">🔧 Thống kê sửa chữa</div>
+      <div class="ct">🔧 Trạng thái sửa chữa</div>
       <div id="repair-stats"></div>
     </div>
+  </div>
+  <div class="card" style="margin-top:14px">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+      <div class="ct" style="margin:0">💰 Lợi nhuận sửa chữa</div>
+      <div style="display:flex;gap:6px">
+        <button class="btn bsm bg2" id="rp-day"   onclick="showRepairProfit('day')">Hôm nay</button>
+        <button class="btn bsm bg2" id="rp-week"  onclick="showRepairProfit('week')">Tuần này</button>
+        <button class="btn bsm bp"  id="rp-month" onclick="showRepairProfit('month')">Tháng này</button>
+      </div>
+    </div>
+    <div id="repair-profit-body"></div>
   </div>
 </div>
 
@@ -1709,6 +1720,32 @@ function renderStats(){
     <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px">
       <span class="bx ${ST_CLASS[k]||'b-gy'}">${k}</span><strong>${v}</strong>
     </div>`).join('');
+  showRepairProfit('month');
+}
+
+function showRepairProfit(period){
+  ['day','week','month'].forEach(p=>{const b=document.getElementById('rp-'+p);if(b)b.className='btn bsm '+(p===period?'bp':'bg2');});
+  const repairs=DB.repairs.filter(r=>r.status==='Đã giao'&&r.deliveredDate);
+  const now=new Date();
+  function rev(r){const its=r.deliveryItems||[];return its.length?its.reduce((s,i)=>s+i.qty*i.price,0):(+r.cost||0);}
+  function inRange(ds){
+    if(!ds)return false;const d=new Date(ds);
+    if(period==='day')return ds===todayISO();
+    if(period==='week'){const mon=new Date(now);mon.setDate(now.getDate()-((now.getDay()||7)-1));mon.setHours(0,0,0,0);const sun=new Date(mon);sun.setDate(mon.getDate()+6);sun.setHours(23,59,59,999);return d>=mon&&d<=sun;}
+    return d.getMonth()===now.getMonth()&&d.getFullYear()===now.getFullYear();
+  }
+  const list=repairs.filter(r=>inRange(r.deliveredDate)).sort((a,b)=>b.deliveredDate.localeCompare(a.deliveredDate));
+  const total=list.reduce((s,r)=>s+rev(r),0);
+  const avg=list.length?Math.round(total/list.length):0;
+  let bars=[];
+  if(period==='day'){for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().split('T')[0];bars.push({label:p2(d.getDate())+'/'+( d.getMonth()+1),val:repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0),hi:i===0});}}
+  else if(period==='week'){const labels=['T2','T3','T4','T5','T6','T7','CN'];const dow=(now.getDay()||7)-1;for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()-dow+i);const ds=d.toISOString().split('T')[0];bars.push({label:labels[i],val:repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0),hi:i===dow});}}
+  else{const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();const cw=Math.floor((now.getDate()-1)/7);for(let w=0;w<Math.ceil(dim/7);w++){const s1=w*7+1,e1=Math.min((w+1)*7,dim);let wv=0;for(let d=s1;d<=e1;d++){const ds=now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(d);wv+=repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0);}bars.push({label:'T'+(w+1),val:wv,hi:w===cw});}}
+  const maxV=Math.max(...bars.map(b=>b.val),1);
+  const chartHTML=`<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin:0 0 12px">${bars.map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:8px;color:var(--gy)">${b.val>0?fmtN(Math.round(b.val/1000))+'k':''}</div><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;background:${b.hi?'var(--ok)':'#60a5fa'};border-radius:3px 3px 0 0;height:${Math.max(b.val>0?4:2,Math.round(b.val/maxV*60))}px"></div></div><div style="font-size:9px;color:${b.hi?'var(--ok)':'var(--gy)'};font-weight:${b.hi?700:400}">${b.label}</div></div>`).join('')}</div>`;
+  const sumHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(total)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Tổng thu</div></div><div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#2563eb">${list.length}</div><div style="font-size:10px;color:var(--gy)">Đơn đã giao</div></div><div style="background:#fefce8;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#ca8a04">${fmtN(avg)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">TB/đơn</div></div></div>`;
+  const listHTML=list.length?list.slice(0,8).map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><div><strong>${r.customerName}</strong> – <span style="color:var(--gy)">${r.device}</span><br><span style="font-size:10px;color:var(--gy)">${r.deliveredDate}</span></div><strong style="color:var(--ok);white-space:nowrap">${fmtN(rev(r))} đ</strong></div>`).join('')+(list.length>8?`<div style="text-align:center;font-size:10px;color:var(--gy);padding:6px">…và ${list.length-8} đơn khác</div>`:''):'<div style="text-align:center;color:var(--gy);padding:20px;font-size:12px">Chưa có đơn hoàn thành trong kỳ này</div>';
+  document.getElementById('repair-profit-body').innerHTML=chartHTML+sumHTML+listHTML;
 }
 
 // ══════════════════════════════════════════════
