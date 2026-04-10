@@ -1838,9 +1838,9 @@ function login(){
   var pass=document.getElementById('li-pass').value||'';
   if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
   if(!pass){toast('Vui lòng nhập mật khẩu!','er');return;}
-  var users=getUsers()||DEFAULT_USERS;
-  if(!users||!users.length){users=DEFAULT_USERS;}
-  var matched=users.find(function(x){return x.username===uname;});
+  initDefaultUsers();
+  var users=getUsers();
+  var matched=users?users.find(function(x){return x.username===uname;}):null;
   if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
   if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
   currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
