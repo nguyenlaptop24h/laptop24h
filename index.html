@@ -280,8 +280,8 @@ tr:last-child td{border-bottom:none}
 <!-- SỬA CHỮA                                  -->
 <!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-repair">
-  <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
-    <div class="sw" style="flex:1;margin:0">
+  <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
+    <div class="sw" style="flex:1;margin:0;min-width:180px">
       <input type="text" id="rep-search" placeholder="Tìm tên KH, SĐT, thiết bị, mã phiếu..." oninput="renderRepairs()">
     </div>
     <select id="rep-filter" onchange="renderRepairs()" style="width:auto;padding:9px 11px">
@@ -297,7 +297,9 @@ tr:last-child td{border-bottom:none}
       <option value="month">Tháng này</option>
       <option value="year">Năm nay</option>
     </select>
-    <button class="btn bp" onclick="openRepairModal()">➕ Nhận máy</button>
+    <button class="btn bp" onclick="openRepairModal()" style="margin-left:auto;font-size:15px;padding:9px 22px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(99,102,241,.35)">➕ Nhận máy</button>
+  </div>
+  <div style="display:flex;gap:6px;margin-bottom:10px">
   <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">📥 Nhập CSV</button>
   <button class="btn b-gy bsm" onclick="downloadImportTemplate()">📋 Mẫu</button>
   <input type="file" id="import-rep-inp" accept=".csv,.xlsx" style="display:none" onchange="importRepairsCSV(this)">
