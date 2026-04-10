@@ -719,9 +719,8 @@ tr:last-child td{border-bottom:none}
       </div>
       <div class="fg" style="margin-bottom:10px"><label>Tình trạng khi nhận (mô tả lỗi)</label><textarea id="rm-issue" placeholder="Không lên nguồn, màn hình trắng, bàn phím liệt..."></textarea></div>
       <div class="fg" style="margin-bottom:10px"><label>Phụ kiện kèm theo</label><input id="rm-acc" placeholder="Sạc, túi, chuột..."></div>
-      <div class="fr c4">
+      <div class="fr c3">
         <div class="fg"><label>Ngày nhận *</label><input id="rm-in" type="date"></div>
-        <div class="fg"><label>Hẹn giao</label><input id="rm-out" type="date"></div>
         <div class="fg"><label>Chi phí dự kiến (đ)</label><input id="rm-cost" type="number" value="0" min="0"></div>
         <div class="fg"><label>Tiền cọc (đ)</label><input id="rm-dep" type="number" value="0" min="0"></div>
       </div>
@@ -1239,7 +1238,6 @@ function openRepairModal(id){
     document.getElementById('rm-issue').value=r.issue;
     document.getElementById('rm-acc').value=r.accessories||'';
     document.getElementById('rm-in').value=r.receivedDate||todayISO();
-    document.getElementById('rm-out').value=r.estimatedDate||'';
     document.getElementById('rm-cost').value=r.cost||0;
     document.getElementById('rm-dep').value=r.deposit||0;
     document.getElementById('rm-warranty').value=r.warrantyMonths||0;
@@ -1271,7 +1269,6 @@ function saveRepair(){
     issue:document.getElementById('rm-issue').value,
     accessories:document.getElementById('rm-acc').value,
     receivedDate:document.getElementById('rm-in').value,
-    estimatedDate:document.getElementById('rm-out').value,
     deliveredDate: editRepairId ? (reps.find(r=>r.id===editRepairId)?.deliveredDate||'') : '',
     status: editRepairId ? (reps.find(r=>r.id===editRepairId)?.status||'Mới nhận') : 'Mới nhận',
     cost:parseFloat(document.getElementById('rm-cost').value)||0,
@@ -1321,7 +1318,6 @@ function renderRepairs(){
   if(!reps.length){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">🔧</div><div>Không có phiếu nào</div></div>`;return}
   list.innerHTML=reps.map(r=>{
     const stCls=ST_CLASS[r.status]||'b-gy';
-    const overdue=r.estimatedDate&&r.status!=='Đã giao'&&new Date(r.estimatedDate)<new Date();
     const repCost=r.deliveryItems?r.deliveryItems.reduce((s,it)=>s+it.qty*it.price,0):(r.cost||0);
     const remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
     const canDeliver=r.status!=='Đã giao';
@@ -1343,7 +1339,7 @@ function renderRepairs(){
         <div><b>👤</b> ${r.customerName} – ${r.phone}</div>
         <div><b>💻</b> ${r.device}${r.serial?` (${r.serial})`:''}</div>
         <div><b>🛠</b> ${r.issue}</div>
-        <div><b>📅</b> Nhận: ${isoToDisplay(r.receivedDate)} ${r.estimatedDate?`→ Hẹn: ${isoToDisplay(r.estimatedDate)}`:''}</div>
+        <div><b>📅</b> Nhận: ${isoToDisplay(r.receivedDate)}</div>
         <div><b>💰</b> Phí: ${fmtN(repCost)} đ | Cọc: ${fmtN(r.deposit||0)} đ | Còn: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} đ</strong></div>
         ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
         ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
