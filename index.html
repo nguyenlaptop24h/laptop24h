@@ -2305,7 +2305,7 @@ function importRepairsCSV(inp){
         r.deliveryItems=r.cost>0?[{name:'Dịch vụ',qty:1,price:r.cost}]:[];
         DB.repairs.push(r);imported++;
       });
-      if(imported>0){saveDB();renderRepairs();toast('Đã nhập '+imported+' phiếu'+(skipped>0?', bỏ qua '+skipped+' dòng trống':'')+'!');}
+      if(imported>0){DB.repairs=DB.repairs;renderRepairs();toast('Đã nhập '+imported+' phiếu'+(skipped>0?', bỏ qua '+skipped+' dòng trống':'')+'!');}
       else toast('Không có dữ liệu hợp lệ! Cột cần có: Khách Hàng, SĐT','er');
     }catch(err){toast('Lỗi đọc file: '+err.message,'er');}
   };
