@@ -2223,61 +2223,42 @@ autoFillLogin();              // Login check (must be after DB init)
 </script>
 
 <script>
-// ══════════════════════════════════════════════
 function exportProducts(){
-  if(!DB.products||!DB.products.length){toast('Không có sản phẩm để xuất!','er');return;}
-  const isAdmin=currentUser?.role==='admin';
-  const rows=DB.products.map(p=>({
-    'Mã SP':p.id||'',
-    'Tên Sản Phẩm':p.name||'',
-    'Loại':p.category||'',
-    ...(isAdmin?{'Giá Nhập (đ)':p.cost||0}:{}),
-    'Giá Bán (đ)':p.price||0,
-    'Tồn Kho':p.stock||0,
-    'Ghi Chú':p.note||''
-  }));
-  const ws=XLSX.utils.json_to_sheet(rows);
-  // Column widths
-  ws['!cols']=[{wch:12},{wch:35},{wch:18},{wch:16},{wch:16},{wch:12},{wch:25}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Sản Phẩm');
-  const date=new Date().toLocaleDateString('vi-VN').replace(///g,'-');
-  XLSX.writeFile(wb,'SanPham_Laptop24H_'+date+'.xlsx');
-  toast('Đã xuất file Excel sản phẩm!');
-}
-
-function exportRepairs(){
-  if(!DB.repairs||!DB.repairs.length){toast('Không có phiếu sửa chữa để xuất!','er');return;}
-  const rows=DB.repairs.map(r=>{
-    const repCost=r.deliveryItems?r.deliveryItems.reduce((s,it)=>s+it.qty*it.price,0):(r.cost||0);
-    const remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
-    return {
-      'Mã Phiếu':r.id||'',
-      'Tên Khách Hàng':r.customerName||'',
-      'Số Điện Thoại':r.phone||'',
-      'Địa Chỉ':r.address||'',
-      'Thiết Bị':r.device||'',
-      'Serial/IMEI':r.serial||'',
-      'Tình Trạng Nhận':r.issue||'',
-      'Ngày Nhận':r.receivedDate?isoToDisplay(r.receivedDate):'',
-      'Ngày Giao':r.deliveredDate?isoToDisplay(r.deliveredDate):'',
-      'Trạng Thái':r.status||'',
-      'Chi Phí (đ)':repCost,
-      'Tiền Cọc (đ)':r.deposit||0,
-      'Còn Lại (đ)':remaining,
-      'BH Sửa Chữa (tháng)':r.warrantyMonths||0,
-      'Kỹ Thuật Viên':r.techName||'',
-      'Phụ Kiện':r.accessories||'',
-      'Ghi Chú':r.note||''
-    };
+  if(!DB.products||!DB.products.length){toast("Không có sản phẩm để xuất!","er");return;}
+  var isAdmin=currentUser&&currentUser.role==="admin";
+  var rows=DB.products.map(function(p){
+    var row={};
+    row["Mã SP"]=p.id||"";
+    row["Tên Sản Phẩm"]=p.name||"";
+    row["Loại"]=p.category||"";
+    if(isAdmin) row["Giá Nhập (đ)"]=p.cost||0;
+    row["Giá Bán (đ)"]=p.price||0;
+    row["Tồn Kho"]=p.stock||0;
+    row["Ghi Chú"]=p.note||"";
+    return row;
   });
-  const ws=XLSX.utils.json_to_sheet(rows);
-  ws['!cols']=[{wch:12},{wch:22},{wch:14},{wch:20},{wch:20},{wch:16},{wch:30},{wch:13},{wch:13},{wch:14},{wch:13},{wch:13},{wch:13},{wch:10},{wch:16},{wch:20},{wch:25}];
-  const wb=XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb,ws,'Phiếu Sửa Chữa');
-  const date=new Date().toLocaleDateString('vi-VN').replace(///g,'-');
-  XLSX.writeFile(wb,'SuaChua_Laptop24H_'+date+'.xlsx');
-  toast('Đã xuất file Excel phiếu sửa chữa!');
+  var ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[{wch:12},{wch:35},{wch:18},{wch:16},{wch:16},{wch:12},{wch:25}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"San Pham");
+  var d=new Date(),dn=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
+  XLSX.writeFile(wb,"SanPham_"+dn+".xlsx");
+  toast("Đã xuất Excel sản phẩm!");
+}
+function exportRepairs(){
+  if(!DB.repairs||!DB.repairs.length){toast("Không có phiếu để xuất!","er");return;}
+  var rows=DB.repairs.map(function(r){
+    var rc=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
+    var rem=Math.max(0,rc-(r.deposit||0)-(r.deliveryPaid||0));
+    return {"Mã Phiếu":r.id||"","Khách Hàng":r.customerName||"","SĐT":r.phone||"","Địa Chỉ":r.address||"","Thiết Bị":r.device||"","Serial":r.serial||"","Tình Trạng":r.issue||"","Ngày Nhận":r.receivedDate?isoToDisplay(r.receivedDate):"","Ngày Giao":r.deliveredDate?isoToDisplay(r.deliveredDate):"","Trạng Thái":r.status||"","Chi Phí (đ)":rc,"Tiền Cọ (đ)":r.deposit||0,"Còn Lại (đ)":rem,"BH (tháng)":r.warrantyMonths||0,"KTV":r.techName||"","Ghi Chú":r.note||""};
+  });
+  var ws=XLSX.utils.json_to_sheet(rows);
+  ws["!cols"]=[{wch:12},{wch:22},{wch:14},{wch:20},{wch:20},{wch:16},{wch:30},{wch:13},{wch:13},{wch:14},{wch:13},{wch:13},{wch:13},{wch:10},{wch:14},{wch:25}];
+  var wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,ws,"Sua Chua");
+  var d=new Date(),dn=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
+  XLSX.writeFile(wb,"SuaChua_"+dn+".xlsx");
+  toast("Đã xuất Excel sửa chữa!");
 }
 </script>
 </body>
