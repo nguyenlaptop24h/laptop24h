@@ -730,6 +730,7 @@ tr:last-child td{border-bottom:none}
         <div class="fg"><label>Chi phí dự kiến (đ)</label><input id="rm-cost" type="number" value="0" min="0"></div>
         <div class="fg"><label>Tiền cọc (đ)</label><input id="rm-dep" type="number" value="0" min="0"></div>
       </div>
+      <div class="fg admin-only" style="margin-bottom:10px"><label>🔒 Vốn linh kiện (đ)</label><input id="rm-capital" type="number" value="0" min="0"></div>
       <div class="fr c2">
         <div class="fg"><label>Bảo hành sửa chữa</label><select id="rm-warranty"><option value="0">Không BH</option><option value="1">1 tháng</option><option value="3">3 tháng</option><option value="6">6 tháng</option></select></div>
         <div class="fg"><label>Kỹ thuật viên</label><input id="rm-tech" placeholder="Tên KTV..."></div>
@@ -1246,6 +1247,7 @@ function openRepairModal(id){
     document.getElementById('rm-in').value=r.receivedDate||todayISO();
     document.getElementById('rm-cost').value=r.cost||0;
     document.getElementById('rm-dep').value=r.deposit||0;
+    document.getElementById('rm-capital').value=r.capital||0;
     document.getElementById('rm-warranty').value=r.warrantyMonths||0;
     document.getElementById('rm-tech').value=r.techName||'';
     document.getElementById('rm-note').value=r.note||'';
@@ -1278,6 +1280,7 @@ function saveRepair(){
     status: editRepairId ? (reps.find(r=>r.id===editRepairId)?.status||'Mới nhận') : 'Mới nhận',
     cost:parseFloat(document.getElementById('rm-cost').value)||0,
     deposit:parseFloat(document.getElementById('rm-dep').value)||0,
+    capital:parseFloat(document.getElementById('rm-capital').value)||0,
     warrantyMonths:parseInt(document.getElementById('rm-warranty').value)||0,
     techName:document.getElementById('rm-tech').value,
     note:document.getElementById('rm-note').value,
@@ -1740,14 +1743,14 @@ function showRepairProfit(period){
   }
   const list=repairs.filter(r=>inRange(r.deliveredDate)).sort((a,b)=>b.deliveredDate.localeCompare(a.deliveredDate));
   const total=list.reduce((s,r)=>s+rev(r),0);
-  const collected=list.reduce((s,r)=>s+(r.deposit||0)+(r.deliveryPaid||0),0);
+  const capital=list.reduce((s,r)=>s+(r.capital||0),0);const profit=total-capital;
   let bars=[];
   if(period==='day'){for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);const ds=d.toISOString().split('T')[0];bars.push({label:p2(d.getDate())+'/'+( d.getMonth()+1),val:repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0),hi:i===0});}}
   else if(period==='week'){const labels=['T2','T3','T4','T5','T6','T7','CN'];const dow=(now.getDay()||7)-1;for(let i=0;i<7;i++){const d=new Date(now);d.setDate(now.getDate()-dow+i);const ds=d.toISOString().split('T')[0];bars.push({label:labels[i],val:repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0),hi:i===dow});}}
   else{const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();const cw=Math.floor((now.getDate()-1)/7);for(let w=0;w<Math.ceil(dim/7);w++){const s1=w*7+1,e1=Math.min((w+1)*7,dim);let wv=0;for(let d=s1;d<=e1;d++){const ds=now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(d);wv+=repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0);}bars.push({label:'T'+(w+1),val:wv,hi:w===cw});}}
   const maxV=Math.max(...bars.map(b=>b.val),1);
   const chartHTML=`<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin:0 0 12px">${bars.map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:8px;color:var(--gy)">${b.val>0?fmtN(Math.round(b.val/1000))+'k':''}</div><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;background:${b.hi?'var(--ok)':'#60a5fa'};border-radius:3px 3px 0 0;height:${Math.max(b.val>0?4:2,Math.round(b.val/maxV*60))}px"></div></div><div style="font-size:9px;color:${b.hi?'var(--ok)':'var(--gy)'};font-weight:${b.hi?700:400}">${b.label}</div></div>`).join('')}</div>`;
-  const sumHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(total)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Tổng thu</div></div><div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#2563eb">${list.length}</div><div style="font-size:10px;color:var(--gy)">Đơn đã giao</div></div><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(collected)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Lợi nhuận</div></div></div>`;
+  const sumHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(total)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Tổng thu</div></div><div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#2563eb">${list.length}</div><div style="font-size:10px;color:var(--gy)">Đơn đã giao</div></div><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(profit)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Lợi nhuận</div></div></div>`;
   const listHTML=list.length?list.slice(0,8).map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><div><strong>${r.customerName}</strong> – <span style="color:var(--gy)">${r.device}</span><br><span style="font-size:10px;color:var(--gy)">${r.deliveredDate}</span></div><strong style="color:var(--ok);white-space:nowrap">${fmtN(rev(r))} đ</strong></div>`).join('')+(list.length>8?`<div style="text-align:center;font-size:10px;color:var(--gy);padding:6px">…và ${list.length-8} đơn khác</div>`:''):'<div style="text-align:center;color:var(--gy);padding:20px;font-size:12px">Chưa có đơn hoàn thành trong kỳ này</div>';
   document.getElementById('repair-profit-body').innerHTML=chartHTML+sumHTML+listHTML;
 }
