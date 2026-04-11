@@ -18,6 +18,19 @@ window.saveProcessNote=function(id,val){
   DB.repairs[idx].processNote=val||null;
   try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}
 };
+
+window._showPNDisplay=function(id,val){
+  window._pnEdit=window._pnEdit||{};
+  window._pnEdit[id]=false;
+  window.saveProcessNote(id,val);
+  var ta=document.getElementById('_pn_'+id);
+  if(!ta)return;
+  var dv=document.createElement('div');
+  dv.style.cssText='display:block;width:100%;margin-top:6px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--pr,#5c6bc0);font-size:13px;min-height:60px;background:var(--bg,#fff);color:var(--tx,#222);white-space:pre-wrap;cursor:text;box-sizing:border-box';
+  dv.textContent=val;
+  dv.onclick=function(){window._pnEdit[id]=true;setTimeout(function(){window.renderRepairs&&window.renderRepairs();},0);};
+  if(ta.parentNode)ta.parentNode.replaceChild(dv,ta);
+};
 window._origSRS=window.setRepairStatus;
 window.setRepairStatus=function(id,status){
   if(status==='Hoàn thành'){
@@ -87,7 +100,7 @@ window.renderRepairs=function(){
       +'</select>'
       +(window._showPN(r.status)&&r.processNote&&!window._pnEdit[r.id]
   ?'<div style="display:block;width:100%;margin-top:6px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--pr,#5c6bc0);font-size:13px;min-height:60px;background:var(--bg,#fff);color:var(--tx,#222);white-space:pre-wrap;cursor:text;box-sizing:border-box" onclick="window._pnEdit[\''+r.id+'\']= true;setTimeout(function(){window.renderRepairs&&window.renderRepairs();},0);">' +r.processNote.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
-  :'<textarea id="_pn_'+r.id+'" data-orig="'+(r.processNote||'')+'" style="display:'+noteShow+';width:100%;margin-top:6px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--pr,#5c6bc0);font-size:13px;resize:vertical;min-height:60px;background:var(--bg,#fff);color:var(--tx,#222);box-sizing:border-box" placeholder="M\u00f4 t\u1ea3 x\u1eed l\u00fd..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();var v=this.value;window.saveProcessNote(\''+r.id+'\',v);this.dataset.orig=v;window._pnEdit[\''+r.id+'\']= false;window.renderRepairs&&window.renderRepairs();}" onblur="if(this.value!==(this.dataset.orig||\'\')){window.saveProcessNote(\''+r.id+'\',this.value);this.dataset.orig=this.value;}">'+(r.processNote||'')+'</textarea>');
+  :'<textarea id="_pn_'+r.id+'" data-orig="'+(r.processNote||'')+'" style="display:'+noteShow+';width:100%;margin-top:6px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--pr,#5c6bc0);font-size:13px;resize:vertical;min-height:60px;background:var(--bg,#fff);color:var(--tx,#222);box-sizing:border-box" placeholder="M\u00f4 t\u1ea3 x\u1eed l\u00fd..." onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();var v=this.value;window._showPNDisplay(\''+r.id+'\',v);}" onblur="if(this.value!==(this.dataset.orig||\'\')){window.saveProcessNote(\''+r.id+'\',this.value);this.dataset.orig=this.value;}">'+(r.processNote||'')+'</textarea>');
     return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
