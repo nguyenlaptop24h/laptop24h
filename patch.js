@@ -27,7 +27,14 @@ window.setRepairStatus=function(id,status){
       try{firebase.database().ref('repairs/'+idx+'/status').set('Hoàn thành');}catch(e){}
     }
   }else if(window._origSRS){
-    window._origSRS(id,status);
+    try{window._origSRS(id,status);}catch(e){
+      var idx2=DB.repairs?DB.repairs.findIndex(function(x){return x&&x.id===id;}):-1;
+      if(idx2>=0){
+        DB.repairs[idx2].status=status;
+        if(status==='\u0110\u00e3 giao'&&!DB.repairs[idx2].deliveredDate)DB.repairs[idx2].deliveredDate=new Date().toISOString().slice(0,10);
+        try{firebase.database().ref('repairs/'+idx2+'/status').set(status);}catch(e2){}
+      }
+    }
   }
   setTimeout(function(){window.renderRepairs&&window.renderRepairs();},30);
 };
