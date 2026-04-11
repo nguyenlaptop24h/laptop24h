@@ -6,7 +6,7 @@ function addMonths(ds,m){if(!ds||!m)return null;var d=new Date(ds);d.setMonth(d.
 function injectCSS(){
   if(document.getElementById('_patchCSS'))return;
   var s=document.createElement('style');s.id='_patchCSS';
-  s.textContent='body:has(#pg-repair.on){overflow:hidden}#pg-repair.on{display:flex!important;flex-direction:column;height:calc(100vh - var(--_navH,87px));overflow:hidden;box-sizing:border-box}#pg-repair.on #repair-list{flex:1;min-height:0;overflow-y:auto;padding-bottom:10px}#rsf-select{width:auto!important;min-width:120px;max-width:160px}.step{pointer-events:auto!important}';
+  s.textContent='body:has(#pg-repair.on){overflow:hidden}#pg-repair.on{display:flex!important;flex-direction:column;height:calc(100vh - var(--_navH,87px));overflow:hidden;box-sizing:border-box}#pg-repair.on #repair-list{flex:1;min-height:0;overflow-y:auto;padding-bottom:10px}#rsf-select{width:auto!important;min-width:120px;max-width:160px}';
   document.head.appendChild(s);
 }
 function setNavH(){var n=document.querySelector('nav');if(n)document.documentElement.style.setProperty('--_navH',n.offsetHeight+'px');}
@@ -52,7 +52,9 @@ window.renderRepairs=function(){
     var locked=!isAdmin&&r.status==='&#272;&#227; giao';
     var wDate=addMonths(r.deliveredDate,r.warrantyMonths);
     var delivRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+toDisp(r.deliveredDate)+(wDate?' &#8226; &#128737;&#65039; BH &#273;&#7871;n '+toDisp(wDate):'')+' </div>':'';
-    var statusBtns=(window.STATUSES||_STAT).map(function(s){return '<button class="step'+(r.status===s?' on':'')+' " onclick="setRepairStatus(\''+r.id+'\',\''+s+'\')">'+ s+'</button>';}).join('');
+    var statusSel='<select onchange="setRepairStatus(\''+r.id+'\',this.value)" style="margin-top:10px;width:100%;padding:9px 14px;border-radius:8px;border:2px solid var(--pr,#5c6bc0);background:var(--bg,#fff);color:var(--tx,#222);font-size:14px;font-weight:600;cursor:pointer">'
+      +(window.STATUSES||_STAT).map(function(s){return '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('')
+      +'</select>';
     return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span><span class="bx '+stCls+'" style="margin-left:6px">'+r.status+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
@@ -73,7 +75,7 @@ window.renderRepairs=function(){
       +(r.deliveryItems&&r.deliveryItems.length?'<div style="grid-column:1/-1"><b>&#128203;</b> '+r.deliveryItems.length+' h&#7841;ng m&#7909;c</div>':'')
       +(r.processNote?'<div style="grid-column:1/-1"><b>&#128296;</b> '+r.processNote+'</div>':'')
       +'</div>'
-      +(!locked?'<div style="margin-top:12px"><div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">C&#7840;P NH&#7840;T TR&#7840;NG TH&#193;I:</div><div class="steps">'+statusBtns+'</div></div>':'')
+      +(!locked?statusSel:'')
       +'</div>';
   }).join('');
   function mkPagin(top){
@@ -110,15 +112,16 @@ function addScrollBtns(){
   document.addEventListener('scroll',onScr,{passive:true,capture:true});
   var rl=getList();if(rl)rl.addEventListener('scroll',onScr,{passive:true});
 }
+injectCSS();
+addScrollBtns();
 var attempts=0;
 var iv=setInterval(function(){
   attempts++;
-  if(typeof DB!=='undefined'&&DB&&window.renderRepairs&&attempts<30){
+  var dbOk=false;try{dbOk=typeof DB!=='undefined'&&!!DB;}catch(e){}
+  if(dbOk&&window.renderRepairs&&attempts<60){
     clearInterval(iv);
-    injectCSS();
-    addScrollBtns();
     if(document.getElementById('repair-list')&&document.getElementById('repair-list').children.length>0)
       renderRepairs();
-  }else if(attempts>=30)clearInterval(iv);
+  }else if(attempts>=60)clearInterval(iv);
 },500);
 })();
