@@ -10,13 +10,22 @@ function injectCSS(){
   document.head.appendChild(s);
 }
 function setNavH(){var n=document.querySelector('nav');if(n)document.documentElement.style.setProperty('--_navH',n.offsetHeight+'px');}
-window._showPN=function(s){return s==='Đang sửa'||s==='Chờ linh kiện'||s==='Hoàn thành';};
+window._showPN=function(s){return s==='Äang sá»­a'||s==='Chá» linh kiá»n'||s==='HoÃ n thÃ nh';};
 window.saveProcessNote=function(id,val){
   if(!window.DB||!DB.repairs)return;
   var idx=DB.repairs.findIndex(function(x){return x&&x.id===id;});
   if(idx<0)return;
   DB.repairs[idx].processNote=val||null;
-  setTimeout(function(){try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}},0);
+  setTimeout(function(){
+    var savedStatus=DB.repairs&&DB.repairs[idx]?DB.repairs[idx].status:null;
+    var savedPN=val||null;
+    try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}
+    if(DB.repairs&&DB.repairs[idx]){
+      if(savedStatus)DB.repairs[idx].status=savedStatus;
+      DB.repairs[idx].processNote=savedPN;
+    }
+    window.renderRepairs&&window.renderRepairs();
+  },0);
 };
 
 window._showPNDisplay=function(id,val){
@@ -33,11 +42,11 @@ window._showPNDisplay=function(id,val){
 };
 window._origSRS=window.setRepairStatus;
 window.setRepairStatus=function(id,status){
-  if(status==='Hoàn thành'){
+  if(status==='HoÃ n thÃ nh'){
     var idx=DB.repairs?DB.repairs.findIndex(function(x){return x&&x.id===id;}):-1;
     if(idx>=0){
-      DB.repairs[idx].status='Hoàn thành';
-      try{firebase.database().ref('repairs/'+idx+'/status').set('Hoàn thành');}catch(e){}
+      DB.repairs[idx].status='HoÃ n thÃ nh';
+      try{firebase.database().ref('repairs/'+idx+'/status').set('HoÃ n thÃ nh');}catch(e){}
     }
   }else if(window._origSRS){
     try{window._origSRS(id,status);}catch(e){
@@ -84,8 +93,8 @@ window.renderRepairs=function(){
   if(!list)return;
   if(!total){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">&#128295;</div><div>Kh&#244;ng c&#243; phi&#7871;u n&#224;o</div></div>';return;}
   var cardsHTML=pageReps.map(function(r){
-    var _STAT=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
-    var _SCLS={'Mới nhận':'b-bl','Đang kiểm tra':'b-or','Đang sửa':'b-pu','Chờ linh kiện':'b-rd','Hoàn thành':'b-gn','Đã giao':'b-gy'};
+    var _STAT=['Má»i nháº­n','Äang kiá»m tra','Äang sá»­a','Chá» linh kiá»n','HoÃ n thÃ nh','ÄÃ£ giao'];
+    var _SCLS={'Má»i nháº­n':'b-bl','Äang kiá»m tra':'b-or','Äang sá»­a':'b-pu','Chá» linh kiá»n':'b-rd','HoÃ n thÃ nh':'b-gn','ÄÃ£ giao':'b-gy'};
     var stCls=(window.ST_CLASS||_SCLS)[r.status]||'b-gy';
     var repCost=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
     var remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
@@ -142,7 +151,7 @@ window.renderRepairs=function(){
     var _origDP=window.doPrint;
     window.doPrint=function(html){
       var marker='<div class="tk"';
-      var inject='<div class="ir"><span>Mô tả xử lý:</span><span style="white-space:pre-wrap">'+rep.processNote+'</span></div>';
+      var inject='<div class="ir"><span>MÃ´ táº£ xá»­ lÃ½:</span><span style="white-space:pre-wrap">'+rep.processNote+'</span></div>';
       html=html.indexOf(marker)>=0?html.replace(marker,inject+marker):html+inject;
       _origDP(html);
       window.doPrint=_origDP;
