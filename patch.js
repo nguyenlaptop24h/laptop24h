@@ -42,7 +42,9 @@ window.renderRepairs=function(){
   if(!list)return;
   if(!total){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">&#128295;</div><div>Kh&#244;ng c&#243; phi&#7871;u n&#224;o</div></div>';return;}
   var cardsHTML=pageReps.map(function(r){
-    var stCls=(window.ST_CLASS||{})[r.status]||'b-gy';
+    var _STAT=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
+    var _SCLS={'Mới nhận':'b-bl','Đang kiểm tra':'b-or','Đang sửa':'b-pu','Chờ linh kiện':'b-rd','Hoàn thành':'b-gn','Đã giao':'b-gy'};
+    var stCls=(window.ST_CLASS||_SCLS)[r.status]||'b-gy';
     var repCost=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
     var remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
     var canDeliver=r.status!=='&#272;&#227; giao';
@@ -50,7 +52,7 @@ window.renderRepairs=function(){
     var locked=!isAdmin&&r.status==='&#272;&#227; giao';
     var wDate=addMonths(r.deliveredDate,r.warrantyMonths);
     var delivRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+toDisp(r.deliveredDate)+(wDate?' &#8226; &#128737;&#65039; BH &#273;&#7871;n '+toDisp(wDate):'')+' </div>':'';
-    var statusBtns=(window.STATUSES||[]).map(function(s){return '<button class="step'+(r.status===s?' on':'')+' " onclick="setRepairStatus(\''+r.id+'\',\''+s+'\')">'+ s+'</button>';}).join('');
+    var statusBtns=(window.STATUSES||_STAT).map(function(s){return '<button class="step'+(r.status===s?' on':'')+' " onclick="setRepairStatus(\''+r.id+'\',\''+s+'\')">'+ s+'</button>';}).join('');
     return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span><span class="bx '+stCls+'" style="margin-left:6px">'+r.status+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
