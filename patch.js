@@ -100,7 +100,6 @@ setTimeout(function(){
     var _orig=window.openRepairModal;
     window.openRepairModal=function(id){
       if(!id){try{_orig();}catch(e){}return;}
-      if(!window.DB)return;
       if(DB._d&&Array.isArray(DB._d['repairs'])){
         DB._d['repairs']=DB._d['repairs'].filter(function(x){return x!=null;});
       }
@@ -150,7 +149,7 @@ setTimeout(function(){
 },1000);
 
 // BILL EDIT
-injectCSS();addScrollBtns();
+injectCSS();
 var attempts=0,iv=setInterval(function(){
   attempts++;var dbOk=false;try{dbOk=typeof DB!=='undefined'&&!!DB;}catch(e){}
   if(dbOk&&window.renderRepairs&&attempts<60){clearInterval(iv);
