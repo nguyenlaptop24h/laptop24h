@@ -113,7 +113,7 @@ function addScrollBtns(){
 var attempts=0;
 var iv=setInterval(function(){
   attempts++;
-  if(window.DB&&window.renderRepairs&&attempts<30){
+  if(typeof DB!=='undefined'&&DB&&window.renderRepairs&&attempts<30){
     clearInterval(iv);
     injectCSS();
     addScrollBtns();
