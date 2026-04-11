@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Laptop 24H">
-<title>Laptop 24H â Quáº£n LÃ½</title>
+<title>Laptop 24H – Quản Lý</title>
 <!-- Firebase SDK v9 compat -->
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
@@ -130,7 +130,7 @@ tr:last-child td{border-bottom:none}
 /* SEARCH */
 .sw{position:relative;margin-bottom:10px}
 .sw input{padding-left:34px}
-.sw::before{content:'ð';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px}
+.sw::before{content:'🔍';position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px}
 /* TOAST */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:#1f2937;color:#fff;padding:11px 22px;border-radius:99px;font-size:13px;font-weight:600;z-index:99999;transition:transform .3s;white-space:nowrap;box-shadow:var(--sh-lg)}
 .toast.on{transform:translateX(-50%) translateY(0)}
@@ -173,160 +173,160 @@ tr:last-child td{border-bottom:none}
 
 <nav class="nav">
   <div class="nav-top">
-    <div class="nav-logo">ð»</div>
+    <div class="nav-logo">💻</div>
     <div>
       <div class="nav-title">Laptop 24H</div>
-      <div class="nav-sub">Quáº£n lÃ½ cá»­a hÃ ng</div>
+      <div class="nav-sub">Quản lý cửa hàng</div>
     </div>
-    <div id="sync-badge" style="margin-left:auto;font-size:10px;font-weight:600;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.15);white-space:nowrap">ð¡ Äang káº¿t ná»i...</div>
-    <div id="user-badge" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.15);cursor:pointer;white-space:nowrap" onclick="logout()">ð¤ <span id="user-name"></span> â©</div>
+    <div id="sync-badge" style="margin-left:auto;font-size:10px;font-weight:600;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.15);white-space:nowrap">🟡 Đang kết nối...</div>
+    <div id="user-badge" style="display:none;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;background:rgba(255,255,255,.15);cursor:pointer;white-space:nowrap" onclick="logout()">👤 <span id="user-name"></span> ↩</div>
   </div>
   <div class="nav-tabs">
-    <button class="tb on"  onclick="go('sale',this)">ð§¾ BÃ¡n HÃ ng</button>
-    <button class="tb"     onclick="go('repair',this)">ð§ Sá»­a Chá»¯a</button>
-    <button class="tb"     onclick="go('customer',this)">ð¥ KhÃ¡ch HÃ ng</button>
-    <button class="tb"     onclick="go('debt',this)">ð³ CÃ´ng Ná»£</button>
-    <button class="tb"     onclick="go('products',this)">ð¦ Sáº£n Pháº©m</button>
-    <button class="tb"     onclick="go('history',this)">ð Lá»ch Sá»­</button>
-    <button class="tb"     onclick="go('stats',this)">ð Thá»ng KÃª</button>
-    <button class="tb admin-only" id="tab-users" style="display:none" onclick="go('users',this)">ð¤ NgÆ°á»i DÃ¹ng</button>
-    <button class="tb admin-only" id="tab-settings" style="display:none" onclick="go('settings',this)">âï¸ CÃ i Äáº·t Bill</button>
+    <button class="tb on"  onclick="go('sale',this)">🧾 Bán Hàng</button>
+    <button class="tb"     onclick="go('repair',this)">🔧 Sửa Chữa</button>
+    <button class="tb"     onclick="go('customer',this)">👥 Khách Hàng</button>
+    <button class="tb"     onclick="go('debt',this)">💳 Công Nợ</button>
+    <button class="tb"     onclick="go('products',this)">📦 Sản Phẩm</button>
+    <button class="tb"     onclick="go('history',this)">📋 Lịch Sử</button>
+    <button class="tb"     onclick="go('stats',this)">📈 Thống Kê</button>
+    <button class="tb admin-only" id="tab-users" style="display:none" onclick="go('users',this)">👤 Người Dùng</button>
+    <button class="tb admin-only" id="tab-settings" style="display:none" onclick="go('settings',this)">⚙️ Cài Đặt Bill</button>
   </div>
 </nav>
 
 <div class="toast" id="toast"></div>
 <div id="pa" style="display:none"></div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- BÃN HÃNG                                  -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- BÁN HÀNG                                  -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg on" id="pg-sale">
   <div class="card">
-    <div class="ct">ð¤ ThÃ´ng tin khÃ¡ch hÃ ng</div>
+    <div class="ct">👤 Thông tin khách hàng</div>
     <div class="fr c3">
       <div class="fg">
-        <label>KhÃ¡ch hÃ ng</label>
-        <input id="s-name" type="text" placeholder="TÃªn hoáº·c tÃ¬m KH má»i..." list="cust-list" oninput="fillCust('s',this.value)">
+        <label>Khách hàng</label>
+        <input id="s-name" type="text" placeholder="Tên hoặc tìm KH mối..." list="cust-list" oninput="fillCust('s',this.value)">
         <datalist id="cust-list"></datalist>
       </div>
       <div class="fg">
-        <label>Sá» Äiá»n thoáº¡i</label>
+        <label>Số điện thoại</label>
         <input id="s-phone" type="tel" placeholder="0xxx xxx xxx">
       </div>
       <div class="fg">
-        <label>Ghi chÃº ÄÆ¡n</label>
-        <input id="s-note" type="text" placeholder="Báº£o hÃ nh, giao hÃ ng...">
+        <label>Ghi chú đơn</label>
+        <input id="s-note" type="text" placeholder="Bảo hành, giao hàng...">
       </div>
     </div>
     <div class="fr c3">
       <div class="fg">
-        <label>Báº£o hÃ nh</label>
+        <label>Bảo hành</label>
         <select id="s-warranty">
-          <option value="0">KhÃ´ng báº£o hÃ nh</option>
-          <option value="1">1 thÃ¡ng</option>
-          <option value="3" selected>3 thÃ¡ng</option>
-          <option value="6">6 thÃ¡ng</option>
-          <option value="12">12 thÃ¡ng</option>
-          <option value="24">24 thÃ¡ng</option>
+          <option value="0">Không bảo hành</option>
+          <option value="1">1 tháng</option>
+          <option value="3" selected>3 tháng</option>
+          <option value="6">6 tháng</option>
+          <option value="12">12 tháng</option>
+          <option value="24">24 tháng</option>
         </select>
       </div>
       <div class="fg">
-        <label>HÃ¬nh thá»©c thanh toÃ¡n</label>
+        <label>Hình thức thanh toán</label>
         <select id="s-paymethod">
-          <option>Tiá»n máº·t</option>
-          <option>Chuyá»n khoáº£n</option>
-          <option>Tiá»n máº·t + CK</option>
-          <option>CÃ´ng ná»£</option>
+          <option>Tiền mặt</option>
+          <option>Chuyển khoản</option>
+          <option>Tiền mặt + CK</option>
+          <option>Công nợ</option>
         </select>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <div class="ct">ð Danh sÃ¡ch sáº£n pháº©m</div>
+    <div class="ct">🛒 Danh sách sản phẩm</div>
     <div class="bi" style="font-size:10px;font-weight:700;color:var(--gy);text-transform:uppercase;margin-bottom:3px;">
-      <span>MÃ£ SP</span><span>TÃªn SP</span><span>SL</span>
-      <span class="pc">ÄÆ¡n giÃ¡</span><span class="dc">G.GiÃ¡%</span><span class="tc2">ThÃ nh tiá»n</span><span></span>
+      <span>Mã SP</span><span>Tên SP</span><span>SL</span>
+      <span class="pc">Đơn giá</span><span class="dc">G.Giá%</span><span class="tc2">Thành tiền</span><span></span>
     </div>
     <div id="bill-items"></div>
-    <button class="btn bg2 bsm" onclick="addItem()" style="margin-top:6px">â ThÃªm dÃ²ng</button>
+    <button class="btn bg2 bsm" onclick="addItem()" style="margin-top:6px">➕ Thêm dòng</button>
 
     <div style="margin-top:18px;padding-top:14px;border-top:2px solid var(--bd)">
-      <div class="tot"><span>Tá»ng tiá»n hÃ ng</span><strong id="t-sub">0 Ä</strong></div>
+      <div class="tot"><span>Tổng tiền hàng</span><strong id="t-sub">0 đ</strong></div>
       <div class="tot">
-        <span>Giáº£m giÃ¡ thÃªm (Ä)</span>
+        <span>Giảm giá thêm (đ)</span>
         <input type="number" id="t-xdisc" value="0" min="0" style="width:130px;padding:6px 10px" oninput="calcT()">
       </div>
-      <div class="tot grand"><span>Tá»NG THANH TOÃN</span><span id="t-tot">0 Ä</span></div>
+      <div class="tot grand"><span>TỔNG THANH TOÁN</span><span id="t-tot">0 đ</span></div>
       <div class="tot" style="padding-top:10px">
-        <span>KhÃ¡ch tráº£ (Ä)</span>
+        <span>Khách trả (đ)</span>
         <input type="number" id="t-paid" value="0" min="0" style="width:150px;padding:8px 12px;font-size:14px;font-weight:700" oninput="calcT()">
       </div>
       <div class="tot change" id="change-row" style="display:none">
-        <span id="change-lbl">ðµ Tiá»n thá»«a</span>
-        <strong id="t-change">0 Ä</strong>
+        <span id="change-lbl">💵 Tiền thừa</span>
+        <strong id="t-change">0 đ</strong>
       </div>
     </div>
   </div>
 
   <div style="display:flex;gap:10px;flex-wrap:wrap">
-    <button class="btn bs" onclick="printSaleBill(null)" style="flex:1;justify-content:center;padding:13px">ð¨ï¸ In Bill + BH</button>
-    <button class="btn bp" onclick="saveSale()" style="flex:1;justify-content:center;padding:13px">ð¾ LÆ°u ÄÆ¡n HÃ ng</button>
-    <button class="btn bg2" onclick="clearSale()" style="padding:13px 14px">ðï¸</button>
+    <button class="btn bs" onclick="printSaleBill(null)" style="flex:1;justify-content:center;padding:13px">🖨️ In Bill + BH</button>
+    <button class="btn bp" onclick="saveSale()" style="flex:1;justify-content:center;padding:13px">💾 Lưu Đơn Hàng</button>
+    <button class="btn bg2" onclick="clearSale()" style="padding:13px 14px">🗑️</button>
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- Sá»¬A CHá»®A                                  -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- SỬA CHỮA                                  -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-repair">
   <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0;min-width:180px">
-      <input type="text" id="rep-search" placeholder="TÃ¬m tÃªn KH, SÄT, thiáº¿t bá», mÃ£ phiáº¿u..." oninput="renderRepairs()">
+      <input type="text" id="rep-search" placeholder="Tìm tên KH, SĐT, thiết bị, mã phiếu..." oninput="renderRepairs()">
     </div>
     <select id="rep-filter" onchange="renderRepairs()" style="width:auto;padding:9px 11px">
-      <option value="">Táº¥t cáº£ tráº¡ng thÃ¡i</option>
-      <option>Má»i nháº­n</option><option>Äang kiá»m tra</option>
-      <option>Äang sá»­a</option><option>Chá» linh kiá»n</option>
-      <option>HoÃ n thÃ nh</option><option>ÄÃ£ giao</option>
+      <option value="">Tất cả trạng thái</option>
+      <option>Mới nhận</option><option>Đang kiểm tra</option>
+      <option>Đang sửa</option><option>Chờ linh kiện</option>
+      <option>Hoàn thành</option><option>Đã giao</option>
     </select>
     <select id="rsf-select" onchange="setRepFilter(this.value)" style="height:32px;border-radius:6px;border:1px solid var(--bdr);padding:0 8px;font-size:13px;background:var(--card);color:var(--tx);cursor:pointer">
-      <option value="">Táº¥t cáº£ ngÃ y</option>
-      <option value="day">HÃ´m nay</option>
-      <option value="week">Tuáº§n nÃ y</option>
-      <option value="month">ThÃ¡ng nÃ y</option>
-      <option value="year">NÄm nay</option>
+      <option value="">Tất cả ngày</option>
+      <option value="day">Hôm nay</option>
+      <option value="week">Tuần này</option>
+      <option value="month">Tháng này</option>
+      <option value="year">Năm nay</option>
     </select>
-    <button class="btn bp" onclick="openRepairModal()" style="margin-left:auto;font-size:15px;padding:9px 22px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(99,102,241,.35)">â Nháº­n mÃ¡y</button>
+    <button class="btn bp" onclick="openRepairModal()" style="margin-left:auto;font-size:15px;padding:9px 22px;font-weight:700;white-space:nowrap;box-shadow:0 2px 8px rgba(99,102,241,.35)">➕ Nhận máy</button>
   </div>
   <div style="display:flex;gap:6px;margin-bottom:10px">
-  <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">ð¥ Nháº­p CSV</button>
-  <button class="btn b-gy bsm" onclick="downloadImportTemplate()">ð Máº«u</button>
+  <button class="btn bpu bsm" onclick="document.getElementById('import-rep-inp').click()">📥 Nhập CSV</button>
+  <button class="btn b-gy bsm" onclick="downloadImportTemplate()">📋 Mẫu</button>
   <input type="file" id="import-rep-inp" accept=".csv,.xlsx" style="display:none" onchange="importRepairsCSV(this)">
-  <button class="btn bd2 bsm" onclick="exportRepairs()">ð Xuáº¥t Excel</button>
+  <button class="btn bd2 bsm" onclick="exportRepairs()">📊 Xuất Excel</button>
   </div>
 
   <!-- Repair cards -->
   <div id="repair-list"></div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- KHÃCH HÃNG                                -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- KHÁCH HÀNG                                -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-customer">
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="cust-search" placeholder="TÃ¬m tÃªn, SÄT..." oninput="renderCustomers()">
+      <input type="text" id="cust-search" placeholder="Tìm tên, SĐT..." oninput="renderCustomers()">
     </div>
-    <button class="btn bpu" onclick="quickPhoneLookup()">ð Tra SÄT</button>
-    <button class="btn bp" onclick="openCustModal()">â ThÃªm KH</button>
+    <button class="btn bpu" onclick="quickPhoneLookup()">📞 Tra SĐT</button>
+    <button class="btn bp" onclick="openCustModal()">➕ Thêm KH</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table>
         <thead>
-          <tr><th>MÃ£ KH</th><th>TÃªn khÃ¡ch hÃ ng</th><th>SÄT</th><th>Loáº¡i KH</th>
-          <th class="tr">Tá»ng mua</th><th class="tr">CÃ´ng ná»£</th><th class="tc">Thao tÃ¡c</th></tr>
+          <tr><th>Mã KH</th><th>Tên khách hàng</th><th>SĐT</th><th>Loại KH</th>
+          <th class="tr">Tổng mua</th><th class="tr">Công nợ</th><th class="tc">Thao tác</th></tr>
         </thead>
         <tbody id="cust-tbody"></tbody>
       </table>
@@ -334,29 +334,29 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- CÃNG Ná»¢                                   -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- CÔNG NỢ                                   -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-debt">
   <div class="stats" id="debt-stats"></div>
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="debt-search" placeholder="TÃ¬m tÃªn khÃ¡ch hÃ ng..." oninput="renderDebts()">
+      <input type="text" id="debt-search" placeholder="Tìm tên khách hàng..." oninput="renderDebts()">
     </div>
     <select id="debt-filter" onchange="renderDebts()" style="width:auto;padding:9px 11px">
-      <option value="">Táº¥t cáº£</option>
-      <option value="CÃ²n ná»£">CÃ²n ná»£</option>
-      <option value="ÄÃ£ tráº£">ÄÃ£ tráº£</option>
+      <option value="">Tất cả</option>
+      <option value="Còn nợ">Còn nợ</option>
+      <option value="Đã trả">Đã trả</option>
     </select>
-    <button class="btn bp" onclick="openDebtModal()">â ThÃªm ná»£</button>
+    <button class="btn bp" onclick="openDebtModal()">➕ Thêm nợ</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table>
         <thead>
-          <tr><th>NgÃ y</th><th>KhÃ¡ch hÃ ng</th><th>MÃ´ táº£</th>
-          <th class="tr">Tá»ng ná»£</th><th class="tr">ÄÃ£ tráº£</th><th class="tr">CÃ²n láº¡i</th>
-          <th class="tc">TT</th><th class="tc">Thao tÃ¡c</th></tr>
+          <tr><th>Ngày</th><th>Khách hàng</th><th>Mô tả</th>
+          <th class="tr">Tổng nợ</th><th class="tr">Đã trả</th><th class="tr">Còn lại</th>
+          <th class="tc">TT</th><th class="tc">Thao tác</th></tr>
         </thead>
         <tbody id="debt-tbody"></tbody>
       </table>
@@ -364,24 +364,24 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- Sáº¢N PHáº¨M                                  -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- SẢN PHẨM                                  -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-products">
   <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="prod-search" placeholder="TÃ¬m mÃ£ hoáº·c tÃªn sáº£n pháº©m..." oninput="renderProds()">
+      <input type="text" id="prod-search" placeholder="Tìm mã hoặc tên sản phẩm..." oninput="renderProds()">
     </div>
-    <button class="btn bp" onclick="openProdModal()">â ThÃªm SP</button>
-  <button class="btn bd2 bsm" onclick="exportProducts()">ð Xuáº¥t Excel</button>
+    <button class="btn bp" onclick="openProdModal()">➕ Thêm SP</button>
+  <button class="btn bd2 bsm" onclick="exportProducts()">📊 Xuất Excel</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table>
         <thead>
-          <tr><th>MÃ£ SP</th><th>TÃªn Sáº£n Pháº©m</th><th>Loáº¡i</th>
-          <th class="tr cost-col">GiÃ¡ Nháº­p</th><th class="tr">GiÃ¡ BÃ¡n</th>
-          <th class="tc">Tá»n</th><th class="tc">Thao tÃ¡c</th></tr>
+          <tr><th>Mã SP</th><th>Tên Sản Phẩm</th><th>Loại</th>
+          <th class="tr cost-col">Giá Nhập</th><th class="tr">Giá Bán</th>
+          <th class="tc">Tồn</th><th class="tc">Thao tác</th></tr>
         </thead>
         <tbody id="prod-tbody"></tbody>
       </table>
@@ -389,22 +389,22 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- Lá»CH Sá»¬                                   -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- LỊCH SỬ                                   -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-history">
   <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap">
     <div class="sw" style="flex:1;margin:0">
-      <input type="text" id="hist-search" placeholder="TÃ¬m tÃªn khÃ¡ch, SÄT, sá» bill..." oninput="renderHistory()">
+      <input type="text" id="hist-search" placeholder="Tìm tên khách, SĐT, số bill..." oninput="renderHistory()">
     </div>
-    <button class="btn bd2 bsm admin-only" onclick="if(confirm('XÃ³a toÃ n bá» lá»ch sá»­?')){DB.sales=[];renderHistory();toast('ÄÃ£ xÃ³a')}">ðï¸ XÃ³a háº¿t</button>
+    <button class="btn bd2 bsm admin-only" onclick="if(confirm('Xóa toàn bộ lịch sử?')){DB.sales=[];renderHistory();toast('Đã xóa')}">🗑️ Xóa hết</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table>
         <thead>
-          <tr><th>NgÃ y</th><th>Sá» Bill</th><th>KhÃ¡ch hÃ ng</th>
-          <th class="tr">Tá»ng tiá»n</th><th>Thanh toÃ¡n</th><th class="tc">Chi tiáº¿t</th></tr>
+          <tr><th>Ngày</th><th>Số Bill</th><th>Khách hàng</th>
+          <th class="tr">Tổng tiền</th><th>Thanh toán</th><th class="tc">Chi tiết</th></tr>
         </thead>
         <tbody id="hist-tbody"></tbody>
       </table>
@@ -412,68 +412,68 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- THá»NG KÃ                                  -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- THỐNG KÊ                                  -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-stats">
   <div class="stats" id="stat-cards"></div>
   <div class="card">
-    <div class="ct">ð Doanh thu 7 ngÃ y gáº§n nháº¥t</div>
+    <div class="ct">📅 Doanh thu 7 ngày gần nhất</div>
     <div id="chart-wrap"></div>
   </div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
     <div class="card">
-      <div class="ct">ð SP bÃ¡n cháº¡y</div>
+      <div class="ct">🏆 SP bán chạy</div>
       <div id="top-prods"></div>
     </div>
     <div class="card">
-      <div class="ct">ð§ Tráº¡ng thÃ¡i sá»­a chá»¯a</div>
+      <div class="ct">🔧 Trạng thái sửa chữa</div>
       <div id="repair-stats"></div>
     </div>
   </div>
   <div class="card" style="margin-top:14px">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
-      <div class="ct" style="margin:0">ð° Lá»£i nhuáº­n sá»­a chá»¯a</div>
+      <div class="ct" style="margin:0">💰 Lợi nhuận sửa chữa</div>
       <div style="display:flex;gap:6px">
-        <button class="btn bsm bg2" id="rp-day"   onclick="showRepairProfit('day')">HÃ´m nay</button>
-        <button class="btn bsm bg2" id="rp-week"  onclick="showRepairProfit('week')">Tuáº§n nÃ y</button>
-        <button class="btn bsm bp"  id="rp-month" onclick="showRepairProfit('month')">ThÃ¡ng nÃ y</button>
+        <button class="btn bsm bg2" id="rp-day"   onclick="showRepairProfit('day')">Hôm nay</button>
+        <button class="btn bsm bg2" id="rp-week"  onclick="showRepairProfit('week')">Tuần này</button>
+        <button class="btn bsm bp"  id="rp-month" onclick="showRepairProfit('month')">Tháng này</button>
       </div>
     </div>
     <div id="repair-profit-body"></div>
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- MODAL: MÃ Táº¢ Xá»¬ LÃ KHI HOÃN THÃNH       -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- MODAL: MÔ TẢ XỬ LÍ KHI HOÀN THÀNH       -->
+<!-- ══════════════════════════════════════════ -->
 <div class="mo" id="mo-procnote">
   <div class="mw" style="max-width:460px">
-    <div class="mh"><div class="mt2">â HoÃ n thÃ nh â MÃ´ táº£ xá»­ lÃ­</div><button class="btn bg2 bsm" onclick="closeMo('mo-procnote')">â</button></div>
+    <div class="mh"><div class="mt2">✅ Hoàn thành – Mô tả xử lí</div><button class="btn bg2 bsm" onclick="closeMo('mo-procnote')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="pn-repid">
-      <div class="fg"><label>MÃ´ táº£ cÃ´ng viá»c ÄÃ£ xá»­ lÃ­ (ná»i bá»)</label><textarea id="pn-note" rows="4" placeholder="VD: Thay mÃ n hÃ¬nh 144Hz, vá» sinh táº£n nhiá»t, cÃ i láº¡i Windows..."></textarea></div>
+      <div class="fg"><label>Mô tả công việc đã xử lí (nội bộ)</label><textarea id="pn-note" rows="4" placeholder="VD: Thay màn hình 144Hz, vệ sinh tản nhiệt, cài lại Windows..."></textarea></div>
     </div>
     <div class="mf">
-      <button class="btn bg2" onclick="closeMo('mo-procnote')">Há»§y</button>
-      <button class="btn bp" onclick="saveProcNote()">â LÆ°u hoÃ n thÃ nh</button>
+      <button class="btn bg2" onclick="closeMo('mo-procnote')">Hủy</button>
+      <button class="btn bp" onclick="saveProcNote()">✅ Lưu hoàn thành</button>
     </div>
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- NGÆ¯á»I DÃNG (admin only)                  -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- NGƯỜI DÙNG (admin only)                  -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-users">
   <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap">
-    <div style="font-size:14px;font-weight:700;color:var(--pr-d)">ð¤ Quáº£n lÃ½ ngÆ°á»i dÃ¹ng</div>
-    <button class="btn bp" onclick="openUserModal()" style="margin-left:auto">â ThÃªm ngÆ°á»i dÃ¹ng</button>
+    <div style="font-size:14px;font-weight:700;color:var(--pr-d)">👤 Quản lý người dùng</div>
+    <button class="btn bp" onclick="openUserModal()" style="margin-left:auto">➕ Thêm người dùng</button>
   </div>
   <div class="card" style="padding:0;overflow:hidden">
     <div class="tw">
       <table>
         <thead>
-          <tr><th>TÃªn hiá»n thá»</th><th>TÃªn ÄÄng nháº­p</th><th>PhÃ¢n quyá»n</th><th class="tc">Thao tÃ¡c</th></tr>
+          <tr><th>Tên hiển thị</th><th>Tên đăng nhập</th><th>Phân quyền</th><th class="tc">Thao tác</th></tr>
         </thead>
         <tbody id="users-tbody"></tbody>
       </table>
@@ -481,42 +481,42 @@ tr:last-child td{border-bottom:none}
   </div>
 </div>
 
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
-<!-- CÃI Äáº¶T BILL                              -->
-<!-- ââââââââââââââââââââââââââââââââââââââââââ -->
+<!-- ══════════════════════════════════════════ -->
+<!-- CÀI ĐẶT BILL                              -->
+<!-- ══════════════════════════════════════════ -->
 <div class="pg" id="pg-settings">
   <div class="card">
-    <div class="ct">ðª ThÃ´ng tin cá»­a hÃ ng trÃªn bill</div>
+    <div class="ct">🏪 Thông tin cửa hàng trên bill</div>
     <div class="fr c2">
-      <div class="fg"><label>TÃªn cá»­a hÃ ng</label><input id="set-shopname" placeholder="Cá»¬A HÃNG LAPTOP 24H"></div>
-      <div class="fg"><label>Slogan / Dá»ch vá»¥</label><input id="set-slogan" placeholder="ChuyÃªn: Mua bÃ¡n, sá»­a chá»¯a Laptop..."></div>
+      <div class="fg"><label>Tên cửa hàng</label><input id="set-shopname" placeholder="CỬA HÀNG LAPTOP 24H"></div>
+      <div class="fg"><label>Slogan / Dịch vụ</label><input id="set-slogan" placeholder="Chuyên: Mua bán, sửa chữa Laptop..."></div>
     </div>
     <div class="fr c2">
-      <div class="fg"><label>Äá»a chá»</label><input id="set-addr" placeholder="123 ÄÆ°á»ng ABC, VÄ©nh Long"></div>
-      <div class="fg"><label>Sá» Äiá»n thoáº¡i</label><input id="set-phone" placeholder="0901 234 567" type="tel"></div>
+      <div class="fg"><label>Địa chỉ</label><input id="set-addr" placeholder="123 Đường ABC, Vĩnh Long"></div>
+      <div class="fg"><label>Số điện thoại</label><input id="set-phone" placeholder="0901 234 567" type="tel"></div>
     </div>
     <div class="fr c2">
       <div class="fg"><label>Facebook / Zalo</label><input id="set-social" placeholder="fb.com/laptop24h"></div>
-      <div class="fg"><label>Website (tuá»³ chá»n)</label><input id="set-web" placeholder="laptop24h.com"></div>
+      <div class="fg"><label>Website (tuỳ chọn)</label><input id="set-web" placeholder="laptop24h.com"></div>
     </div>
   </div>
   <div class="card">
-    <div class="ct">ð Ná»i dung cuá»i bill</div>
+    <div class="ct">📄 Nội dung cuối bill</div>
     <div class="fr c2">
-      <div class="fg"><label>Lá»i cáº£m Æ¡n bill bÃ¡n hÃ ng</label><textarea id="set-footer-sale" rows="2" placeholder="Cáº£m Æ¡n quÃ½ khÃ¡ch! HÃ ng ÄÃ£ mua khÃ´ng Äá»i tráº£."></textarea></div>
-      <div class="fg"><label>Lá»i cáº£m Æ¡n bill sá»­a chá»¯a</label><textarea id="set-footer-repair" rows="2" placeholder="Cáº£m Æ¡n quÃ½ khÃ¡ch! LiÃªn há» ngay náº¿u cÃ³ váº¥n Äá»."></textarea></div>
+      <div class="fg"><label>Lời cảm ơn bill bán hàng</label><textarea id="set-footer-sale" rows="2" placeholder="Cảm ơn quý khách! Hàng đã mua không đổi trả."></textarea></div>
+      <div class="fg"><label>Lời cảm ơn bill sửa chữa</label><textarea id="set-footer-repair" rows="2" placeholder="Cảm ơn quý khách! Liên hệ ngay nếu có vấn đề."></textarea></div>
     </div>
     <div class="fr c2">
-      <div class="fg"><label>Äiá»u khoáº£n báº£o hÃ nh bÃ¡n hÃ ng</label><textarea id="set-wterm-sale" rows="3" placeholder="â Báº£o hÃ nh miá»n phÃ­ lá»i nhÃ  sáº£n xuáº¥t&#10;â KhÃ´ng BH: va Äáº­p, vÃ o nÆ°á»c...&#10;â Xuáº¥t trÃ¬nh phiáº¿u nÃ y khi báº£o hÃ nh"></textarea></div>
-      <div class="fg"><label>Äiá»u khoáº£n báº£o hÃ nh sá»­a chá»¯a</label><textarea id="set-wterm-repair" rows="3" placeholder="â Báº£o hÃ nh lá»i phÃ¡t sinh tá»« sá»­a chá»¯a&#10;â KhÃ´ng BH: va Äáº­p, vÃ o nÆ°á»c...&#10;â Xuáº¥t trÃ¬nh phiáº¿u nÃ y khi báº£o hÃ nh"></textarea></div>
+      <div class="fg"><label>Điều khoản bảo hành bán hàng</label><textarea id="set-wterm-sale" rows="3" placeholder="✔ Bảo hành miễn phí lỗi nhà sản xuất&#10;✔ Không BH: va đập, vào nước...&#10;✔ Xuất trình phiếu này khi bảo hành"></textarea></div>
+      <div class="fg"><label>Điều khoản bảo hành sửa chữa</label><textarea id="set-wterm-repair" rows="3" placeholder="✔ Bảo hành lỗi phát sinh từ sửa chữa&#10;✔ Không BH: va đập, vào nước...&#10;✔ Xuất trình phiếu này khi bảo hành"></textarea></div>
     </div>
   </div>
   <div class="card">
-    <div class="ct">ðï¸ Font chá»¯ & Äá»nh dáº¡ng bill</div>
+    <div class="ct">🖋️ Font chữ & Định dạng bill</div>
     <div class="fr c3">
-      <div class="fg"><label>Font chá»¯ bill</label>
+      <div class="fg"><label>Font chữ bill</label>
         <select id="set-font">
-          <option value="Arial,sans-serif">Arial (máº·c Äá»nh)</option>
+          <option value="Arial,sans-serif">Arial (mặc định)</option>
           <option value="'Times New Roman',serif">Times New Roman</option>
           <option value="'Courier New',monospace">Courier New</option>
           <option value="Georgia,serif">Georgia</option>
@@ -524,278 +524,278 @@ tr:last-child td{border-bottom:none}
           <option value="Verdana,sans-serif">Verdana</option>
         </select>
       </div>
-      <div class="fg"><label>Cá»¡ chá»¯ ná»i dung</label>
+      <div class="fg"><label>Cỡ chữ nội dung</label>
         <select id="set-fontsize">
-          <option value="10px">Nhá» (10px)</option>
-          <option value="11px" selected>Trung bÃ¬nh (11px)</option>
-          <option value="12px">HÆ¡i lá»n (12px)</option>
-          <option value="13px">Lá»n (13px)</option>
+          <option value="10px">Nhỏ (10px)</option>
+          <option value="11px" selected>Trung bình (11px)</option>
+          <option value="12px">Hơi lớn (12px)</option>
+          <option value="13px">Lớn (13px)</option>
         </select>
       </div>
-      <div class="fg"><label>MÃ u chá»§ Äáº¡o bill</label>
+      <div class="fg"><label>Màu chủ đạo bill</label>
         <select id="set-billcolor">
-          <option value="#1e3a8a">Xanh Äáº­m (máº·c Äá»nh)</option>
-          <option value="#1a56db">Xanh nháº¡t</option>
-          <option value="#065f46">Xanh lÃ¡</option>
-          <option value="#7c3aed">TÃ­m</option>
-          <option value="#b45309">NÃ¢u vÃ ng</option>
-          <option value="#111111">Äen tráº¯ng</option>
+          <option value="#1e3a8a">Xanh đậm (mặc định)</option>
+          <option value="#1a56db">Xanh nhạt</option>
+          <option value="#065f46">Xanh lá</option>
+          <option value="#7c3aed">Tím</option>
+          <option value="#b45309">Nâu vàng</option>
+          <option value="#111111">Đen trắng</option>
         </select>
       </div>
     </div>
     <div class="fr c3" style="margin-top:10px">
-      <div class="fg"><label>Hiá»n thá» logo emoji</label>
-        <select id="set-logo"><option value="ð»">ð» Laptop</option><option value="ð¥ï¸">ð¥ï¸ MÃ n hÃ¬nh</option><option value="ð">ð Giá» hÃ ng</option><option value="ðª">ðª Cá»­a hÃ ng</option><option value="">KhÃ´ng logo</option></select>
+      <div class="fg"><label>Hiển thị logo emoji</label>
+        <select id="set-logo"><option value="💻">💻 Laptop</option><option value="🖥️">🖥️ Màn hình</option><option value="🛒">🛒 Giỏ hàng</option><option value="🏪">🏪 Cửa hàng</option><option value="">Không logo</option></select>
       </div>
-      <div class="fg"><label>Chiá»u rá»ng bill (mm)</label>
-        <select id="set-billwidth"><option value="420px">A4 (420px)</option><option value="320px" selected>Khá» 80mm (320px)</option><option value="380px">Khá» A5 (380px)</option></select>
+      <div class="fg"><label>Chiều rộng bill (mm)</label>
+        <select id="set-billwidth"><option value="420px">A4 (420px)</option><option value="320px" selected>Khổ 80mm (320px)</option><option value="380px">Khổ A5 (380px)</option></select>
       </div>
       <div class="fg" style="justify-content:flex-end;padding-top:18px">
-        <button class="btn bs bbl" onclick="saveBillSettings()">ð¾ LÆ°u cÃ i Äáº·t</button>
+        <button class="btn bs bbl" onclick="saveBillSettings()">💾 Lưu cài đặt</button>
       </div>
     </div>
     <div style="margin-top:14px;padding:12px;background:var(--pr-l);border-radius:var(--rs);font-size:12px">
-      <b>Xem trÆ°á»c:</b> Font <span id="prev-font">Arial</span>, Cá»¡ <span id="prev-size">11px</span>, MÃ u <span id="prev-color" style="font-weight:700">#1e3a8a</span>
-      &nbsp;|&nbsp; <button class="btn bg2 bsm" onclick="printSaleBill(null)">ð¨ï¸ In thá»­ bill bÃ¡n hÃ ng</button>
+      <b>Xem trước:</b> Font <span id="prev-font">Arial</span>, Cỡ <span id="prev-size">11px</span>, Màu <span id="prev-color" style="font-weight:700">#1e3a8a</span>
+      &nbsp;|&nbsp; <button class="btn bg2 bsm" onclick="printSaleBill(null)">🖨️ In thử bill bán hàng</button>
     </div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: Lá»CH Sá»¬ KHÃCH HÃNG âââââââ -->
+<!-- ═══════ MODAL: LỊCH SỬ KHÁCH HÀNG ═══════ -->
 <div class="mo" id="mo-cust-hist">
   <div class="mw" style="max-width:680px">
-    <div class="mh"><div class="mt2" id="mo-cust-hist-title">ð Lá»ch sá»­ giao dá»ch</div><button class="btn bg2 bsm" onclick="closeMo('mo-cust-hist')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-cust-hist-title">📋 Lịch sử giao dịch</div><button class="btn bg2 bsm" onclick="closeMo('mo-cust-hist')">✕</button></div>
     <div class="mb2" id="mo-cust-hist-body"></div>
   </div>
 </div>
 
-<!-- âââââââ LOGIN OVERLAY âââââââ -->
+<!-- ═══════ LOGIN OVERLAY ═══════ -->
 <div class="login-ov" id="login-overlay">
   <div class="login-box">
-    <div class="login-logo">ð»</div>
+    <div class="login-logo">💻</div>
     <div class="login-title">Laptop 24H</div>
-    <div class="login-sub">ÄÄng nháº­p Äá» tiáº¿p tá»¥c</div>
+    <div class="login-sub">Đăng nhập để tiếp tục</div>
     <div class="fg" style="margin-bottom:10px;text-align:left">
-      <label>TÃªn ÄÄng nháº­p</label>
+      <label>Tên đăng nhập</label>
       <input id="li-user" type="text" placeholder="" onkeydown="if(event.key==='Enter')login()">
     </div>
     <div class="fg" style="margin-bottom:18px;text-align:left">
-      <label>Máº­t kháº©u</label>
+      <label>Mật khẩu</label>
       <div class="pw-wrap">
-        <input id="li-pass" type="password" placeholder="â¢â¢â¢â¢â¢â¢" onkeydown="if(event.key==='Enter')login()">
-        <button class="pw-eye" type="button" onclick="togglePw('li-pass',this)" tabindex="-1">ðï¸</button>
+        <input id="li-pass" type="password" placeholder="••••••" onkeydown="if(event.key==='Enter')login()">
+        <button class="pw-eye" type="button" onclick="togglePw('li-pass',this)" tabindex="-1">👁️</button>
       </div>
     </div>
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;text-align:left"><input type="checkbox" id="li-remember" style="width:15px;height:15px;cursor:pointer;accent-color:var(--pr)"><label for="li-remember" style="font-size:12px;color:#666;cursor:pointer;margin:0">LÆ°u tÃ i khoáº£n</label></div>
-    <button class="btn bp bbl" onclick="login()" style="padding:12px">ð ÄÄng nháº­p</button>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;text-align:left"><input type="checkbox" id="li-remember" style="width:15px;height:15px;cursor:pointer;accent-color:var(--pr)"><label for="li-remember" style="font-size:12px;color:#666;cursor:pointer;margin:0">Lưu tài khoản</label></div>
+    <button class="btn bp bbl" onclick="login()" style="padding:12px">🔐 Đăng nhập</button>
     
   </div>
 </div>
 
-<!-- âââââââ MODAL: GIAO MÃY âââââââ -->
+<!-- ═══════ MODAL: GIAO MÁY ═══════ -->
 <div class="mo" id="mo-deliver">
   <div class="mw" style="max-width:660px">
-    <div class="mh"><div class="mt2">ð Giao mÃ¡y & Xuáº¥t bill</div><button class="btn bg2 bsm" onclick="closeMo('mo-deliver')">â</button></div>
+    <div class="mh"><div class="mt2">🚀 Giao máy & Xuất bill</div><button class="btn bg2 bsm" onclick="closeMo('mo-deliver')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="dv-repid">
       <div id="dv-rep-info" style="background:var(--pr-l);padding:10px 12px;border-radius:var(--rs);margin-bottom:14px;font-size:12px"></div>
-      <div style="font-size:12px;font-weight:700;color:var(--pr-d);margin-bottom:6px">ð Háº¡ng má»¥c sá»­a chá»¯a / linh kiá»n thay tháº¿:</div>
+      <div style="font-size:12px;font-weight:700;color:var(--pr-d);margin-bottom:6px">📋 Hạng mục sửa chữa / linh kiện thay thế:</div>
       <div class="di" style="font-size:10px;font-weight:700;color:var(--gy);text-transform:uppercase;margin-bottom:3px">
-        <span>MÃ´ táº£ / Linh kiá»n</span><span>SL</span><span>ÄÆ¡n giÃ¡ (Ä)</span><span>ThÃ nh tiá»n</span><span></span>
+        <span>Mô tả / Linh kiện</span><span>SL</span><span>Đơn giá (đ)</span><span>Thành tiền</span><span></span>
       </div>
       <div id="dv-items"></div>
-      <button class="btn bg2 bsm" onclick="addDeliveryItem()" style="margin-bottom:14px">â ThÃªm dÃ²ng</button>
+      <button class="btn bg2 bsm" onclick="addDeliveryItem()" style="margin-bottom:14px">➕ Thêm dòng</button>
       <div style="margin-bottom:14px">
         <div class="fg">
-          <label>Chá»n sáº£n pháº©m tá»« kho (tá»± Äá»ng thÃªm dÃ²ng)</label>
+          <label>Chọn sản phẩm từ kho (tự động thêm dòng)</label>
           <select id="dv-prod-pick" onchange="pickProdForDelivery(this.value)" style="width:100%">
-            <option value="">-- Chá»n sáº£n pháº©m trong kho --</option>
+            <option value="">-- Chọn sản phẩm trong kho --</option>
           </select>
         </div>
       </div>
       <div style="padding-top:10px;border-top:2px solid var(--bd)">
-        <div class="tot"><span>Tá»ng háº¡ng má»¥c</span><strong id="dv-subtotal">0 Ä</strong></div>
+        <div class="tot"><span>Tổng hạng mục</span><strong id="dv-subtotal">0 đ</strong></div>
         <div class="tot">
-          <span>Tiá»n cá»c ÄÃ£ nháº­n</span><strong id="dv-deposit">0 Ä</strong>
+          <span>Tiền cọc đã nhận</span><strong id="dv-deposit">0 đ</strong>
         </div>
-        <div class="tot grand"><span>CÃN Láº I THANH TOÃN</span><span id="dv-remaining">0 Ä</span></div>
+        <div class="tot grand"><span>CÒN LẠI THANH TOÁN</span><span id="dv-remaining">0 đ</span></div>
         <div class="tot" style="padding-top:10px">
-          <span>KhÃ¡ch tráº£ thÃªm (Ä)</span>
+          <span>Khách trả thêm (đ)</span>
           <input type="number" id="dv-paid" value="0" min="0" style="width:160px;padding:8px 12px;font-size:14px;font-weight:700" oninput="calcDelivery()">
         </div>
         <div class="tot change" id="dv-change-row" style="display:none">
-          <span id="dv-change-lbl">ðµ Tiá»n thá»«a</span>
-          <strong id="dv-change">0 Ä</strong>
+          <span id="dv-change-lbl">💵 Tiền thừa</span>
+          <strong id="dv-change">0 đ</strong>
         </div>
       </div>
       <div class="fr c2" style="margin-top:12px">
-        <div class="fg"><label>Báº£o hÃ nh sá»­a chá»¯a</label>
-          <select id="dv-warranty"><option value="0">KhÃ´ng BH</option><option value="1">1 thÃ¡ng</option><option value="3" selected>3 thÃ¡ng</option><option value="6">6 thÃ¡ng</option><option value="12">12 thÃ¡ng</option></select>
+        <div class="fg"><label>Bảo hành sửa chữa</label>
+          <select id="dv-warranty"><option value="0">Không BH</option><option value="1">1 tháng</option><option value="3" selected>3 tháng</option><option value="6">6 tháng</option><option value="12">12 tháng</option></select>
         </div>
-        <div class="fg"><label>NgÃ y giao</label>
+        <div class="fg"><label>Ngày giao</label>
           <input id="dv-date" type="date">
         </div>
       </div>
-      <div class="fg admin-only" style="margin-top:10px"><label>ð§ MÃ´ táº£ xá»­ lÃ­ (ná»i bá»)</label><textarea id="dv-process" rows="3" placeholder="MÃ´ táº£ cÃ´ng viá»c ÄÃ£ xá»­ lÃ­, linh kiá»n thay, lÆ°u Ã½ ká»¹ thuáº­t..."></textarea></div>
+      <div class="fg admin-only" style="margin-top:10px"><label>🔧 Mô tả xử lí (nội bộ)</label><textarea id="dv-process" rows="3" placeholder="Mô tả công việc đã xử lí, linh kiện thay, lưu ý kỹ thuật..."></textarea></div>
     </div>
     <div class="mf">
-      <button class="btn bg2" onclick="closeMo('mo-deliver')">Há»§y</button>
-      <button class="btn bpu" onclick="printDeliverBill()">ð¨ï¸ In bill</button>
-      <button class="btn bs" onclick="saveDeliver()">â XÃ¡c nháº­n giao + In</button>
+      <button class="btn bg2" onclick="closeMo('mo-deliver')">Hủy</button>
+      <button class="btn bpu" onclick="printDeliverBill()">🖨️ In bill</button>
+      <button class="btn bs" onclick="saveDeliver()">✅ Xác nhận giao + In</button>
     </div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: NGÆ¯á»I DÃNG âââââââ -->
+<!-- ═══════ MODAL: NGƯỜI DÙNG ═══════ -->
 <div class="mo" id="mo-user">
   <div class="mw" style="max-width:400px">
-    <div class="mh"><div class="mt2" id="mo-user-title">ThÃªm ngÆ°á»i dÃ¹ng</div><button class="btn bg2 bsm" onclick="closeMo('mo-user')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-user-title">Thêm người dùng</div><button class="btn bg2 bsm" onclick="closeMo('mo-user')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="um-oid">
-      <div class="fg" style="margin-bottom:10px"><label>TÃªn hiá»n thá» *</label><input id="um-name" placeholder="Nguyá»n VÄn A"></div>
-      <div class="fg" style="margin-bottom:10px"><label>TÃªn ÄÄng nháº­p *</label><input id="um-username" placeholder="nhanvien1"></div>
-      <div class="fg" style="margin-bottom:10px"><label>Máº­t kháº©u *</label><div class="pw-wrap"><input id="um-pass" type="password" placeholder="â¢â¢â¢â¢â¢â¢"><button class="pw-eye" type="button" onclick="togglePw('um-pass',this)" tabindex="-1">ðï¸</button></div></div>
-      <div class="fg"><label>PhÃ¢n quyá»n</label>
-        <select id="um-role"><option value="staff">NhÃ¢n viÃªn</option><option value="admin">Admin</option></select>
+      <div class="fg" style="margin-bottom:10px"><label>Tên hiển thị *</label><input id="um-name" placeholder="Nguyễn Văn A"></div>
+      <div class="fg" style="margin-bottom:10px"><label>Tên đăng nhập *</label><input id="um-username" placeholder="nhanvien1"></div>
+      <div class="fg" style="margin-bottom:10px"><label>Mật khẩu *</label><div class="pw-wrap"><input id="um-pass" type="password" placeholder="••••••"><button class="pw-eye" type="button" onclick="togglePw('um-pass',this)" tabindex="-1">👁️</button></div></div>
+      <div class="fg"><label>Phân quyền</label>
+        <select id="um-role"><option value="staff">Nhân viên</option><option value="admin">Admin</option></select>
       </div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-user')">Há»§y</button><button class="btn bp" onclick="saveUser()">ð¾ LÆ°u</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-user')">Hủy</button><button class="btn bp" onclick="saveUser()">💾 Lưu</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: Sáº¢N PHáº¨M âââââââ -->
+<!-- ═══════ MODAL: SẢN PHẨM ═══════ -->
 <div class="mo" id="mo-prod">
   <div class="mw">
-    <div class="mh"><div class="mt2" id="mo-prod-title">ThÃªm Sáº£n Pháº©m</div><button class="btn bg2 bsm" onclick="closeMo('mo-prod')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-prod-title">Thêm Sản Phẩm</div><button class="btn bg2 bsm" onclick="closeMo('mo-prod')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="pm-oid">
-      <div class="fr c2"><div class="fg"><label>MÃ£ SP *</label><input id="pm-code" placeholder="SP001"></div><div class="fg"><label>Loáº¡i</label><select id="pm-type"><option>Laptop</option><option>Linh kiá»n</option><option>Phá»¥ kiá»n</option><option>Dá»ch vá»¥</option><option>KhÃ¡c</option></select></div></div>
-      <div class="fg" style="margin-bottom:10px"><label>TÃªn sáº£n pháº©m *</label><input id="pm-name" placeholder="TÃªn Äáº§y Äá»§..."></div>
+      <div class="fr c2"><div class="fg"><label>Mã SP *</label><input id="pm-code" placeholder="SP001"></div><div class="fg"><label>Loại</label><select id="pm-type"><option>Laptop</option><option>Linh kiện</option><option>Phụ kiện</option><option>Dịch vụ</option><option>Khác</option></select></div></div>
+      <div class="fg" style="margin-bottom:10px"><label>Tên sản phẩm *</label><input id="pm-name" placeholder="Tên đầy đủ..."></div>
       <div class="fr c3">
-        <div class="fg"><label>ÄÆ¡n vá»</label><input id="pm-unit" value="CÃ¡i"></div>
-        <div class="fg"><label>GiÃ¡ nháº­p (Ä)</label><input id="pm-cost" type="number" value="0" min="0"></div>
-        <div class="fg"><label>GiÃ¡ bÃ¡n (Ä)</label><input id="pm-price" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Đơn vị</label><input id="pm-unit" value="Cái"></div>
+        <div class="fg"><label>Giá nhập (đ)</label><input id="pm-cost" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Giá bán (đ)</label><input id="pm-price" type="number" value="0" min="0"></div>
       </div>
       <div class="fr c3">
-        <div class="fg"><label>Tá»n kho</label><input id="pm-stock" type="number" value="0" min="0"></div>
-        <div class="fg"><label>Báº£o hÃ nh (thÃ¡ng)</label><select id="pm-warranty"><option value="0">KhÃ´ng BH</option><option value="1">1 thÃ¡ng</option><option value="3">3 thÃ¡ng</option><option value="6">6 thÃ¡ng</option><option value="12">12 thÃ¡ng</option><option value="18">18 thÃ¡ng</option><option value="24">24 thÃ¡ng</option></select></div>
-        <div class="fg"><label>Ghi chÃº</label><input id="pm-note" placeholder="MÃ u sáº¯c, Äáº·c tÃ­nh..."></div>
+        <div class="fg"><label>Tồn kho</label><input id="pm-stock" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Bảo hành (tháng)</label><select id="pm-warranty"><option value="0">Không BH</option><option value="1">1 tháng</option><option value="3">3 tháng</option><option value="6">6 tháng</option><option value="12">12 tháng</option><option value="18">18 tháng</option><option value="24">24 tháng</option></select></div>
+        <div class="fg"><label>Ghi chú</label><input id="pm-note" placeholder="Màu sắc, đặc tính..."></div>
       </div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-prod')">Há»§y</button><button class="btn bp" onclick="saveProd()">ð¾ LÆ°u</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-prod')">Hủy</button><button class="btn bp" onclick="saveProd()">💾 Lưu</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: KHÃCH HÃNG âââââââ -->
+<!-- ═══════ MODAL: KHÁCH HÀNG ═══════ -->
 <div class="mo" id="mo-cust">
   <div class="mw">
-    <div class="mh"><div class="mt2" id="mo-cust-title">ThÃªm KhÃ¡ch HÃ ng</div><button class="btn bg2 bsm" onclick="closeMo('mo-cust')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-cust-title">Thêm Khách Hàng</div><button class="btn bg2 bsm" onclick="closeMo('mo-cust')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="cm-oid">
       <div class="fr c2">
-        <div class="fg"><label>TÃªn khÃ¡ch hÃ ng *</label><input id="cm-name" placeholder="Nguyá»n VÄn A"></div>
-        <div class="fg"><label>Sá» Äiá»n thoáº¡i *</label><input id="cm-phone" placeholder="0901234567" type="tel"></div>
+        <div class="fg"><label>Tên khách hàng *</label><input id="cm-name" placeholder="Nguyễn Văn A"></div>
+        <div class="fg"><label>Số điện thoại *</label><input id="cm-phone" placeholder="0901234567" type="tel"></div>
       </div>
       <div class="fr c2">
-        <div class="fg"><label>Loáº¡i khÃ¡ch hÃ ng</label><select id="cm-type"><option>Má»i</option><option>ThÃ¢n thiáº¿t</option><option>VIP</option></select></div>
-        <div class="fg"><label>Äá»a chá»</label><input id="cm-addr" placeholder="Äá»a chá»..."></div>
+        <div class="fg"><label>Loại khách hàng</label><select id="cm-type"><option>Mới</option><option>Thân thiết</option><option>VIP</option></select></div>
+        <div class="fg"><label>Địa chỉ</label><input id="cm-addr" placeholder="Địa chỉ..."></div>
       </div>
-      <div class="fg"><label>Ghi chÃº</label><textarea id="cm-note" placeholder="Thiáº¿t bá» Äang dÃ¹ng, sá» thÃ­ch..."></textarea></div>
+      <div class="fg"><label>Ghi chú</label><textarea id="cm-note" placeholder="Thiết bị đang dùng, sở thích..."></textarea></div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-cust')">Há»§y</button><button class="btn bp" onclick="saveCust()">ð¾ LÆ°u</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-cust')">Hủy</button><button class="btn bp" onclick="saveCust()">💾 Lưu</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: CÃNG Ná»¢ âââââââ -->
+<!-- ═══════ MODAL: CÔNG NỢ ═══════ -->
 <div class="mo" id="mo-debt">
   <div class="mw">
-    <div class="mh"><div class="mt2" id="mo-debt-title">ThÃªm CÃ´ng Ná»£</div><button class="btn bg2 bsm" onclick="closeMo('mo-debt')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-debt-title">Thêm Công Nợ</div><button class="btn bg2 bsm" onclick="closeMo('mo-debt')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="dm-oid">
       <div class="fr c2">
-        <div class="fg"><label>KhÃ¡ch hÃ ng *</label><input id="dm-name" placeholder="TÃªn hoáº·c chá»n KH má»i" list="cust-list2"><datalist id="cust-list2"></datalist></div>
-        <div class="fg"><label>Sá» Äiá»n thoáº¡i</label><input id="dm-phone" type="tel" placeholder="0xxx..."></div>
+        <div class="fg"><label>Khách hàng *</label><input id="dm-name" placeholder="Tên hoặc chọn KH mối" list="cust-list2"><datalist id="cust-list2"></datalist></div>
+        <div class="fg"><label>Số điện thoại</label><input id="dm-phone" type="tel" placeholder="0xxx..."></div>
       </div>
       <div class="fr c2">
-        <div class="fg"><label>Sá» tiá»n ná»£ (Ä) *</label><input id="dm-amt" type="number" value="0" min="0"></div>
-        <div class="fg"><label>ÄÃ£ tráº£ (Ä)</label><input id="dm-paid" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Số tiền nợ (đ) *</label><input id="dm-amt" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Đã trả (đ)</label><input id="dm-paid" type="number" value="0" min="0"></div>
       </div>
       <div class="fr c2">
-        <div class="fg"><label>Háº¡n tráº£</label><input id="dm-due" type="date"></div>
-        <div class="fg"><label>Tráº¡ng thÃ¡i</label><select id="dm-status"><option>CÃ²n ná»£</option><option>ÄÃ£ tráº£</option></select></div>
+        <div class="fg"><label>Hạn trả</label><input id="dm-due" type="date"></div>
+        <div class="fg"><label>Trạng thái</label><select id="dm-status"><option>Còn nợ</option><option>Đã trả</option></select></div>
       </div>
-      <div class="fg"><label>MÃ´ táº£ / nguá»n gá»c ná»£</label><textarea id="dm-desc" placeholder="Mua laptop, sá»­a mÃ¡y..."></textarea></div>
+      <div class="fg"><label>Mô tả / nguồn gốc nợ</label><textarea id="dm-desc" placeholder="Mua laptop, sửa máy..."></textarea></div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-debt')">Há»§y</button><button class="btn bp" onclick="saveDebt()">ð¾ LÆ°u</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-debt')">Hủy</button><button class="btn bp" onclick="saveDebt()">💾 Lưu</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: Sá»¬A CHá»®A âââââââ -->
+<!-- ═══════ MODAL: SỬA CHỮA ═══════ -->
 <div class="mo" id="mo-repair">
   <div class="mw" style="max-width:620px">
-    <div class="mh"><div class="mt2" id="mo-rep-title">ð§ Phiáº¿u Nháº­n MÃ¡y Sá»­a</div><button class="btn bg2 bsm" onclick="closeMo('mo-repair')">â</button></div>
+    <div class="mh"><div class="mt2" id="mo-rep-title">🔧 Phiếu Nhận Máy Sửa</div><button class="btn bg2 bsm" onclick="closeMo('mo-repair')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="rm-oid">
       <div class="fr c3">
-        <div class="fg"><label>TÃªn khÃ¡ch hÃ ng *</label><input id="rm-name" list="cust-list3" oninput="fillCust('rm',this.value)" placeholder="TÃªn KH..."><datalist id="cust-list3"></datalist></div>
-        <div class="fg"><label>Sá» Äiá»n thoáº¡i *</label><input id="rm-phone" type="tel" placeholder="0xxx..."></div>
-        <div class="fg"><label>Äá»a chá»</label><input id="rm-addr" placeholder="Äá»a chá»..."></div>
+        <div class="fg"><label>Tên khách hàng *</label><input id="rm-name" list="cust-list3" oninput="fillCust('rm',this.value)" placeholder="Tên KH..."><datalist id="cust-list3"></datalist></div>
+        <div class="fg"><label>Số điện thoại *</label><input id="rm-phone" type="tel" placeholder="0xxx..."></div>
+        <div class="fg"><label>Địa chỉ</label><input id="rm-addr" placeholder="Địa chỉ..."></div>
       </div>
       <div class="fr c3">
-        <div class="fg"><label>Thiáº¿t bá» *</label><input id="rm-device" placeholder="Dell Inspiron 15 3520"></div>
+        <div class="fg"><label>Thiết bị *</label><input id="rm-device" placeholder="Dell Inspiron 15 3520"></div>
         <div class="fg"><label>Serial / IMEI</label><input id="rm-serial" placeholder="SN12345..."></div>
-        <div class="fg"><label>Máº­t kháº©u mÃ¡y</label><input id="rm-pass" placeholder="Password..."></div>
+        <div class="fg"><label>Mật khẩu máy</label><input id="rm-pass" placeholder="Password..."></div>
       </div>
-      <div class="fg" style="margin-bottom:10px"><label>TÃ¬nh tráº¡ng khi nháº­n (mÃ´ táº£ lá»i)</label><textarea id="rm-issue" placeholder="KhÃ´ng lÃªn nguá»n, mÃ n hÃ¬nh tráº¯ng, bÃ n phÃ­m liá»t..."></textarea></div>
-      <div class="fg" style="margin-bottom:10px"><label>Phá»¥ kiá»n kÃ¨m theo</label><input id="rm-acc" placeholder="Sáº¡c, tÃºi, chuá»t..."></div>
+      <div class="fg" style="margin-bottom:10px"><label>Tình trạng khi nhận (mô tả lỗi)</label><textarea id="rm-issue" placeholder="Không lên nguồn, màn hình trắng, bàn phím liệt..."></textarea></div>
+      <div class="fg" style="margin-bottom:10px"><label>Phụ kiện kèm theo</label><input id="rm-acc" placeholder="Sạc, túi, chuột..."></div>
       <div class="fr c3">
-        <div class="fg"><label>NgÃ y nháº­n *</label><input id="rm-in" type="date"></div>
-        <div class="fg"><label>Chi phÃ­ dá»± kiáº¿n (Ä)</label><input id="rm-cost" type="number" value="0" min="0"></div>
-        <div class="fg"><label>Tiá»n cá»c (Ä)</label><input id="rm-dep" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Ngày nhận *</label><input id="rm-in" type="date"></div>
+        <div class="fg"><label>Chi phí dự kiến (đ)</label><input id="rm-cost" type="number" value="0" min="0"></div>
+        <div class="fg"><label>Tiền cọc (đ)</label><input id="rm-dep" type="number" value="0" min="0"></div>
       </div>
-      <div class="fg admin-only" style="margin-bottom:10px"><label>ð Vá»n linh kiá»n (Ä)</label><input id="rm-capital" type="number" value="0" min="0"></div>
+      <div class="fg admin-only" style="margin-bottom:10px"><label>🔒 Vốn linh kiện (đ)</label><input id="rm-capital" type="number" value="0" min="0"></div>
       <div class="fr c2">
-        <div class="fg"><label>Báº£o hÃ nh sá»­a chá»¯a</label><select id="rm-warranty"><option value="0">KhÃ´ng BH</option><option value="1">1 thÃ¡ng</option><option value="3">3 thÃ¡ng</option><option value="6">6 thÃ¡ng</option></select></div>
-        <div class="fg"><label>Ká»¹ thuáº­t viÃªn</label><input id="rm-tech" placeholder="TÃªn KTV..."></div>
+        <div class="fg"><label>Bảo hành sửa chữa</label><select id="rm-warranty"><option value="0">Không BH</option><option value="1">1 tháng</option><option value="3">3 tháng</option><option value="6">6 tháng</option></select></div>
+        <div class="fg"><label>Kỹ thuật viên</label><input id="rm-tech" placeholder="Tên KTV..."></div>
       </div>
-      <div class="fg"><label>Ghi chÃº ná»i bá»</label><textarea id="rm-note" placeholder="Chá» nhÃ¢n viÃªn tháº¥y..."></textarea></div>
+      <div class="fg"><label>Ghi chú nội bộ</label><textarea id="rm-note" placeholder="Chỉ nhân viên thấy..."></textarea></div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-repair')">Há»§y</button><button class="btn bp" onclick="saveRepair()">ð¾ LÆ°u phiáº¿u</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-repair')">Hủy</button><button class="btn bp" onclick="saveRepair()">💾 Lưu phiếu</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: CHI TIáº¾T ÄÆ N HÃNG âââââââ -->
+<!-- ═══════ MODAL: CHI TIẾT ĐƠN HÀNG ═══════ -->
 <div class="mo" id="mo-order">
   <div class="mw" style="max-width:600px">
-    <div class="mh"><div class="mt2">ð Chi tiáº¿t ÄÆ¡n hÃ ng</div><button class="btn bg2 bsm" onclick="closeMo('mo-order')">â</button></div>
+    <div class="mh"><div class="mt2">📋 Chi tiết đơn hàng</div><button class="btn bg2 bsm" onclick="closeMo('mo-order')">✕</button></div>
     <div class="mb2" id="mo-order-body"></div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-order')">ÄÃ³ng</button><button class="btn bw" id="reprint-btn">ð¨ï¸ In láº¡i</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-order')">Đóng</button><button class="btn bw" id="reprint-btn">🖨️ In lại</button></div>
   </div>
 </div>
 
-<!-- âââââââ MODAL: THANH TOÃN Ná»¢ âââââââ -->
+<!-- ═══════ MODAL: THANH TOÁN NỢ ═══════ -->
 <div class="mo" id="mo-pay">
   <div class="mw" style="max-width:400px">
-    <div class="mh"><div class="mt2">ð° Ghi nháº­n thanh toÃ¡n ná»£</div><button class="btn bg2 bsm" onclick="closeMo('mo-pay')">â</button></div>
+    <div class="mh"><div class="mt2">💰 Ghi nhận thanh toán nợ</div><button class="btn bg2 bsm" onclick="closeMo('mo-pay')">✕</button></div>
     <div class="mb2">
       <input type="hidden" id="pay-id">
       <div id="pay-info" style="background:var(--gy-l);padding:12px;border-radius:var(--rs);margin-bottom:12px;font-size:13px"></div>
-      <div class="fg"><label>Sá» tiá»n thanh toÃ¡n (Ä)</label><input id="pay-amt" type="number" value="0" min="0"></div>
+      <div class="fg"><label>Số tiền thanh toán (đ)</label><input id="pay-amt" type="number" value="0" min="0"></div>
     </div>
-    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-pay')">Há»§y</button><button class="btn bs" onclick="recordPayment()">â XÃ¡c nháº­n</button></div>
+    <div class="mf"><button class="btn bg2" onclick="closeMo('mo-pay')">Hủy</button><button class="btn bs" onclick="recordPayment()">✅ Xác nhận</button></div>
   </div>
 </div>
 
 <script>
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
-// âï¸  Cáº¤U HÃNH FIREBASE â ÄIá»N THÃNG TIN Dá»° ÃN Cá»¦A Báº N VÃO ÄÃY
-//  HÆ°á»ng dáº«n:
-//  1. VÃ o https://console.firebase.google.com â Táº¡o dá»± Ã¡n má»i
-//  2. VÃ o Project Settings â General â SDK setup â Config
-//  3. Copy tá»«ng giÃ¡ trá» vÃ o dÆ°á»i ÄÃ¢y
-//  4. VÃ o Realtime Database â Create database â chá»n "Start in test mode"
-//  5. LÆ°u file vÃ  má» láº¡i â dá»¯ liá»u sáº½ tá»± Äá»ng bá» má»i thiáº¿t bá»!
-// ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════════════════════════
+// ⚙️  CẤU HÌNH FIREBASE – ĐIỀN THÔNG TIN DỰ ÁN CỦA BẠN VÀO ĐÂY
+//  Hướng dẫn:
+//  1. Vào https://console.firebase.google.com → Tạo dự án mới
+//  2. Vào Project Settings → General → SDK setup → Config
+//  3. Copy từng giá trị vào dưới đây
+//  4. Vào Realtime Database → Create database → chọn "Start in test mode"
+//  5. Lưu file và mở lại → dữ liệu sẽ tự đồng bộ mọi thiết bị!
+// ══════════════════════════════════════════════════════════════════
 const FB_CFG = {
   apiKey:            "AIzaSyCDT00j5rXt8IeFHHxkDIuwasi2st_NEyM",
   authDomain:        "quan-li-laptop24h.firebaseapp.com",
@@ -807,9 +807,9 @@ const FB_CFG = {
 };
 const FB_READY = FB_CFG.apiKey !== "DIEN_API_KEY_CUA_BAN";
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// DATABASE â localStorage cache + Firebase sync
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// DATABASE – localStorage cache + Firebase sync
+// ══════════════════════════════════════════════
 const DB = {
   _d: { products:[], sales:[], customers:[], debts:[], repairs:[] },
   _fb: null,
@@ -820,7 +820,7 @@ const DB = {
   // Read from in-memory cache
   g(k){ return this._d[k] || []; },
 
-  // Write: cache â localStorage â Firebase
+  // Write: cache → localStorage → Firebase
   s(k, v){
     this._d[k] = v;
     try { localStorage.setItem('l24_' + this._LS[k], JSON.stringify(v)); } catch(e){}
@@ -868,7 +868,7 @@ const DB = {
         });
       });
     } catch(e){
-      console.warn('Firebase lá»i:', e);
+      console.warn('Firebase lỗi:', e);
       setSyncStatus('offline');
     }
   }
@@ -876,22 +876,22 @@ const DB = {
 
 // Seed products
 if(!DB.products.length) DB.products=[
-  {id:'SP001',name:'Laptop Dell Inspiron 15 3520',type:'Laptop',unit:'CÃ¡i',cost:8500000,price:10500000,stock:5,note:''},
-  {id:'SP002',name:'Laptop HP 15s-fq5000',type:'Laptop',unit:'CÃ¡i',cost:7200000,price:8900000,stock:3,note:''},
-  {id:'SP003',name:'RAM DDR4 8GB 3200MHz',type:'Linh kiá»n',unit:'Thanh',cost:320000,price:450000,stock:20,note:''},
-  {id:'SP004',name:'SSD 256GB M.2 NVMe',type:'Linh kiá»n',unit:'CÃ¡i',cost:450000,price:650000,stock:15,note:''},
-  {id:'SP005',name:'Hub USB-C 7 in 1',type:'Phá»¥ kiá»n',unit:'CÃ¡i',cost:180000,price:280000,stock:10,note:''},
-  {id:'SP006',name:'CÃ¡p sáº¡c Type-C 65W',type:'Phá»¥ kiá»n',unit:'CÃ¡i',cost:120000,price:200000,stock:30,note:''},
-  {id:'SP007',name:'Pin laptop Dell 15R',type:'Linh kiá»n',unit:'CÃ¡i',cost:450000,price:700000,stock:8,note:''},
-  {id:'SP008',name:'MÃ n hÃ¬nh 15.6 FHD IPS',type:'Linh kiá»n',unit:'CÃ¡i',cost:1200000,price:1800000,stock:4,note:''},
-  {id:'SP009',name:'Vá» sinh laptop',type:'Dá»ch vá»¥',unit:'Láº§n',cost:0,price:150000,stock:999,note:''},
-  {id:'SP010',name:'Thay keo táº£n nhiá»t',type:'Dá»ch vá»¥',unit:'Láº§n',cost:0,price:80000,stock:999,note:''},
+  {id:'SP001',name:'Laptop Dell Inspiron 15 3520',type:'Laptop',unit:'Cái',cost:8500000,price:10500000,stock:5,note:''},
+  {id:'SP002',name:'Laptop HP 15s-fq5000',type:'Laptop',unit:'Cái',cost:7200000,price:8900000,stock:3,note:''},
+  {id:'SP003',name:'RAM DDR4 8GB 3200MHz',type:'Linh kiện',unit:'Thanh',cost:320000,price:450000,stock:20,note:''},
+  {id:'SP004',name:'SSD 256GB M.2 NVMe',type:'Linh kiện',unit:'Cái',cost:450000,price:650000,stock:15,note:''},
+  {id:'SP005',name:'Hub USB-C 7 in 1',type:'Phụ kiện',unit:'Cái',cost:180000,price:280000,stock:10,note:''},
+  {id:'SP006',name:'Cáp sạc Type-C 65W',type:'Phụ kiện',unit:'Cái',cost:120000,price:200000,stock:30,note:''},
+  {id:'SP007',name:'Pin laptop Dell 15R',type:'Linh kiện',unit:'Cái',cost:450000,price:700000,stock:8,note:''},
+  {id:'SP008',name:'Màn hình 15.6 FHD IPS',type:'Linh kiện',unit:'Cái',cost:1200000,price:1800000,stock:4,note:''},
+  {id:'SP009',name:'Vệ sinh laptop',type:'Dịch vụ',unit:'Lần',cost:0,price:150000,stock:999,note:''},
+  {id:'SP010',name:'Thay keo tản nhiệt',type:'Dịch vụ',unit:'Lần',cost:0,price:80000,stock:999,note:''},
 ];
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // UTILS
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-const fmt  = n => (+n||0).toLocaleString('vi-VN')+' Ä';
+// ══════════════════════════════════════════════
+const fmt  = n => (+n||0).toLocaleString('vi-VN')+' đ';
 const fmtN = n => (+n||0).toLocaleString('vi-VN');
 const today = () => { const d=new Date(); return `${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`; };
 const todayISO = () => new Date().toISOString().slice(0,10);
@@ -938,9 +938,9 @@ function fillCust(pfx, name){
   if(addr) addr.value = c.address||'';
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // NAVIGATION
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 function go(name, btn){
   document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.tb').forEach(b=>b.classList.remove('on'));
@@ -956,9 +956,9 @@ function go(name, btn){
   if(name==='settings'){loadBillSettings();}
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// BÃN HÃNG
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// BÁN HÀNG
+// ══════════════════════════════════════════════
 let items=[];
 function initSale(){
   items=[newItem()];
@@ -980,15 +980,15 @@ function renderItems(){
     const d=document.createElement('div');
     d.className='bi';
     d.innerHTML=`
-      <input type="text" value="${it.code}" placeholder="MÃ£ SP" list="pl-${i}"
+      <input type="text" value="${it.code}" placeholder="Mã SP" list="pl-${i}"
         oninput="updCode(${i},this.value)">
       <datalist id="pl-${i}">${DB.products.map(p=>`<option value="${p.id}">${p.name}</option>`).join('')}</datalist>
-      <input type="text" value="${it.name}" placeholder="TÃªn SP" class="ro-inp" readonly>
+      <input type="text" value="${it.name}" placeholder="Tên SP" class="ro-inp" readonly>
       <input type="number" value="${it.qty}" min="1" oninput="updQty(${i},this.value)">
-      <input type="number" value="${it.price}" min="0" class="pc" oninput="updPrice(${i},this.value)" placeholder="Ä.giÃ¡">
-      <input type="number" value="${it.disc}" min="0" max="100" class="dc" oninput="updDisc(${i},this.value)" placeholder="G.giÃ¡%">
+      <input type="number" value="${it.price}" min="0" class="pc" oninput="updPrice(${i},this.value)" placeholder="Đ.giá">
+      <input type="number" value="${it.disc}" min="0" max="100" class="dc" oninput="updDisc(${i},this.value)" placeholder="G.giá%">
       <input type="text" value="${fmtN(it.qty*it.price*(1-it.disc/100))}" class="ro-inp tc2" readonly>
-      <button class="btn bd2 bsm" onclick="removeItem(${i})" style="padding:6px 9px">â</button>`;
+      <button class="btn bd2 bsm" onclick="removeItem(${i})" style="padding:6px 9px">✕</button>`;
     wrap.appendChild(d);
   });
 }
@@ -1017,17 +1017,17 @@ function calcT(){
   if(paid>0){
     cr.style.display='flex';
     const ch=paid-tot;
-    document.getElementById('t-change').textContent=ch>=0?fmt(ch):'Thiáº¿u '+fmt(-ch);
-    document.getElementById('change-lbl').textContent=ch>=0?'ðµ Tiá»n thá»«a':'â  CÃ²n thiáº¿u';
+    document.getElementById('t-change').textContent=ch>=0?fmt(ch):'Thiếu '+fmt(-ch);
+    document.getElementById('change-lbl').textContent=ch>=0?'💵 Tiền thừa':'⚠ Còn thiếu';
     cr.style.background=ch>=0?'#d1fae5':'#fee2e2';
     cr.style.color=ch>=0?'#065f46':'#991b1b';
   } else cr.style.display='none';
 }
-function clearSale(){if(!confirm('XÃ³a ÄÆ¡n?'))return;initSale();toast('ÄÃ£ xÃ³a ÄÆ¡n')}
+function clearSale(){if(!confirm('Xóa đơn?'))return;initSale();toast('Đã xóa đơn')}
 
 function saveSale(){
   const vi=items.filter(it=>it.code&&it.qty>0&&it.price>=0);
-  if(!vi.length){toast('ChÆ°a cÃ³ sáº£n pháº©m!','er');return}
+  if(!vi.length){toast('Chưa có sản phẩm!','er');return}
   const xd=parseFloat(document.getElementById('t-xdisc').value)||0;
   const sub=vi.reduce((s,it)=>s+it.qty*it.price*(1-it.disc/100),0);
   const tot=Math.max(0,sub-xd);
@@ -1036,7 +1036,7 @@ function saveSale(){
   const paymethod=document.getElementById('s-paymethod').value;
   const sale={
     billNo:genBillNo(), date:today(), ts:Date.now(),
-    customer:document.getElementById('s-name').value||'KhÃ¡ch láº»',
+    customer:document.getElementById('s-name').value||'Khách lẻ',
     phone:document.getElementById('s-phone').value,
     note:document.getElementById('s-note').value,
     items:vi, subtotal:sub, extraDiscount:xd, total:tot, paid, paymethod,
@@ -1044,25 +1044,25 @@ function saveSale(){
   };
   // Update stock
   const prods=DB.products;
-  vi.forEach(it=>{const p=prods.find(p=>p.id===it.code);if(p&&p.type!=='Dá»ch vá»¥')p.stock=Math.max(0,p.stock-it.qty)});
+  vi.forEach(it=>{const p=prods.find(p=>p.id===it.code);if(p&&p.type!=='Dịch vụ')p.stock=Math.max(0,p.stock-it.qty)});
   DB.products=prods;
-  // If cÃ´ng ná»£ payment, create debt record
-  if(paymethod==='CÃ´ng ná»£'&&tot>paid){
+  // If công nợ payment, create debt record
+  if(paymethod==='Công nợ'&&tot>paid){
     const debts=DB.debts;
     debts.unshift({id:genId('CN'),customerName:sale.customer,phone:sale.phone,
-      amount:tot,paid,remaining:tot-paid,description:'ÄÆ¡n hÃ ng '+sale.billNo,
-      dueDate:'',status:'CÃ²n ná»£',date:today(),ts:Date.now()});
+      amount:tot,paid,remaining:tot-paid,description:'Đơn hàng '+sale.billNo,
+      dueDate:'',status:'Còn nợ',date:today(),ts:Date.now()});
     DB.debts=debts;
   }
   const sales=DB.sales; sales.unshift(sale); DB.sales=sales;
-  toast('â ÄÃ£ lÆ°u '+sale.billNo,'ok');
+  toast('✅ Đã lưu '+sale.billNo,'ok');
   initSale();
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// PRINT HELPER â popup window (loáº¡i bá» header/footer cá»§a Chrome)
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// ══════════════════════════════════════════════
+// PRINT HELPER – popup window (loại bỏ header/footer của Chrome)
+// ══════════════════════════════════════════════
 function doPrint(html){
   var css=`@page{size:A5 portrait;margin:0}body{margin:8mm;font-family:Arial,sans-serif}
 .pb{font-family:Arial,sans-serif;color:#111;max-width:100%}
@@ -1086,18 +1086,18 @@ function doPrint(html){
   w.document.close();
   setTimeout(function(){w.focus();w.print();setTimeout(function(){w.close();},800);},300);
 }
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // PRINT BILLS
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 function printSaleBill(sale){
   const vi=sale?sale.items:items.filter(it=>it.code&&it.qty>0&&it.price>=0);
-  if(!vi.length){toast('ChÆ°a cÃ³ sáº£n pháº©m!','er');return}
+  if(!vi.length){toast('Chưa có sản phẩm!','er');return}
   const sub = sale?sale.subtotal:vi.reduce((s,it)=>s+it.qty*it.price*(1-it.disc/100),0);
   const xd  = sale?sale.extraDiscount:(parseFloat(document.getElementById('t-xdisc').value)||0);
   const tot = sale?sale.total:Math.max(0,sub-xd);
   const paid= sale?sale.paid:(parseFloat(document.getElementById('t-paid').value)||0);
   const ch  = paid-tot;
-  const cust= sale?sale.customer:(document.getElementById('s-name').value||'KhÃ¡ch láº»');
+  const cust= sale?sale.customer:(document.getElementById('s-name').value||'Khách lẻ');
   const ph  = sale?sale.phone:document.getElementById('s-phone').value;
   const nt  = sale?sale.note:document.getElementById('s-note').value;
   const bn  = sale?sale.billNo:'Preview';
@@ -1128,40 +1128,40 @@ function printSaleBill(sale){
   const html=`<div class="pb" style="${billStyle}max-width:${billWidth}">
     <style>.pb-dyn .sn{color:${billColor}}.pb-dyn hr{border-color:${billColor}}.pb-dyn th{background:${billColor}}.pb-dyn .tf{background:${billColor}}.pb-dyn .wbox{border-color:${billColor}}.pb-dyn .wt{color:${billColor}}.pb-dyn .ir{font-size:${billFontSize}}.pb-dyn .sr2{font-size:${billFontSize}}</style>
     <div class="pb-dyn">
-    <div class="sn">${BS.logo?BS.logo+' ':''} ${BS.shopname||'Cá»¬A HÃNG LAPTOP 24H'}</div>
-    <div class="ss">${BS.slogan||'ChuyÃªn: Mua bÃ¡n, sá»­a chá»¯a Laptop â Linh kiá»n â Phá»¥ kiá»n'}</div>
-    <div class="ss">ÄC: ${BS.addr||'VÄ©nh Long'}</div>
-    <div class="ss">ÄT: ${BS.phone||'0xxx.xxx.xxx'}${BS.social?' &nbsp;|&nbsp; FB/Zalo: '+BS.social:''}${BS.web?' &nbsp;|&nbsp; '+BS.web:''}</div>
+    <div class="sn">${BS.logo?BS.logo+' ':''} ${BS.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
+    <div class="ss">${BS.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
+    <div class="ss">ĐC: ${BS.addr||'Vĩnh Long'}</div>
+    <div class="ss">ĐT: ${BS.phone||'0xxx.xxx.xxx'}${BS.social?' &nbsp;|&nbsp; FB/Zalo: '+BS.social:''}${BS.web?' &nbsp;|&nbsp; '+BS.web:''}</div>
     <hr>
-    <div class="bt2">HÃA ÄÆ N BÃN HÃNG</div>
-    <div class="ir"><span>Sá» bill:</span><strong>${bn}</strong></div>
-    <div class="ir"><span>NgÃ y bÃ¡n:</span><span>${dt}</span></div>
-    <div class="ir"><span>KhÃ¡ch hÃ ng:</span><strong>${cust}</strong></div>
-    ${ph?`<div class="ir"><span>SÄT:</span><span>${ph}</span></div>`:''}
-    ${pm?`<div class="ir"><span>Thanh toÃ¡n:</span><span>${pm}</span></div>`:''}
+    <div class="bt2">HÓA ĐƠN BÁN HÀNG</div>
+    <div class="ir"><span>Số bill:</span><strong>${bn}</strong></div>
+    <div class="ir"><span>Ngày bán:</span><span>${dt}</span></div>
+    <div class="ir"><span>Khách hàng:</span><strong>${cust}</strong></div>
+    ${ph?`<div class="ir"><span>SĐT:</span><span>${ph}</span></div>`:''}
+    ${pm?`<div class="ir"><span>Thanh toán:</span><span>${pm}</span></div>`:''}
     <hr>
-    <table><thead><tr><th>Sáº£n pháº©m</th><th style="text-align:center">SL</th><th style="text-align:right">ÄÆ¡n giÃ¡</th><th style="text-align:right">ThÃ nh tiá»n</th></tr></thead>
+    <table><thead><tr><th>Sản phẩm</th><th style="text-align:center">SL</th><th style="text-align:right">Đơn giá</th><th style="text-align:right">Thành tiền</th></tr></thead>
     <tbody>${vi.map(it=>`<tr>
-      <td>${it.name||it.code}${it.disc>0?`<br><small style="color:#888">Giáº£m ${it.disc}%</small>`:''}</td>
+      <td>${it.name||it.code}${it.disc>0?`<br><small style="color:#888">Giảm ${it.disc}%</small>`:''}</td>
       <td style="text-align:center">${it.qty} ${it.unit||''}</td>
       <td style="text-align:right">${fmtN(it.price)}</td>
       <td style="text-align:right"><strong>${fmtN(it.qty*it.price*(1-it.disc/100))}</strong></td>
     </tr>`).join('')}</tbody></table>
     <hr>
-    <div class="sr2"><span>Tá»ng tiá»n hÃ ng:</span><span>${fmtN(sub)} Ä</span></div>
-    ${xd>0?`<div class="sr2"><span>Giáº£m giÃ¡ thÃªm:</span><span>- ${fmtN(xd)} Ä</span></div>`:''}
-    <div class="tf"><span>Tá»NG THANH TOÃN</span><span>${fmtN(tot)} Ä</span></div>
-    <div class="sr2" style="margin-top:6px"><span>KhÃ¡ch tráº£:</span><span>${fmtN(paid)} Ä</span></div>
-    <div class="sr2"><span>Tiá»n thá»«a:</span><strong>${fmtN(Math.max(0,ch))} Ä</strong></div>
-    ${nt?`<div style="font-size:10px;color:#555;margin-top:5px">ð ${nt}</div>`:''}
+    <div class="sr2"><span>Tổng tiền hàng:</span><span>${fmtN(sub)} đ</span></div>
+    ${xd>0?`<div class="sr2"><span>Giảm giá thêm:</span><span>- ${fmtN(xd)} đ</span></div>`:''}
+    <div class="tf"><span>TỔNG THANH TOÁN</span><span>${fmtN(tot)} đ</span></div>
+    <div class="sr2" style="margin-top:6px"><span>Khách trả:</span><span>${fmtN(paid)} đ</span></div>
+    <div class="sr2"><span>Tiền thừa:</span><strong>${fmtN(Math.max(0,ch))} đ</strong></div>
+    ${nt?`<div style="font-size:10px;color:#555;margin-top:5px">📝 ${nt}</div>`:''}
     ${(wm>0||itemsWithWarranty.length>0)?`<div class="wbox">
-      <div class="wt">ð¡ï¸ PHIáº¾U Báº¢O HÃNH</div>
+      <div class="wt">🛡️ PHIẾU BẢO HÀNH</div>
       <div class="wi">
-        <b>KhÃ¡ch hÃ ng:</b> ${cust}${ph?' â '+ph:''}<br>
-        <b>NgÃ y mua:</b> ${dt} &nbsp;&nbsp; <b>Sá» bill:</b> ${bn}<br>
+        <b>Khách hàng:</b> ${cust}${ph?' – '+ph:''}<br>
+        <b>Ngày mua:</b> ${dt} &nbsp;&nbsp; <b>Số bill:</b> ${bn}<br>
         ${itemsWithWarranty.length>0?
-          itemsWithWarranty.map(it=>`<div style="margin:3px 0;padding:3px 0;border-bottom:1px dashed #ccc"><b>${it.name||it.code}:</b> Báº£o hÃ nh <b>${it.prodWarranty} thÃ¡ng</b> â Háº¡n Äáº¿n: <b>${calcExp(it.prodWarranty,dt)}</b></div>`).join('')
-          :`<b>Sáº£n pháº©m:</b> ${vi.map(it=>it.name||it.code).join(', ')}<br><b>Háº¡n BH:</b> ${wExp} (${wm} thÃ¡ng)<br>`
+          itemsWithWarranty.map(it=>`<div style="margin:3px 0;padding:3px 0;border-bottom:1px dashed #ccc"><b>${it.name||it.code}:</b> Bảo hành <b>${it.prodWarranty} tháng</b> – Hạn đến: <b>${calcExp(it.prodWarranty,dt)}</b></div>`).join('')
+          :`<b>Sản phẩm:</b> ${vi.map(it=>it.name||it.code).join(', ')}<br><b>Hạn BH:</b> ${wExp} (${wm} tháng)<br>`
         }
         <div style="margin-top:5px;color:#555;white-space:pre-line">
         ${(BS.wtermSale||BILL_DEFAULTS.wtermSale)}
@@ -1191,51 +1191,51 @@ function printRepairBill(rep){
     wExp=`${p2(d.getDate())}/${p2(d.getMonth()+1)}/${d.getFullYear()}`;
   }
   const itemsHtml=items.length?`
-    <table><thead><tr><th>Háº¡ng má»¥c / Linh kiá»n</th><th style="text-align:center">SL</th><th style="text-align:right">ÄÆ¡n giÃ¡</th><th style="text-align:right">ThÃ nh tiá»n</th></tr></thead>
+    <table><thead><tr><th>Hạng mục / Linh kiện</th><th style="text-align:center">SL</th><th style="text-align:right">Đơn giá</th><th style="text-align:right">Thành tiền</th></tr></thead>
     <tbody>${items.map(it=>`<tr>
       <td>${it.desc}</td>
       <td style="text-align:center">${it.qty}</td>
       <td style="text-align:right">${fmtN(it.price)}</td>
       <td style="text-align:right"><strong>${fmtN(it.qty*it.price)}</strong></td>
     </tr>`).join('')}</tbody></table>`:
-    `<div class="sr2"><span>Chi phÃ­ sá»­a chá»¯a:</span><strong>${fmtN(cost)} Ä</strong></div>`;
+    `<div class="sr2"><span>Chi phí sửa chữa:</span><strong>${fmtN(cost)} đ</strong></div>`;
   const BSr = getBillSettings();
   const billColorR = BSr.billcolor||'#1e3a8a';
   const html=`<div class="pb" style="font-family:${BSr.font||'Arial,sans-serif'};max-width:${BSr.billwidth||'320px'}">
     <style>.pb-dyn2 .sn{color:${billColorR}}.pb-dyn2 hr{border-color:${billColorR}}.pb-dyn2 th{background:${billColorR}}.pb-dyn2 .tf{background:${billColorR}}.pb-dyn2 .wbox{border-color:${billColorR}}.pb-dyn2 .wt{color:${billColorR}}.pb-dyn2 .ir{font-size:${BSr.fontsize||'11px'}}.pb-dyn2 .sr2{font-size:${BSr.fontsize||'11px'}}</style>
     <div class="pb-dyn2">
-    <div class="sn">${BSr.logo?BSr.logo+' ':''} ${BSr.shopname||'Cá»¬A HÃNG LAPTOP 24H'}</div>
-    <div class="ss">${BSr.slogan||'ChuyÃªn: Mua bÃ¡n, sá»­a chá»¯a Laptop â Linh kiá»n â Phá»¥ kiá»n'}</div>
-    <div class="ss">ÄC: ${BSr.addr||'VÄ©nh Long'}</div>
-    <div class="ss">ÄT: ${BSr.phone||'0xxx.xxx.xxx'}${BSr.social?' &nbsp;|&nbsp; FB/Zalo: '+BSr.social:''}</div>
+    <div class="sn">${BSr.logo?BSr.logo+' ':''} ${BSr.shopname||'CỬA HÀNG LAPTOP 24H'}</div>
+    <div class="ss">${BSr.slogan||'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện'}</div>
+    <div class="ss">ĐC: ${BSr.addr||'Vĩnh Long'}</div>
+    <div class="ss">ĐT: ${BSr.phone||'0xxx.xxx.xxx'}${BSr.social?' &nbsp;|&nbsp; FB/Zalo: '+BSr.social:''}</div>
     <hr>
-    <div class="bt2">PHIáº¾U Sá»¬A CHá»®A${wm>0?' + Báº¢O HÃNH':''}</div>
-    <div class="ir"><span>MÃ£ phiáº¿u:</span><strong>${rep.id}</strong></div>
-    <div class="ir"><span>NgÃ y nháº­n:</span><span>${isoToDisplay(rep.receivedDate)}</span></div>
-    ${delivDate?`<div class="ir"><span>NgÃ y giao:</span><span>${isoToDisplay(delivDate)}</span></div>`:''}
+    <div class="bt2">PHIẾU SỬA CHỮA${wm>0?' + BẢO HÀNH':''}</div>
+    <div class="ir"><span>Mã phiếu:</span><strong>${rep.id}</strong></div>
+    <div class="ir"><span>Ngày nhận:</span><span>${isoToDisplay(rep.receivedDate)}</span></div>
+    ${delivDate?`<div class="ir"><span>Ngày giao:</span><span>${isoToDisplay(delivDate)}</span></div>`:''}
     <hr>
-    <div class="ir"><span>KhÃ¡ch hÃ ng:</span><strong>${rep.customerName}</strong></div>
-    <div class="ir"><span>SÄT:</span><span>${rep.phone}</span></div>
-    ${rep.address?`<div class="ir"><span>Äá»a chá»:</span><span>${rep.address}</span></div>`:''}
+    <div class="ir"><span>Khách hàng:</span><strong>${rep.customerName}</strong></div>
+    <div class="ir"><span>SĐT:</span><span>${rep.phone}</span></div>
+    ${rep.address?`<div class="ir"><span>Địa chỉ:</span><span>${rep.address}</span></div>`:''}
     <hr>
-    <div class="ir"><span>Thiáº¿t bá»:</span><strong>${rep.device}</strong></div>
+    <div class="ir"><span>Thiết bị:</span><strong>${rep.device}</strong></div>
     ${rep.serial?`<div class="ir"><span>Serial:</span><span>${rep.serial}</span></div>`:''}
-    <div class="ir"><span>TÃ¬nh tráº¡ng nháº­n:</span><span>${rep.issue}</span></div>
-    ${rep.accessories?`<div class="ir"><span>Phá»¥ kiá»n:</span><span>${rep.accessories}</span></div>`:''}
+    <div class="ir"><span>Tình trạng nhận:</span><span>${rep.issue}</span></div>
+    ${rep.accessories?`<div class="ir"><span>Phụ kiện:</span><span>${rep.accessories}</span></div>`:''}
     ${rep.techName?`<div class="ir"><span>KTV:</span><span>${rep.techName}</span></div>`:''}
     <hr>
     ${itemsHtml}
-    <div class="sr2" style="margin-top:4px"><span>Tá»ng chi phÃ­:</span><strong>${fmtN(cost)} Ä</strong></div>
-    <div class="sr2"><span>Tiá»n cá»c ÄÃ£ nháº­n:</span><span>- ${fmtN(dep)} Ä</span></div>
-    ${dvPaid>0?`<div class="sr2"><span>ÄÃ£ thanh toÃ¡n thÃªm:</span><span>- ${fmtN(dvPaid)} Ä</span></div>`:''}
-    <div class="tf"><span>CÃN Láº I THANH TOÃN</span><span>${fmtN(remaining)} Ä</span></div>
+    <div class="sr2" style="margin-top:4px"><span>Tổng chi phí:</span><strong>${fmtN(cost)} đ</strong></div>
+    <div class="sr2"><span>Tiền cọc đã nhận:</span><span>- ${fmtN(dep)} đ</span></div>
+    ${dvPaid>0?`<div class="sr2"><span>Đã thanh toán thêm:</span><span>- ${fmtN(dvPaid)} đ</span></div>`:''}
+    <div class="tf"><span>CÒN LẠI THANH TOÁN</span><span>${fmtN(remaining)} đ</span></div>
     ${wm>0?`<div class="wbox">
-      <div class="wt">ð¡ï¸ Báº¢O HÃNH Sá»¬A CHá»®A</div>
+      <div class="wt">🛡️ BẢO HÀNH SỬA CHỮA</div>
       <div class="wi">
-        <b>Thiáº¿t bá»:</b> ${rep.device}<br>
-        <b>Ná»i dung sá»­a:</b> ${rep.issue}<br>
-        ${items.length?`<b>Linh kiá»n thay tháº¿:</b> ${items.map(it=>it.desc).join(', ')}<br>`:''}
-        <b>NgÃ y giao:</b> ${isoToDisplay(delivDate)||'â'} &nbsp; <b>Háº¡n BH:</b> ${wExp||'â'} (${wm} thÃ¡ng)<br>
+        <b>Thiết bị:</b> ${rep.device}<br>
+        <b>Nội dung sửa:</b> ${rep.issue}<br>
+        ${items.length?`<b>Linh kiện thay thế:</b> ${items.map(it=>it.desc).join(', ')}<br>`:''}
+        <b>Ngày giao:</b> ${isoToDisplay(delivDate)||'—'} &nbsp; <b>Hạn BH:</b> ${wExp||'—'} (${wm} tháng)<br>
         <div style="margin-top:5px;color:#555;white-space:pre-line">
         ${BSr.wtermRepair||BILL_DEFAULTS.wtermRepair}
         </div>
@@ -1246,16 +1246,16 @@ function printRepairBill(rep){
   doPrint(html);
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // REPAIR
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-const STATUSES=['Má»i nháº­n','Äang kiá»m tra','Äang sá»­a','Chá» linh kiá»n','HoÃ n thÃ nh','ÄÃ£ giao'];
-const ST_CLASS={'Má»i nháº­n':'st-new','Äang kiá»m tra':'st-check','Äang sá»­a':'st-fix','Chá» linh kiá»n':'st-wait','HoÃ n thÃ nh':'st-done','ÄÃ£ giao':'st-del'};
+// ══════════════════════════════════════════════
+const STATUSES=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
+const ST_CLASS={'Mới nhận':'st-new','Đang kiểm tra':'st-check','Đang sửa':'st-fix','Chờ linh kiện':'st-wait','Hoàn thành':'st-done','Đã giao':'st-del'};
 
 let editRepairId=null;
 function openRepairModal(id){
   editRepairId=id||null;
-  document.getElementById('mo-rep-title').textContent=id?'âï¸ Sá»­a phiáº¿u':'ð§ Phiáº¿u Nháº­n MÃ¡y Sá»­a';
+  document.getElementById('mo-rep-title').textContent=id?'✏️ Sửa phiếu':'🔧 Phiếu Nhận Máy Sửa';
   const fields=['rm-name','rm-phone','rm-addr','rm-device','rm-serial','rm-pass','rm-issue','rm-acc','rm-note','rm-tech'];
   if(id){
     const r=DB.repairs.find(x=>x.id===id);
@@ -1287,7 +1287,7 @@ function openRepairModal(id){
 function saveRepair(){
   const name=document.getElementById('rm-name').value.trim();
   const device=document.getElementById('rm-device').value.trim();
-  if(!name||!device){toast('Nháº­p tÃªn KH vÃ  thiáº¿t bá»!','er');return}
+  if(!name||!device){toast('Nhập tên KH và thiết bị!','er');return}
   const reps=DB.repairs;
   const rep={
     id: editRepairId||genId('SC'),
@@ -1300,7 +1300,7 @@ function saveRepair(){
     accessories:document.getElementById('rm-acc').value,
     receivedDate:document.getElementById('rm-in').value,
     deliveredDate: editRepairId ? (reps.find(r=>r.id===editRepairId)?.deliveredDate||'') : '',
-    status: editRepairId ? (reps.find(r=>r.id===editRepairId)?.status||'Má»i nháº­n') : 'Má»i nháº­n',
+    status: editRepairId ? (reps.find(r=>r.id===editRepairId)?.status||'Mới nhận') : 'Mới nhận',
     cost:parseFloat(document.getElementById('rm-cost').value)||0,
     deposit:parseFloat(document.getElementById('rm-dep').value)||0,
     capital:parseFloat(document.getElementById('rm-capital').value)||0,
@@ -1314,7 +1314,7 @@ function saveRepair(){
   DB.repairs=reps;
   closeMo('mo-repair');
   renderRepairs();
-  toast('â ÄÃ£ lÆ°u phiáº¿u '+rep.id,'ok');
+  toast('✅ Đã lưu phiếu '+rep.id,'ok');
 }
 function saveProcNote(){
   const id=document.getElementById('pn-repid').value;
@@ -1322,15 +1322,15 @@ function saveProcNote(){
   const reps=DB.repairs;
   const r=reps.find(x=>x.id===id);
   if(!r)return;
-  r.status='HoÃ n thÃ nh';
+  r.status='Hoàn thành';
   r.processNote=note;
   DB.repairs=reps;
   closeMo('mo-procnote');
   renderRepairs();
-  toast('â HoÃ n thÃ nh â ÄÃ£ lÆ°u mÃ´ táº£','ok');
+  toast('✅ Hoàn thành – đã lưu mô tả','ok');
 }
 function setRepairStatus(id,status){
-  if(status==='HoÃ n thÃ nh'){
+  if(status==='Hoàn thành'){
     const r=DB.repairs.find(x=>x.id===id);if(!r)return;
     document.getElementById('pn-repid').value=id;
     document.getElementById('pn-note').value=r.processNote||'';
@@ -1340,16 +1340,16 @@ function setRepairStatus(id,status){
   const r=reps.find(r=>r.id===id);
   if(!r)return;
   r.status=status;
-  if(status==='ÄÃ£ giao'&&!r.deliveredDate) r.deliveredDate=todayISO();
+  if(status==='Đã giao'&&!r.deliveredDate) r.deliveredDate=todayISO();
   DB.repairs=reps;
   renderRepairs();
-  toast('Cáº­p nháº­t: '+status,'ok');
+  toast('Cập nhật: '+status,'ok');
 }
 function showUndoToast(msg,fn){
   clearTimeout(window._undoTimer);
   var t=document.getElementById('undo-toast');
   if(!t){t=document.createElement('div');t.id='undo-toast';t.style.cssText='position:fixed;bottom:72px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 16px;border-radius:8px;display:flex;gap:12px;align-items:center;z-index:9999;font-size:13px;box-shadow:0 4px 16px rgba(0,0,0,.35);white-space:nowrap';document.body.appendChild(t);}
-  t.innerHTML=msg+'&nbsp;<button onclick="undoLast()" style="background:var(--ac);border:none;color:#fff;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700">â©ï¸ HoÃ n tÃ¡c</button>';
+  t.innerHTML=msg+'&nbsp;<button onclick="undoLast()" style="background:var(--ac);border:none;color:#fff;padding:4px 12px;border-radius:5px;cursor:pointer;font-size:12px;font-weight:700">↩️ Hoàn tác</button>';
   t.style.display='flex';
   window._undoFn=fn;
   window._undoTimer=setTimeout(function(){t.style.display='none';window._undoFn=null;},8000);
@@ -1361,13 +1361,13 @@ function undoLast(){
   if(window._undoFn){window._undoFn();window._undoFn=null;}
 }
 function deleteRepair(id){
-  if(!confirm('XÃ³a phiáº¿u sá»­a chá»¯a nÃ y?'))return;
+  if(!confirm('Xóa phiếu sửa chữa này?'))return;
   const reps=DB.repairs;
   const idx=reps.findIndex(r=>r.id===id);
   const item={...reps[idx]};
   DB.repairs=reps.filter(r=>r.id!==id);
   renderRepairs();
-  showUndoToast('ÄÃ£ xÃ³a phiáº¿u <b>'+item.id+'</b> â '+item.customerName,function(){const r=DB.repairs;r.splice(idx,0,item);DB.repairs=r;renderRepairs();toast('â©ï¸ ÄÃ£ hoÃ n tÃ¡c','ok');});
+  showUndoToast('Đã xóa phiếu <b>'+item.id+'</b> – '+item.customerName,function(){const r=DB.repairs;r.splice(idx,0,item);DB.repairs=r;renderRepairs();toast('↩️ Đã hoàn tác','ok');});
 }
 
 var _repRecFilter='';
@@ -1389,71 +1389,71 @@ function renderRepairs(){
   });
   reps.sort((a,b)=>{const da=a.receivedDate||'';const db2=b.receivedDate||'';return da<db2?1:-1;});
   const list=document.getElementById('repair-list');
-  if(!reps.length){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">ð§</div><div>KhÃ´ng cÃ³ phiáº¿u nÃ o</div></div>`;return}
+  if(!reps.length){list.innerHTML=`<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">🔧</div><div>Không có phiếu nào</div></div>`;return}
   list.innerHTML=reps.map(r=>{
     const stCls=ST_CLASS[r.status]||'b-gy';
     const repCost=r.deliveryItems?r.deliveryItems.reduce((s,it)=>s+it.qty*it.price,0):(r.cost||0);
     const remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
-    const canDeliver=r.status!=='ÄÃ£ giao';
+    const canDeliver=r.status!=='Đã giao';
     const isAdmin=currentUser?.role==='admin';
-    const locked=!isAdmin&&r.status==='ÄÃ£ giao';
-    return `<div class="card" style="border-left:4px solid ${r.status==='ÄÃ£ giao'?'var(--ok)':'var(--pr)'}">
+    const locked=!isAdmin&&r.status==='Đã giao';
+    return `<div class="card" style="border-left:4px solid ${r.status==='Đã giao'?'var(--ok)':'var(--pr)'}">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">
         <div>
           <span class="bx b-bl">${r.id}</span>
           <span class="bx ${stCls}" style="margin-left:6px">${r.status}</span>
-          ${locked?'<span class="bx b-gy" style="margin-left:4px">ð ÄÃ£ khÃ³a</span>':''}
+          ${locked?'<span class="bx b-gy" style="margin-left:4px">🔒 Đã khóa</span>':''}
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap">
-          ${(!locked&&canDeliver)?`<button class="btn bs bsm" onclick="openDeliverModal('${r.id}')">ð Giao mÃ¡y</button>`:''}
-          ${!locked?`<button class="btn bg2 bsm" onclick="openRepairModal('${r.id}')">âï¸</button>`:''}
-          <button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">ð¨ï¸ In</button>
-          ${!locked?`<button class="btn bd2 bsm" onclick="deleteRepair('${r.id}')">ðï¸</button>`:''}
+          ${(!locked&&canDeliver)?`<button class="btn bs bsm" onclick="openDeliverModal('${r.id}')">🚀 Giao máy</button>`:''}
+          ${!locked?`<button class="btn bg2 bsm" onclick="openRepairModal('${r.id}')">✏️</button>`:''}
+          <button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️ In</button>
+          ${!locked?`<button class="btn bd2 bsm" onclick="deleteRepair('${r.id}')">🗑️</button>`:''}
         </div>
       </div>
       <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">
-        <div><b>ð¤</b> ${r.customerName} â ${r.phone}</div>
-        <div><b>ð»</b> ${r.device}${r.serial?` (${r.serial})`:''}</div>
-        <div><b>ð </b> ${r.issue}</div>
-        <div><b>ð</b> Nháº­n: ${isoToDisplay(r.receivedDate)}</div>
-        ${r.deliveredDate?'<div><b>ð</b> Giao: '+isoToDisplay(r.deliveredDate)+(r.warrantyMonths>0?' â¢ '+wBadge(r):'')+' </div>':''}
-        <div><b>ð°</b> PhÃ­: ${fmtN(repCost)} Ä | Cá»c: ${fmtN(r.deposit||0)} Ä | CÃ²n: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} Ä</strong></div>
-        ${r.techName?`<div><b>ð¨âð§</b> KTV: ${r.techName}</div>`:''}
-        ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>ð</b> ${r.deliveryItems.length} háº¡ng má»¥c</div>`:''}
-        ${r.processNote?`<div style="grid-column:1/-1"><b>ð§</b> <span style="color:var(--gy);font-style:italic">${r.processNote}</span></div>`:''}
+        <div><b>👤</b> ${r.customerName} – ${r.phone}</div>
+        <div><b>💻</b> ${r.device}${r.serial?` (${r.serial})`:''}</div>
+        <div><b>🛠</b> ${r.issue}</div>
+        <div><b>📅</b> Nhận: ${isoToDisplay(r.receivedDate)}</div>
+        ${r.deliveredDate?'<div><b>📆</b> Giao: '+isoToDisplay(r.deliveredDate)+(r.warrantyMonths>0?' • '+wBadge(r):'')+' </div>':''}
+        <div><b>💰</b> Phí: ${fmtN(repCost)} đ | Cọc: ${fmtN(r.deposit||0)} đ | Còn: <strong style="color:${remaining>0?'var(--er)':'var(--ok)'}">${fmtN(remaining)} đ</strong></div>
+        ${r.techName?`<div><b>👨‍🔧</b> KTV: ${r.techName}</div>`:''}
+        ${r.deliveryItems?.length?`<div style="grid-column:1/-1"><b>📋</b> ${r.deliveryItems.length} hạng mục</div>`:''}
+        ${r.processNote?`<div style="grid-column:1/-1"><b>🔧</b> <span style="color:var(--gy);font-style:italic">${r.processNote}</span></div>`:''}
       </div>
       ${!locked?`<div style="margin-top:12px">
-        <div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">Cáº¬P NHáº¬T TRáº NG THÃI:</div>
+        <div style="font-size:11px;font-weight:700;color:var(--gy);margin-bottom:5px">CẬP NHẬT TRẠNG THÁI:</div>
         <div class="steps">${STATUSES.map(s=>`<button class="step${r.status===s?' on':''}" onclick="setRepairStatus('${r.id}','${s}')">${s}</button>`).join('')}</div>
       </div>`:''}
     </div>`;
   }).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// KHÃCH HÃNG
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// KHÁCH HÀNG
+// ══════════════════════════════════════════════
 let editCustId=null;
 function openCustModal(id){
   editCustId=id||null;
-  document.getElementById('mo-cust-title').textContent=id?'âï¸ Sá»­a KhÃ¡ch HÃ ng':'â ThÃªm KhÃ¡ch HÃ ng';
+  document.getElementById('mo-cust-title').textContent=id?'✏️ Sửa Khách Hàng':'➕ Thêm Khách Hàng';
   if(id){
     const c=DB.customers.find(x=>x.id===id);
     document.getElementById('cm-name').value=c.name;
     document.getElementById('cm-phone').value=c.phone;
-    document.getElementById('cm-type').value=c.type||'Má»i';
+    document.getElementById('cm-type').value=c.type||'Mới';
     document.getElementById('cm-addr').value=c.address||'';
     document.getElementById('cm-note').value=c.note||'';
   } else {
     ['cm-name','cm-phone','cm-addr','cm-note'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('cm-type').value='Má»i';
+    document.getElementById('cm-type').value='Mới';
   }
   openMo('mo-cust');
 }
 function saveCust(){
   const name=document.getElementById('cm-name').value.trim();
   const phone=document.getElementById('cm-phone').value.trim();
-  if(!name||!phone){toast('Nháº­p tÃªn vÃ  SÄT!','er');return}
+  if(!name||!phone){toast('Nhập tên và SĐT!','er');return}
   const custs=DB.customers;
   const c={
     id:editCustId||genId('KH'),
@@ -1468,46 +1468,46 @@ function saveCust(){
   DB.customers=custs;
   refreshCustLists();
   closeMo('mo-cust'); renderCustomers();
-  toast('â ÄÃ£ lÆ°u khÃ¡ch hÃ ng','ok');
+  toast('✅ Đã lưu khách hàng','ok');
 }
 function deleteCust(id){
-  if(!confirm('XÃ³a khÃ¡ch hÃ ng nÃ y?'))return;
+  if(!confirm('Xóa khách hàng này?'))return;
   DB.customers=DB.customers.filter(c=>c.id!==id);
-  renderCustomers(); toast('ÄÃ£ xÃ³a');
+  renderCustomers(); toast('Đã xóa');
 }
 function renderCustomers(){
   const q=(document.getElementById('cust-search')?.value||'').toLowerCase();
   const custs=DB.customers.filter(c=>!q||c.name.toLowerCase().includes(q)||c.phone.includes(q));
   const sales=DB.sales; const debts=DB.debts;
   const tbody=document.getElementById('cust-tbody');
-  if(!custs.length){tbody.innerHTML=`<tr><td colspan="7" class="tc" style="padding:28px;color:var(--gy)">ChÆ°a cÃ³ khÃ¡ch hÃ ng</td></tr>`;return}
-  const typeColor={'VIP':'b-pu','ThÃ¢n thiáº¿t':'b-gn','Má»i':'b-bl'};
+  if(!custs.length){tbody.innerHTML=`<tr><td colspan="7" class="tc" style="padding:28px;color:var(--gy)">Chưa có khách hàng</td></tr>`;return}
+  const typeColor={'VIP':'b-pu','Thân thiết':'b-gn','Mới':'b-bl'};
   tbody.innerHTML=custs.map(c=>{
     const totalBuy=sales.filter(s=>s.customer===c.name||s.phone===c.phone).reduce((s,x)=>s+x.total,0);
-    const totalDebt=debts.filter(d=>d.customerName===c.name&&d.status==='CÃ²n ná»£').reduce((s,d)=>s+d.remaining,0);
+    const totalDebt=debts.filter(d=>d.customerName===c.name&&d.status==='Còn nợ').reduce((s,d)=>s+d.remaining,0);
     return `<tr>
       <td><span class="bx b-gy">${c.id}</span></td>
       <td><strong>${c.name}</strong>${c.address?`<br><small style="color:var(--gy)">${c.address}</small>`:''}</td>
       <td>${c.phone}</td>
       <td><span class="bx ${typeColor[c.type]||'b-gy'}">${c.type}</span></td>
-      <td class="tr">${fmtN(totalBuy)} Ä</td>
-      <td class="tr" style="color:${totalDebt>0?'var(--er)':'var(--ok)'}"><strong>${totalDebt>0?fmtN(totalDebt)+' Ä':'â'}</strong></td>
+      <td class="tr">${fmtN(totalBuy)} đ</td>
+      <td class="tr" style="color:${totalDebt>0?'var(--er)':'var(--ok)'}"><strong>${totalDebt>0?fmtN(totalDebt)+' đ':'—'}</strong></td>
       <td class="tc" style="white-space:nowrap">
-        <button class="btn bp bsm" onclick="showCustHistory('${c.phone||c.name}')" style="margin-right:3px" title="Lá»ch sá»­ GD">ð</button>
-        <button class="btn bg2 bsm" onclick="openCustModal('${c.id}')" style="margin-right:3px">âï¸</button>
-        <button class="btn bd2 bsm" onclick="deleteCust('${c.id}')">ðï¸</button>
+        <button class="btn bp bsm" onclick="showCustHistory('${c.phone||c.name}')" style="margin-right:3px" title="Lịch sử GD">📋</button>
+        <button class="btn bg2 bsm" onclick="openCustModal('${c.id}')" style="margin-right:3px">✏️</button>
+        <button class="btn bd2 bsm" onclick="deleteCust('${c.id}')">🗑️</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// CÃNG Ná»¢
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// CÔNG NỢ
+// ══════════════════════════════════════════════
 let editDebtId=null;
 function openDebtModal(id){
   editDebtId=id||null;
-  document.getElementById('mo-debt-title').textContent=id?'âï¸ Sá»­a CÃ´ng Ná»£':'â ThÃªm CÃ´ng Ná»£';
+  document.getElementById('mo-debt-title').textContent=id?'✏️ Sửa Công Nợ':'➕ Thêm Công Nợ';
   if(id){
     const d=DB.debts.find(x=>x.id===id);
     document.getElementById('dm-name').value=d.customerName;
@@ -1522,14 +1522,14 @@ function openDebtModal(id){
     document.getElementById('dm-amt').value=0;
     document.getElementById('dm-paid').value=0;
     document.getElementById('dm-due').value='';
-    document.getElementById('dm-status').value='CÃ²n ná»£';
+    document.getElementById('dm-status').value='Còn nợ';
   }
   openMo('mo-debt');
 }
 function saveDebt(){
   const name=document.getElementById('dm-name').value.trim();
   const amt=parseFloat(document.getElementById('dm-amt').value)||0;
-  if(!name||!amt){toast('Nháº­p tÃªn KH vÃ  sá» tiá»n!','er');return}
+  if(!name||!amt){toast('Nhập tên KH và số tiền!','er');return}
   const paid2=parseFloat(document.getElementById('dm-paid').value)||0;
   const debts=DB.debts;
   const d={
@@ -1542,24 +1542,24 @@ function saveDebt(){
     description:document.getElementById('dm-desc').value,
     date:today(),ts:Date.now(),
   };
-  if(d.remaining<=0) d.status='ÄÃ£ tráº£';
+  if(d.remaining<=0) d.status='Đã trả';
   const idx=debts.findIndex(x=>x.id===d.id);
   if(idx>=0) debts[idx]=d; else debts.unshift(d);
   DB.debts=debts;
   closeMo('mo-debt'); renderDebts(); renderDebtStats();
-  toast('â ÄÃ£ lÆ°u cÃ´ng ná»£','ok');
+  toast('✅ Đã lưu công nợ','ok');
 }
 function deleteDebt(id){
-  if(!confirm('XÃ³a cÃ´ng ná»£ nÃ y?'))return;
+  if(!confirm('Xóa công nợ này?'))return;
   DB.debts=DB.debts.filter(d=>d.id!==id);
-  renderDebts(); renderDebtStats(); toast('ÄÃ£ xÃ³a');
+  renderDebts(); renderDebtStats(); toast('Đã xóa');
 }
 function openPayModal(id){
   const d=DB.debts.find(x=>x.id===id);
   if(!d)return;
   document.getElementById('pay-id').value=id;
   document.getElementById('pay-info').innerHTML=
-    `<b>${d.customerName}</b><br>CÃ²n ná»£: <strong style="color:var(--er)">${fmtN(d.remaining)} Ä</strong>`;
+    `<b>${d.customerName}</b><br>Còn nợ: <strong style="color:var(--er)">${fmtN(d.remaining)} đ</strong>`;
   document.getElementById('pay-amt').value=d.remaining;
   openMo('mo-pay');
 }
@@ -1571,22 +1571,22 @@ function recordPayment(){
   if(!d)return;
   d.paid=Math.min(d.amount,d.paid+amt);
   d.remaining=Math.max(0,d.amount-d.paid);
-  if(d.remaining<=0) d.status='ÄÃ£ tráº£';
+  if(d.remaining<=0) d.status='Đã trả';
   DB.debts=debts;
   closeMo('mo-pay'); renderDebts(); renderDebtStats();
-  toast('â ÄÃ£ ghi nháº­n thanh toÃ¡n '+fmtN(amt)+' Ä','ok');
+  toast('✅ Đã ghi nhận thanh toán '+fmtN(amt)+' đ','ok');
 }
 function renderDebtStats(){
   const debts=DB.debts;
   const total=debts.reduce((s,d)=>s+d.amount,0);
   const paid=debts.reduce((s,d)=>s+d.paid,0);
   const remaining=debts.reduce((s,d)=>s+d.remaining,0);
-  const overdue=debts.filter(d=>d.dueDate&&d.status==='CÃ²n ná»£'&&new Date(d.dueDate)<new Date()).length;
+  const overdue=debts.filter(d=>d.dueDate&&d.status==='Còn nợ'&&new Date(d.dueDate)<new Date()).length;
   document.getElementById('debt-stats').innerHTML=[
-    {icon:'ð³',label:'Tá»ng ná»£',val:fmtN(total)+' Ä'},
-    {icon:'â',label:'ÄÃ£ thu',val:fmtN(paid)+' Ä'},
-    {icon:'â ï¸',label:'CÃ²n pháº£i thu',val:fmtN(remaining)+' Ä'},
-    {icon:'ð´',label:'QuÃ¡ háº¡n',val:overdue+' khoáº£n'},
+    {icon:'💳',label:'Tổng nợ',val:fmtN(total)+' đ'},
+    {icon:'✅',label:'Đã thu',val:fmtN(paid)+' đ'},
+    {icon:'⚠️',label:'Còn phải thu',val:fmtN(remaining)+' đ'},
+    {icon:'🔴',label:'Quá hạn',val:overdue+' khoản'},
   ].map(s=>`<div class="sc"><div style="font-size:22px">${s.icon}</div><div class="sv" style="font-size:16px">${s.val}</div><div class="sl">${s.label}</div></div>`).join('');
 }
 function renderDebts(){
@@ -1598,36 +1598,36 @@ function renderDebts(){
     return mq&&ms;
   });
   const tbody=document.getElementById('debt-tbody');
-  if(!debts.length){tbody.innerHTML=`<tr><td colspan="8" class="tc" style="padding:28px;color:var(--gy)">KhÃ´ng cÃ³ cÃ´ng ná»£</td></tr>`;return}
+  if(!debts.length){tbody.innerHTML=`<tr><td colspan="8" class="tc" style="padding:28px;color:var(--gy)">Không có công nợ</td></tr>`;return}
   tbody.innerHTML=debts.map(d=>{
-    const overdue=d.dueDate&&d.status==='CÃ²n ná»£'&&new Date(d.dueDate)<new Date();
+    const overdue=d.dueDate&&d.status==='Còn nợ'&&new Date(d.dueDate)<new Date();
     const pct=d.amount>0?Math.round(d.paid/d.amount*100):100;
     return `<tr>
-      <td>${d.date}${d.dueDate?`<br><small style="color:${overdue?'var(--er)':'var(--gy)'}">Háº¡n: ${isoToDisplay(d.dueDate)}</small>`:''}</td>
+      <td>${d.date}${d.dueDate?`<br><small style="color:${overdue?'var(--er)':'var(--gy)'}">Hạn: ${isoToDisplay(d.dueDate)}</small>`:''}</td>
       <td><strong>${d.customerName}</strong>${d.phone?`<br><small>${d.phone}</small>`:''}</td>
-      <td>${d.description||'â'}</td>
-      <td class="tr">${fmtN(d.amount)} Ä</td>
-      <td class="tr">${fmtN(d.paid)} Ä</td>
-      <td class="tr"><strong style="color:${d.remaining>0?'var(--er)':'var(--ok)'}">${fmtN(d.remaining)} Ä</strong>
+      <td>${d.description||'—'}</td>
+      <td class="tr">${fmtN(d.amount)} đ</td>
+      <td class="tr">${fmtN(d.paid)} đ</td>
+      <td class="tr"><strong style="color:${d.remaining>0?'var(--er)':'var(--ok)'}">${fmtN(d.remaining)} đ</strong>
         <div class="debt-bar"><div class="debt-fill" style="width:${pct}%;background:${pct>=100?'var(--ok)':'var(--er)'}"></div></div>
       </td>
-      <td class="tc"><span class="bx ${d.status==='ÄÃ£ tráº£'?'b-gn':'b-rd'}">${d.status}</span></td>
+      <td class="tc"><span class="bx ${d.status==='Đã trả'?'b-gn':'b-rd'}">${d.status}</span></td>
       <td class="tc" style="white-space:nowrap">
-        ${d.status==='CÃ²n ná»£'?`<button class="btn bs bsm" onclick="openPayModal('${d.id}')" style="margin-right:3px">ð°</button>`:''}
-        <button class="btn bg2 bsm" onclick="openDebtModal('${d.id}')" style="margin-right:3px">âï¸</button>
-        <button class="btn bd2 bsm" onclick="deleteDebt('${d.id}')">ðï¸</button>
+        ${d.status==='Còn nợ'?`<button class="btn bs bsm" onclick="openPayModal('${d.id}')" style="margin-right:3px">💰</button>`:''}
+        <button class="btn bg2 bsm" onclick="openDebtModal('${d.id}')" style="margin-right:3px">✏️</button>
+        <button class="btn bd2 bsm" onclick="deleteDebt('${d.id}')">🗑️</button>
       </td>
     </tr>`;
   }).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// Sáº¢N PHáº¨M
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// SẢN PHẨM
+// ══════════════════════════════════════════════
 let editProdId=null;
 function openProdModal(id){
   editProdId=id||null;
-  document.getElementById('mo-prod-title').textContent=id?'âï¸ Sá»­a SP':'â ThÃªm SP';
+  document.getElementById('mo-prod-title').textContent=id?'✏️ Sửa SP':'➕ Thêm SP';
   if(id){
     const p=DB.products.find(x=>x.id===id);
     document.getElementById('pm-code').value=p.id;
@@ -1641,7 +1641,7 @@ function openProdModal(id){
     document.getElementById('pm-note').value=p.note||'';
   } else {
     ['pm-code','pm-name','pm-note'].forEach(f=>document.getElementById(f).value='');
-    document.getElementById('pm-unit').value='CÃ¡i';
+    document.getElementById('pm-unit').value='Cái';
     document.getElementById('pm-cost').value=0;
     document.getElementById('pm-price').value=0;
     document.getElementById('pm-stock').value=0;
@@ -1652,10 +1652,10 @@ function openProdModal(id){
 function saveProd(){
   const code=document.getElementById('pm-code').value.trim().toUpperCase();
   const name=document.getElementById('pm-name').value.trim();
-  if(!code||!name){toast('Nháº­p mÃ£ vÃ  tÃªn SP!','er');return}
+  if(!code||!name){toast('Nhập mã và tên SP!','er');return}
   const prods=DB.products;
   const p={id:code,name,type:document.getElementById('pm-type').value,
-    unit:document.getElementById('pm-unit').value||'CÃ¡i',
+    unit:document.getElementById('pm-unit').value||'Cái',
     cost:parseFloat(document.getElementById('pm-cost').value)||0,
     price:parseFloat(document.getElementById('pm-price').value)||0,
     stock:parseInt(document.getElementById('pm-stock').value)||0,
@@ -1665,53 +1665,53 @@ function saveProd(){
   if(idx>=0) prods[idx]=p; else prods.unshift(p);
   DB.products=prods;
   closeMo('mo-prod'); renderProds();
-  toast(idx>=0?'â ÄÃ£ cáº­p nháº­t':'â ÄÃ£ thÃªm SP','ok');
+  toast(idx>=0?'✅ Đã cập nhật':'✅ Đã thêm SP','ok');
 }
 function deleteProd(id){
-  if(!confirm('XÃ³a sáº£n pháº©m?'))return;
+  if(!confirm('Xóa sản phẩm?'))return;
   const prods=DB.products;
   const idx=prods.findIndex(p=>p.id===id);
   const item={...prods[idx]};
   DB.products=prods.filter(p=>p.id!==id);
   renderProds();
-  showUndoToast('ÄÃ£ xÃ³a SP <b>'+item.name+'</b>',function(){const p=DB.products;p.splice(idx,0,item);DB.products=p;renderProds();toast('â©ï¸ ÄÃ£ hoÃ n tÃ¡c','ok');});
+  showUndoToast('Đã xóa SP <b>'+item.name+'</b>',function(){const p=DB.products;p.splice(idx,0,item);DB.products=p;renderProds();toast('↩️ Đã hoàn tác','ok');});
 }
 function renderProds(){
   const q=(document.getElementById('prod-search')?.value||'').toLowerCase();
   const prods=DB.products.filter(p=>!q||p.name.toLowerCase().includes(q)||p.id.toLowerCase().includes(q));
   const tbody=document.getElementById('prod-tbody');
-  if(!prods.length){tbody.innerHTML=`<tr><td colspan="7" class="tc" style="padding:28px;color:var(--gy)">KhÃ´ng cÃ³ sáº£n pháº©m</td></tr>`;return}
+  if(!prods.length){tbody.innerHTML=`<tr><td colspan="7" class="tc" style="padding:28px;color:var(--gy)">Không có sản phẩm</td></tr>`;return}
   tbody.innerHTML=prods.map(p=>`<tr>
     <td><span class="bx b-bl">${p.id}</span></td>
     <td><strong>${p.name}</strong>${p.note?`<br><small style="color:var(--gy)">${p.note}</small>`:''}</td>
     <td><span class="bx b-or">${p.type}</span></td>
-    <td class="tr cost-col">${fmtN(p.cost)} Ä</td>
-    <td class="tr"><strong>${fmtN(p.price)} Ä</strong></td>
+    <td class="tr cost-col">${fmtN(p.cost)} đ</td>
+    <td class="tr"><strong>${fmtN(p.price)} đ</strong></td>
     <td class="tc"><span class="bx ${p.stock<3?'b-rd':p.stock<10?'b-yw':'b-gn'}">${p.stock}</span></td>
     <td class="tc" style="white-space:nowrap">
-      <button class="btn bg2 bsm" onclick="openProdModal('${p.id}')" style="margin-right:3px">âï¸</button>
-      <button class="btn bd2 bsm" onclick="deleteProd('${p.id}')">ðï¸</button>
+      <button class="btn bg2 bsm" onclick="openProdModal('${p.id}')" style="margin-right:3px">✏️</button>
+      <button class="btn bd2 bsm" onclick="deleteProd('${p.id}')">🗑️</button>
     </td>
   </tr>`).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// Lá»CH Sá»¬
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// LỊCH SỬ
+// ══════════════════════════════════════════════
 function renderHistory(){
   const q=(document.getElementById('hist-search')?.value||'').toLowerCase();
   const sales=DB.sales.filter(s=>!q||s.customer.toLowerCase().includes(q)||s.billNo.toLowerCase().includes(q)||(s.phone||'').includes(q));
   const tbody=document.getElementById('hist-tbody');
-  if(!sales.length){tbody.innerHTML=`<tr><td colspan="6" class="tc" style="padding:28px;color:var(--gy)">ChÆ°a cÃ³ giao dá»ch</td></tr>`;return}
+  if(!sales.length){tbody.innerHTML=`<tr><td colspan="6" class="tc" style="padding:28px;color:var(--gy)">Chưa có giao dịch</td></tr>`;return}
   tbody.innerHTML=sales.map((s,i)=>`<tr>
     <td>${s.date}</td>
     <td><span class="bx b-bl">${s.billNo}</span></td>
     <td><strong>${s.customer}</strong>${s.phone?`<br><small>${s.phone}</small>`:''}</td>
-    <td class="tr"><strong>${fmtN(s.total)} Ä</strong></td>
-    <td><span class="bx ${s.paymethod==='CÃ´ng ná»£'?'b-rd':'b-gn'}">${s.paymethod||'Tiá»n máº·t'}</span></td>
+    <td class="tr"><strong>${fmtN(s.total)} đ</strong></td>
+    <td><span class="bx ${s.paymethod==='Công nợ'?'b-rd':'b-gn'}">${s.paymethod||'Tiền mặt'}</span></td>
     <td class="tc">
-      <button class="btn bg2 bsm" onclick="viewOrder(${i})" style="margin-right:3px">ðï¸</button>
-      <button class="btn bpu bsm" onclick="printSaleBill(DB.sales[${i}])">ð¨ï¸</button>
+      <button class="btn bg2 bsm" onclick="viewOrder(${i})" style="margin-right:3px">👁️</button>
+      <button class="btn bpu bsm" onclick="printSaleBill(DB.sales[${i}])">🖨️</button>
     </td>
   </tr>`).join('');
 }
@@ -1720,41 +1720,41 @@ function viewOrder(i){
   const body=document.getElementById('mo-order-body');
   body.innerHTML=`<div style="font-size:13px">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px">
-      <div><b>Bill:</b> ${s.billNo}</div><div><b>NgÃ y:</b> ${s.date}</div>
-      <div><b>KhÃ¡ch:</b> ${s.customer}</div><div><b>SÄT:</b> ${s.phone||'â'}</div>
-      <div><b>Thanh toÃ¡n:</b> ${s.paymethod||'â'}</div><div><b>Báº£o hÃ nh:</b> ${s.warranty||0} thÃ¡ng</div>
+      <div><b>Bill:</b> ${s.billNo}</div><div><b>Ngày:</b> ${s.date}</div>
+      <div><b>Khách:</b> ${s.customer}</div><div><b>SĐT:</b> ${s.phone||'—'}</div>
+      <div><b>Thanh toán:</b> ${s.paymethod||'—'}</div><div><b>Bảo hành:</b> ${s.warranty||0} tháng</div>
     </div>
-    <table><thead><tr><th>Sáº£n pháº©m</th><th class="tc">SL</th><th class="tr">ÄÆ¡n giÃ¡</th><th class="tr">ThÃ nh tiá»n</th></tr></thead>
-    <tbody>${s.items.map(it=>`<tr><td>${it.name||it.code}</td><td class="tc">${it.qty}</td><td class="tr">${fmtN(it.price)} Ä</td><td class="tr">${fmtN(it.qty*it.price*(1-it.disc/100))} Ä</td></tr>`).join('')}</tbody></table>
+    <table><thead><tr><th>Sản phẩm</th><th class="tc">SL</th><th class="tr">Đơn giá</th><th class="tr">Thành tiền</th></tr></thead>
+    <tbody>${s.items.map(it=>`<tr><td>${it.name||it.code}</td><td class="tc">${it.qty}</td><td class="tr">${fmtN(it.price)} đ</td><td class="tr">${fmtN(it.qty*it.price*(1-it.disc/100))} đ</td></tr>`).join('')}</tbody></table>
     <div style="margin-top:10px;text-align:right">
-      <div>Tá»ng: <strong>${fmtN(s.subtotal)} Ä</strong></div>
-      ${s.extraDiscount>0?`<div>Giáº£m thÃªm: -${fmtN(s.extraDiscount)} Ä</div>`:''}
-      <div style="font-size:15px;font-weight:700">Thanh toÃ¡n: ${fmtN(s.total)} Ä</div>
+      <div>Tổng: <strong>${fmtN(s.subtotal)} đ</strong></div>
+      ${s.extraDiscount>0?`<div>Giảm thêm: -${fmtN(s.extraDiscount)} đ</div>`:''}
+      <div style="font-size:15px;font-weight:700">Thanh toán: ${fmtN(s.total)} đ</div>
     </div>
   </div>`;
   document.getElementById('reprint-btn').onclick=()=>{closeMo('mo-order');printSaleBill(s)};
   openMo('mo-order');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// THá»NG KÃ
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// THỐNG KÊ
+// ══════════════════════════════════════════════
 function renderStats(){
   const sales=DB.sales; const repairs=DB.repairs;
   const td=today();
   const todSales=sales.filter(s=>s.date===td);
   const totRev=sales.reduce((s,x)=>s+x.total,0);
   const todRev=todSales.reduce((s,x)=>s+x.total,0);
-  const activeRep=repairs.filter(r=>r.status!=='ÄÃ£ giao').length;
-  const totDebt=DB.debts.filter(d=>d.status==='CÃ²n ná»£').reduce((s,d)=>s+d.remaining,0);
+  const activeRep=repairs.filter(r=>r.status!=='Đã giao').length;
+  const totDebt=DB.debts.filter(d=>d.status==='Còn nợ').reduce((s,d)=>s+d.remaining,0);
 
   document.getElementById('stat-cards').innerHTML=[
-    {icon:'ð§¾',label:'ÄÆ¡n hÃ ng hÃ´m nay',val:todSales.length},
-    {icon:'ð',label:'DT hÃ´m nay',val:fmtN(todRev)+' Ä'},
-    {icon:'ð°',label:'Tá»ng doanh thu',val:fmtN(totRev)+' Ä'},
-    {icon:'ð§',label:'Äang sá»­a chá»¯a',val:activeRep+' mÃ¡y'},
-    {icon:'ð³',label:'CÃ´ng ná»£ chÆ°a thu',val:fmtN(totDebt)+' Ä'},
-    {icon:'ð¥',label:'KhÃ¡ch hÃ ng má»i',val:DB.customers.length+' ngÆ°á»i'},
+    {icon:'🧾',label:'Đơn hàng hôm nay',val:todSales.length},
+    {icon:'📅',label:'DT hôm nay',val:fmtN(todRev)+' đ'},
+    {icon:'💰',label:'Tổng doanh thu',val:fmtN(totRev)+' đ'},
+    {icon:'🔧',label:'Đang sửa chữa',val:activeRep+' máy'},
+    {icon:'💳',label:'Công nợ chưa thu',val:fmtN(totDebt)+' đ'},
+    {icon:'👥',label:'Khách hàng mối',val:DB.customers.length+' người'},
   ].map(s=>`<div class="sc"><div style="font-size:22px">${s.icon}</div><div class="sv" style="font-size:15px">${s.val}</div><div class="sl">${s.label}</div></div>`).join('');
 
   // Chart
@@ -1787,12 +1787,12 @@ function renderStats(){
   document.getElementById('top-prods').innerHTML=sorted.length?
     sorted.map((p,i)=>`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--bd);font-size:12px">
       <span><span class="bx b-bl">#${i+1}</span> ${p.name}</span>
-      <span><strong>${p.qty}</strong> cÃ¡i</span>
+      <span><strong>${p.qty}</strong> cái</span>
     </div>`).join('')
-    :'<div style="color:var(--gy);text-align:center;padding:20px">ChÆ°a cÃ³ dá»¯ liá»u</div>';
+    :'<div style="color:var(--gy);text-align:center;padding:20px">Chưa có dữ liệu</div>';
 
   // Repair stats
-  const sc={'Má»i nháº­n':0,'Äang kiá»m tra':0,'Äang sá»­a':0,'Chá» linh kiá»n':0,'HoÃ n thÃ nh':0,'ÄÃ£ giao':0};
+  const sc={'Mới nhận':0,'Đang kiểm tra':0,'Đang sửa':0,'Chờ linh kiện':0,'Hoàn thành':0,'Đã giao':0};
   repairs.forEach(r=>{if(sc[r.status]!==undefined)sc[r.status]++});
   document.getElementById('repair-stats').innerHTML=Object.entries(sc).map(([k,v])=>`
     <div style="display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px">
@@ -1803,7 +1803,7 @@ function renderStats(){
 
 function showRepairProfit(period){
   ['day','week','month'].forEach(p=>{const b=document.getElementById('rp-'+p);if(b)b.className='btn bsm '+(p===period?'bp':'bg2');});
-  const repairs=DB.repairs.filter(r=>r.status==='ÄÃ£ giao'&&r.deliveredDate);
+  const repairs=DB.repairs.filter(r=>r.status==='Đã giao'&&r.deliveredDate);
   const now=new Date();
   function rev(r){const its=r.deliveryItems||[];return its.length?its.reduce((s,i)=>s+i.qty*i.price,0):(+r.cost||0);}
   function inRange(ds){
@@ -1821,14 +1821,14 @@ function showRepairProfit(period){
   else{const dim=new Date(now.getFullYear(),now.getMonth()+1,0).getDate();const cw=Math.floor((now.getDate()-1)/7);for(let w=0;w<Math.ceil(dim/7);w++){const s1=w*7+1,e1=Math.min((w+1)*7,dim);let wv=0;for(let d=s1;d<=e1;d++){const ds=now.getFullYear()+'-'+p2(now.getMonth()+1)+'-'+p2(d);wv+=repairs.filter(r=>r.deliveredDate===ds).reduce((s,r)=>s+rev(r),0);}bars.push({label:'T'+(w+1),val:wv,hi:w===cw});}}
   const maxV=Math.max(...bars.map(b=>b.val),1);
   const chartHTML=`<div style="display:flex;align-items:flex-end;gap:6px;height:80px;margin:0 0 12px">${bars.map(b=>`<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px"><div style="font-size:8px;color:var(--gy)">${b.val>0?fmtN(Math.round(b.val/1000))+'k':''}</div><div style="flex:1;width:100%;display:flex;align-items:flex-end"><div style="width:100%;background:${b.hi?'var(--ok)':'#60a5fa'};border-radius:3px 3px 0 0;height:${Math.max(b.val>0?4:2,Math.round(b.val/maxV*60))}px"></div></div><div style="font-size:9px;color:${b.hi?'var(--ok)':'var(--gy)'};font-weight:${b.hi?700:400}">${b.label}</div></div>`).join('')}</div>`;
-  const sumHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(total)}<span style="font-size:10px"> Ä</span></div><div style="font-size:10px;color:var(--gy)">Tá»ng thu</div></div><div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#2563eb">${list.length}</div><div style="font-size:10px;color:var(--gy)">ÄÆ¡n ÄÃ£ giao</div></div><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(profit)}<span style="font-size:10px"> Ä</span></div><div style="font-size:10px;color:var(--gy)">Lá»£i nhuáº­n</div></div></div>`;
-  const listHTML=list.length?list.slice(0,8).map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><div><strong>${r.customerName}</strong> â <span style="color:var(--gy)">${r.device}</span><br><span style="font-size:10px;color:var(--gy)">${r.deliveredDate}</span></div><strong style="color:var(--ok);white-space:nowrap">${fmtN(rev(r))} Ä</strong></div>`).join('')+(list.length>8?`<div style="text-align:center;font-size:10px;color:var(--gy);padding:6px">â¦vÃ  ${list.length-8} ÄÆ¡n khÃ¡c</div>`:''):'<div style="text-align:center;color:var(--gy);padding:20px;font-size:12px">ChÆ°a cÃ³ ÄÆ¡n hoÃ n thÃ nh trong ká»³ nÃ y</div>';
+  const sumHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px"><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(total)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Tổng thu</div></div><div style="background:#eff6ff;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:#2563eb">${list.length}</div><div style="font-size:10px;color:var(--gy)">Đơn đã giao</div></div><div style="background:#f0fdf4;border-radius:8px;padding:10px;text-align:center"><div style="font-size:16px;font-weight:800;color:var(--ok)">${fmtN(profit)}<span style="font-size:10px"> đ</span></div><div style="font-size:10px;color:var(--gy)">Lợi nhuận</div></div></div>`;
+  const listHTML=list.length?list.slice(0,8).map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--bd);font-size:12px"><div><strong>${r.customerName}</strong> – <span style="color:var(--gy)">${r.device}</span><br><span style="font-size:10px;color:var(--gy)">${r.deliveredDate}</span></div><strong style="color:var(--ok);white-space:nowrap">${fmtN(rev(r))} đ</strong></div>`).join('')+(list.length>8?`<div style="text-align:center;font-size:10px;color:var(--gy);padding:6px">…và ${list.length-8} đơn khác</div>`:''):'<div style="text-align:center;color:var(--gy);padding:20px;font-size:12px">Chưa có đơn hoàn thành trong kỳ này</div>';
   document.getElementById('repair-profit-body').innerHTML=chartHTML+sumHTML+listHTML;
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // DELIVERY MODAL
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 let deliveryItems=[];
 
 function openDeliverModal(repId){
@@ -1836,8 +1836,8 @@ function openDeliverModal(repId){
   if(!r)return;
   document.getElementById('dv-repid').value=repId;
   document.getElementById('dv-rep-info').innerHTML=
-    `<b>${r.customerName}</b> â ${r.phone} &nbsp;|&nbsp; <b>${r.device}</b>${r.serial?` (${r.serial})`:''}<br>
-     TÃ¬nh tráº¡ng: ${r.issue} &nbsp;|&nbsp; Cá»c: <strong>${fmtN(r.deposit||0)} Ä</strong>`;
+    `<b>${r.customerName}</b> – ${r.phone} &nbsp;|&nbsp; <b>${r.device}</b>${r.serial?` (${r.serial})`:''}<br>
+     Tình trạng: ${r.issue} &nbsp;|&nbsp; Cọc: <strong>${fmtN(r.deposit||0)} đ</strong>`;
   document.getElementById('dv-deposit').textContent=fmt(r.deposit||0);
   document.getElementById('dv-date').value=todayISO();
   document.getElementById('dv-paid').value=0;
@@ -1848,8 +1848,8 @@ function openDeliverModal(repId){
   renderDeliveryItems();
   // Populate product picker
   const sel=document.getElementById('dv-prod-pick');
-  sel.innerHTML='<option value="">-- Chá»n sáº£n pháº©m trong kho --</option>'+
-    DB.products.filter(p=>p.stock>0||p.type==='Dá»ch vá»¥').map(p=>`<option value="${p.id}">[${p.id}] ${p.name} â ${fmtN(p.price)}Ä (Tá»n: ${p.stock})</option>`).join('');
+  sel.innerHTML='<option value="">-- Chọn sản phẩm trong kho --</option>'+
+    DB.products.filter(p=>p.stock>0||p.type==='Dịch vụ').map(p=>`<option value="${p.id}">[${p.id}] ${p.name} – ${fmtN(p.price)}đ (Tồn: ${p.stock})</option>`).join('');
   document.getElementById('dv-process').value=r.processNote||'';
   calcDelivery();
   openMo('mo-deliver');
@@ -1880,11 +1880,11 @@ function renderDeliveryItems(){
     const d=document.createElement('div');
     d.className='di';
     d.innerHTML=`
-      <input type="text" value="${it.desc}" placeholder="MÃ´ táº£ háº¡ng má»¥c / linh kiá»n" oninput="deliveryItems[${i}].desc=this.value;calcDelivery()">
+      <input type="text" value="${it.desc}" placeholder="Mô tả hạng mục / linh kiện" oninput="deliveryItems[${i}].desc=this.value;calcDelivery()">
       <input type="number" value="${it.qty}" min="1" oninput="deliveryItems[${i}].qty=parseFloat(this.value)||1;calcDelivery()">
       <input type="number" value="${it.price}" min="0" oninput="deliveryItems[${i}].price=parseFloat(this.value)||0;calcDelivery()">
       <input type="text" value="${fmtN(it.qty*it.price)}" readonly class="ro-inp">
-      <button class="btn bd2 bsm" onclick="removeDeliveryItem(${i})" style="padding:6px 9px">â</button>`;
+      <button class="btn bd2 bsm" onclick="removeDeliveryItem(${i})" style="padding:6px 9px">✕</button>`;
     wrap.appendChild(d);
   });
 }
@@ -1902,8 +1902,8 @@ function calcDelivery(){
   if(paid>0){
     cr.style.display='flex';
     const ch=paid-remaining;
-    document.getElementById('dv-change').textContent=ch>=0?fmt(ch):'Thiáº¿u '+fmt(-ch);
-    document.getElementById('dv-change-lbl').textContent=ch>=0?'ðµ Tiá»n thá»«a':'â  CÃ²n thiáº¿u';
+    document.getElementById('dv-change').textContent=ch>=0?fmt(ch):'Thiếu '+fmt(-ch);
+    document.getElementById('dv-change-lbl').textContent=ch>=0?'💵 Tiền thừa':'⚠ Còn thiếu';
     cr.style.background=ch>=0?'#d1fae5':'#fee2e2';
     cr.style.color=ch>=0?'#065f46':'#991b1b';
   } else cr.style.display='none';
@@ -1919,18 +1919,18 @@ function saveDeliver(){
   r.deliveryWarranty=parseInt(document.getElementById('dv-warranty').value)||0;
   r.deliveredDate=document.getElementById('dv-date').value||todayISO();
   r.deliveryPaid=parseFloat(document.getElementById('dv-paid').value)||0;
-  r.status='ÄÃ£ giao';
+  r.status='Đã giao';
   // Deduct stock for products picked from inventory
   validItems.forEach(it=>{
     const p=DB.products.find(x=>x.name===it.desc||x.id===it.desc);
-    if(p&&p.type!=='Dá»ch vá»¥')p.stock=Math.max(0,p.stock-it.qty);
+    if(p&&p.type!=='Dịch vụ')p.stock=Math.max(0,p.stock-it.qty);
   });
   DB.products=DB.products; // trigger save
   r.processNote=document.getElementById('dv-process').value;
   DB.repairs=reps;
   closeMo('mo-deliver');
   renderRepairs();
-  toast('â ÄÃ£ giao mÃ¡y '+repId,'ok');
+  toast('✅ Đã giao máy '+repId,'ok');
   // Auto print
   setTimeout(()=>printRepairBill(r),300);
 }
@@ -1949,9 +1949,9 @@ function printDeliverBill(){
   printRepairBill(tmp);
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // LOGIN & AUTH
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 let currentUser=null;
 
 function getUsers(){
@@ -1964,7 +1964,7 @@ function initDefaultUsers(){
   if(!getUsers()){
     setUsers([
       {id:'u1',name:'Admin',username:'admin',password:'admin123',role:'admin'},
-      {id:'u2',name:'NhÃ¢n viÃªn',username:'nhanvien',password:'nv123',role:'staff'},
+      {id:'u2',name:'Nhân viên',username:'nhanvien',password:'nv123',role:'staff'},
     ]);
   }
 }
@@ -1973,19 +1973,19 @@ function togglePw(id,btn){
   var inp=document.getElementById(id);
   var show=inp.type==='password';
   inp.type=show?'text':'password';
-  btn.textContent=show?'ð':'ð';
+  btn.textContent=show?'🙈':'👁';
 }
 
 function login(){
   var uname=(document.getElementById('li-user').value||'').trim();
   var pass=document.getElementById('li-pass').value||'';
   var remember=document.getElementById('li-remember').checked;
-  if(!uname){toast('Vui lÃ²ng nháº­p tÃªn ÄÄng nháº­p!','er');return;}
-  if(!pass){toast('Vui lÃ²ng nháº­p máº­t kháº©u!','er');return;}
+  if(!uname){toast('Vui lòng nhập tên đăng nhập!','er');return;}
+  if(!pass){toast('Vui lòng nhập mật khẩu!','er');return;}
   function doLogin(users){
     var matched=users?users.find(function(x){return x.username===uname;}):null;
-    if(!matched){toast('â TÃªn ÄÄng nháº­p khÃ´ng tá»n táº¡i!','er');return;}
-    if(matched.password!==pass){toast('â Máº­t kháº©u khÃ´ng ÄÃºng!','er');return;}
+    if(!matched){toast('❌ Tên đăng nhập không tồn tại!','er');return;}
+    if(matched.password!==pass){toast('❌ Mật khẩu không đúng!','er');return;}
     if(remember){localStorage.setItem('l24_rem_u',uname);localStorage.setItem('l24_rem_p',pass);}
     else{localStorage.removeItem('l24_rem_u');localStorage.removeItem('l24_rem_p');}
     currentUser={id:matched.id,name:matched.name,username:matched.username,role:matched.role};
@@ -1994,7 +1994,7 @@ function login(){
     applyRoleUI();
   }
   try{
-    toast('â³ Äang xÃ¡c thá»±c...','');
+    toast('⏳ Đang xác thực...','');
     firebase.database().ref('users').once('value')
       .then(function(snap){
         var val=snap.val();
@@ -2007,7 +2007,7 @@ function login(){
 }
 
 function logout(){
-  if(!confirm('ÄÄng xuáº¥t?'))return;
+  if(!confirm('Đăng xuất?'))return;
   try{localStorage.removeItem('l24_session');}catch{}
   currentUser=null;
   document.getElementById('login-overlay').style.display='flex';
@@ -2020,7 +2020,7 @@ function applyRoleUI(){
   const isAdmin=currentUser.role==='admin';
   // Update nav user badge
   document.getElementById('user-badge').style.display='flex';
-  document.getElementById('user-name').textContent=currentUser.name+(isAdmin?' ð':'');
+  document.getElementById('user-name').textContent=currentUser.name+(isAdmin?' 👑':'');
   // Admin-only elements
   document.querySelectorAll('.admin-only').forEach(el=>{
     el.style.display=isAdmin?'inline-flex':'none';
@@ -2057,7 +2057,7 @@ function autoFillLogin(){
 
 function openUserModal(id){
   editUserId=id||null;
-  document.getElementById('mo-user-title').textContent=id?'âï¸ Sá»­a ngÆ°á»i dÃ¹ng':'â ThÃªm ngÆ°á»i dÃ¹ng';
+  document.getElementById('mo-user-title').textContent=id?'✏️ Sửa người dùng':'➕ Thêm người dùng';
   if(id){
     const users=getUsers()||[];
     const u=users.find(x=>x.id===id);
@@ -2077,26 +2077,26 @@ function saveUser(){
   const username=document.getElementById('um-username').value.trim();
   const pass=document.getElementById('um-pass').value;
   const role=document.getElementById('um-role').value;
-  if(!name||!username){toast('Nháº­p tÃªn vÃ  tÃªn ÄÄng nháº­p!','er');return;}
+  if(!name||!username){toast('Nhập tên và tên đăng nhập!','er');return;}
   const users=getUsers()||[];
   if(editUserId){
     const u=users.find(x=>x.id===editUserId);
     if(u){u.name=name;u.username=username;u.role=role;if(pass)u.password=pass;}
   } else {
-    if(users.find(x=>x.username===username)){toast('TÃªn ÄÄng nháº­p ÄÃ£ tá»n táº¡i!','er');return;}
-    if(!pass){toast('Nháº­p máº­t kháº©u!','er');return;}
+    if(users.find(x=>x.username===username)){toast('Tên đăng nhập đã tồn tại!','er');return;}
+    if(!pass){toast('Nhập mật khẩu!','er');return;}
     users.push({id:'u'+Date.now(),name,username,password:pass,role});
   }
   setUsers(users);
   closeMo('mo-user');
   renderUsers();
-  toast('â ÄÃ£ lÆ°u ngÆ°á»i dÃ¹ng','ok');
+  toast('✅ Đã lưu người dùng','ok');
 }
 function deleteUser(id){
-  if(id===currentUser?.id){toast('KhÃ´ng thá» xÃ³a tÃ i khoáº£n Äang dÃ¹ng!','er');return;}
-  if(!confirm('XÃ³a ngÆ°á»i dÃ¹ng nÃ y?'))return;
+  if(id===currentUser?.id){toast('Không thể xóa tài khoản đang dùng!','er');return;}
+  if(!confirm('Xóa người dùng này?'))return;
   setUsers((getUsers()||[]).filter(u=>u.id!==id));
-  renderUsers(); toast('ÄÃ£ xÃ³a');
+  renderUsers(); toast('Đã xóa');
 }
 function renderUsers(){
   const users=getUsers()||[];
@@ -2105,25 +2105,25 @@ function renderUsers(){
   tbody.innerHTML=users.map(u=>`<tr>
     <td><strong>${u.name}</strong></td>
     <td>${u.username}</td>
-    <td><span class="bx ${u.role==='admin'?'b-pu':'b-bl'}">${u.role==='admin'?'ð Admin':'ð¤ NhÃ¢n viÃªn'}</span></td>
+    <td><span class="bx ${u.role==='admin'?'b-pu':'b-bl'}">${u.role==='admin'?'👑 Admin':'👤 Nhân viên'}</span></td>
     <td class="tc" style="white-space:nowrap">
-      <button class="btn bg2 bsm" onclick="openUserModal('${u.id}')" style="margin-right:3px">âï¸</button>
-      ${u.id!=='u1'?`<button class="btn bd2 bsm" onclick="deleteUser('${u.id}')">ðï¸</button>`:''}
+      <button class="btn bg2 bsm" onclick="openUserModal('${u.id}')" style="margin-right:3px">✏️</button>
+      ${u.id!=='u1'?`<button class="btn bd2 bsm" onclick="deleteUser('${u.id}')">🗑️</button>`:''}
     </td>
   </tr>`).join('');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // FIREBASE HELPERS
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 function setSyncStatus(s){
   const el = document.getElementById('sync-badge');
   if(!el) return;
   const map = {
-    'ok':      'ð¢ ÄÃ£ Äá»ng bá»',
-    'syncing': 'ð Äang sync...',
-    'offline': 'ð´ Offline',
-    'no-cfg':  'âï¸ ChÆ°a cáº¥u hÃ¬nh Firebase',
+    'ok':      '🟢 Đã đồng bộ',
+    'syncing': '🔄 Đang sync...',
+    'offline': '🔴 Offline',
+    'no-cfg':  '⚙️ Chưa cấu hình Firebase',
   };
   el.textContent = map[s] || s;
   el.style.background = s==='ok'?'rgba(16,185,129,.3)':s==='offline'?'rgba(239,68,68,.3)':'rgba(255,255,255,.15)';
@@ -2144,34 +2144,34 @@ function reRenderCurrent(){
   // 'sale' page: don't auto-refresh to avoid losing form input
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// TRA SÄT NHANH
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// TRA SĐT NHANH
+// ══════════════════════════════════════════════
 function quickPhoneLookup(){
-  const phone = prompt('Nháº­p sá» Äiá»n thoáº¡i cáº§n tra:','');
+  const phone = prompt('Nhập số điện thoại cần tra:','');
   if(!phone||!phone.trim()) return;
   showCustHistory(phone.trim());
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// CÃI Äáº¶T BILL
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// CÀI ĐẶT BILL
+// ══════════════════════════════════════════════
 const BILL_SETTINGS_KEY = 'l24_bill_settings';
 const BILL_DEFAULTS = {
-  shopname: 'Cá»¬A HÃNG LAPTOP 24H',
-  slogan: 'ChuyÃªn: Mua bÃ¡n, sá»­a chá»¯a Laptop â Linh kiá»n â Phá»¥ kiá»n',
-  addr: 'VÄ©nh Long',
+  shopname: 'CỬA HÀNG LAPTOP 24H',
+  slogan: 'Chuyên: Mua bán, sửa chữa Laptop – Linh kiện – Phụ kiện',
+  addr: 'Vĩnh Long',
   phone: '0xxx.xxx.xxx',
   social: 'laptop24hstore',
   web: '',
-  footerSale: 'Cáº£m Æ¡n quÃ½ khÃ¡ch! HÃ ng ÄÃ£ mua khÃ´ng Äá»i tráº£.\nLiÃªn há» cá»­a hÃ ng khi cáº§n há» trá»£.',
-  footerRepair: 'Cáº£m Æ¡n quÃ½ khÃ¡ch! LiÃªn há» ngay náº¿u cÃ³ váº¥n Äá».',
-  wtermSale: 'â Báº£o hÃ nh miá»n phÃ­ lá»i nhÃ  sáº£n xuáº¥t\nâ KhÃ´ng BH: va Äáº­p, vÃ o nÆ°á»c, háº¿t pin, tá»± Ã½ sá»­a chá» khÃ¡c\nâ Xuáº¥t trÃ¬nh phiáº¿u nÃ y khi báº£o hÃ nh',
-  wtermRepair: 'â Báº£o hÃ nh lá»i phÃ¡t sinh tá»« sá»­a chá»¯a\nâ KhÃ´ng BH: va Äáº­p, vÃ o nÆ°á»c, sá»­ dá»¥ng sai cÃ¡ch\nâ Xuáº¥t trÃ¬nh phiáº¿u nÃ y khi báº£o hÃ nh',
+  footerSale: 'Cảm ơn quý khách! Hàng đã mua không đổi trả.\nLiên hệ cửa hàng khi cần hỗ trợ.',
+  footerRepair: 'Cảm ơn quý khách! Liên hệ ngay nếu có vấn đề.',
+  wtermSale: '✔ Bảo hành miễn phí lỗi nhà sản xuất\n✔ Không BH: va đập, vào nước, hết pin, tự ý sửa chỗ khác\n✔ Xuất trình phiếu này khi bảo hành',
+  wtermRepair: '✔ Bảo hành lỗi phát sinh từ sửa chữa\n✔ Không BH: va đập, vào nước, sử dụng sai cách\n✔ Xuất trình phiếu này khi bảo hành',
   font: 'Arial,sans-serif',
   fontsize: '11px',
   billcolor: '#1e3a8a',
-  logo: 'ð»',
+  logo: '💻',
   billwidth: '320px',
 };
 
@@ -2209,7 +2209,7 @@ function saveBillSettings(){
   });
   try{ localStorage.setItem(BILL_SETTINGS_KEY,JSON.stringify(s)); }catch{}
   updateBillPreview();
-  toast('â ÄÃ£ lÆ°u cÃ i Äáº·t bill','ok');
+  toast('✅ Đã lưu cài đặt bill','ok');
 }
 
 function updateBillPreview(){
@@ -2224,9 +2224,9 @@ function updateBillPreview(){
   }
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
-// Lá»CH Sá»¬ GIAO Dá»CH KHÃCH HÃNG
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
+// LỊCH SỬ GIAO DỊCH KHÁCH HÀNG
+// ══════════════════════════════════════════════
 function showCustHistory(nameOrPhone){
   const q = nameOrPhone.toLowerCase();
   const sales = DB.sales.filter(s=>s.customer.toLowerCase()===q||s.phone===nameOrPhone||(s.customer+'').toLowerCase().includes(q));
@@ -2240,56 +2240,56 @@ function showCustHistory(nameOrPhone){
   },0);
 
   let html = `<div style="background:var(--pr-l);padding:12px;border-radius:var(--rs);margin-bottom:14px;font-size:13px">
-    <b>ð¤ ${cust?cust.name:nameOrPhone}</b>${cust&&cust.phone?' &nbsp;|&nbsp; ð '+cust.phone:''}
-    ${cust&&cust.address?'<br>ð '+cust.address:''}
+    <b>👤 ${cust?cust.name:nameOrPhone}</b>${cust&&cust.phone?' &nbsp;|&nbsp; 📞 '+cust.phone:''}
+    ${cust&&cust.address?'<br>📍 '+cust.address:''}
     <div style="margin-top:6px;display:flex;gap:16px;font-size:12px">
-      <span>ð Mua hÃ ng: <b>${sales.length} láº§n</b> â Tá»ng: <b style="color:var(--pr-d)">${fmtN(totalBuy)} Ä</b></span>
-      <span>ð§ Sá»­a chá»¯a: <b>${repairs.length} láº§n</b> â Tá»ng: <b style="color:var(--pu)">${fmtN(totalRepair)} Ä</b></span>
+      <span>🛒 Mua hàng: <b>${sales.length} lần</b> – Tổng: <b style="color:var(--pr-d)">${fmtN(totalBuy)} đ</b></span>
+      <span>🔧 Sửa chữa: <b>${repairs.length} lần</b> – Tổng: <b style="color:var(--pu)">${fmtN(totalRepair)} đ</b></span>
     </div>
   </div>`;
 
   if(sales.length>0){
-    html += `<div style="font-size:13px;font-weight:700;color:var(--pr-d);margin-bottom:8px">ð Lá»ch sá»­ mua hÃ ng (${sales.length})</div>`;
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pr-d);margin-bottom:8px">🛒 Lịch sử mua hàng (${sales.length})</div>`;
     html += `<div class="tw" style="margin-bottom:14px"><table>
-      <thead><tr><th>NgÃ y</th><th>Sá» bill</th><th>Sáº£n pháº©m</th><th class="tr">Tá»ng tiá»n</th><th>Thanh toÃ¡n</th><th class="tc">In</th></tr></thead>
+      <thead><tr><th>Ngày</th><th>Số bill</th><th>Sản phẩm</th><th class="tr">Tổng tiền</th><th>Thanh toán</th><th class="tc">In</th></tr></thead>
       <tbody>${sales.map(s=>`<tr>
         <td>${s.date}</td>
         <td><span class="bx b-bl">${s.billNo}</span></td>
         <td style="font-size:11px">${(s.items||[]).map(it=>it.name||it.code).join(', ')}</td>
-        <td class="tr"><strong>${fmtN(s.total)} Ä</strong></td>
-        <td><span class="bx ${s.paymethod==='CÃ´ng ná»£'?'b-rd':'b-gn'}">${s.paymethod||'TM'}</span></td>
-        <td class="tc"><button class="btn bg2 bsm" onclick="printSaleBill(DB.sales.find(x=>x.billNo==='${s.billNo}'))">ð¨ï¸</button></td>
+        <td class="tr"><strong>${fmtN(s.total)} đ</strong></td>
+        <td><span class="bx ${s.paymethod==='Công nợ'?'b-rd':'b-gn'}">${s.paymethod||'TM'}</span></td>
+        <td class="tc"><button class="btn bg2 bsm" onclick="printSaleBill(DB.sales.find(x=>x.billNo==='${s.billNo}'))">🖨️</button></td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }
 
   if(repairs.length>0){
-    html += `<div style="font-size:13px;font-weight:700;color:var(--pu);margin-bottom:8px">ð§ Lá»ch sá»­ sá»­a chá»¯a (${repairs.length})</div>`;
+    html += `<div style="font-size:13px;font-weight:700;color:var(--pu);margin-bottom:8px">🔧 Lịch sử sửa chữa (${repairs.length})</div>`;
     html += `<div class="tw"><table>
-      <thead><tr><th>NgÃ y nháº­n</th><th>MÃ£ phiáº¿u</th><th>Thiáº¿t bá»</th><th>TÃ¬nh tráº¡ng</th><th>Tráº¡ng thÃ¡i</th><th class="tc">In</th></tr></thead>
+      <thead><tr><th>Ngày nhận</th><th>Mã phiếu</th><th>Thiết bị</th><th>Tình trạng</th><th>Trạng thái</th><th class="tc">In</th></tr></thead>
       <tbody>${repairs.map(r=>`<tr>
         <td>${isoToDisplay(r.receivedDate)}</td>
         <td><span class="bx b-pu">${r.id}</span></td>
         <td style="font-size:11px"><strong>${r.device}</strong>${r.serial?'<br>'+r.serial:''}</td>
         <td style="font-size:11px">${r.issue}</td>
         <td><span class="bx ${ST_CLASS[r.status]||'b-gy'}">${r.status}</span></td>
-        <td class="tc">${r.status==='ÄÃ£ giao'?`<button class="btn bg2 bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">ð¨ï¸</button>`:'â'}</td>
+        <td class="tc">${r.status==='Đã giao'?`<button class="btn bg2 bsm" onclick="printRepairBill(DB.repairs.find(x=>x.id==='${r.id}'))">🖨️</button>`:'—'}</td>
       </tr>`).join('')}</tbody>
     </table></div>`;
   }
 
   if(!sales.length&&!repairs.length){
-    html += `<div style="text-align:center;padding:40px;color:var(--gy)">ChÆ°a cÃ³ giao dá»ch nÃ o</div>`;
+    html += `<div style="text-align:center;padding:40px;color:var(--gy)">Chưa có giao dịch nào</div>`;
   }
 
-  document.getElementById('mo-cust-hist-title').textContent = `ð Lá»ch sá»­: ${cust?cust.name:nameOrPhone}`;
+  document.getElementById('mo-cust-hist-title').textContent = `📋 Lịch sử: ${cust?cust.name:nameOrPhone}`;
   document.getElementById('mo-cust-hist-body').innerHTML = html;
   openMo('mo-cust-hist');
 }
 
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 // INIT
-// ââââââââââââââââââââââââââââââââââââââââââââââ
+// ══════════════════════════════════════════════
 DB.initFirebase();           // Load local cache + connect Firebase
 initSale();
 refreshCustLists();
@@ -2299,13 +2299,13 @@ autoFillLogin();              // Login check (must be after DB init)
 
 <script>
 function exportProducts(){
-  if(!DB.products||!DB.products.length){toast("KhÃ´ng cÃ³ sáº£n pháº©m Äá» xuáº¥t!","er");return;}
+  if(!DB.products||!DB.products.length){toast("Không có sản phẩm để xuất!","er");return;}
   var isAdmin=currentUser&&currentUser.role==="admin";
   var rows=DB.products.map(function(p){
     var row={};
-    row["MÃ£ SP"]=p.id||""; row["TÃªn Sáº£n Pháº©m"]=p.name||""; row["Loáº¡i"]=p.category||"";
-    if(isAdmin) row["GiÃ¡ Nháº­p (Ä)"]=p.cost||0;
-    row["GiÃ¡ BÃ¡n (Ä)"]=p.price||0; row["Tá»n Kho"]=p.stock||0; row["Ghi ChÃº"]=p.note||"";
+    row["Mã SP"]=p.id||""; row["Tên Sản Phẩm"]=p.name||""; row["Loại"]=p.category||"";
+    if(isAdmin) row["Giá Nhập (đ)"]=p.cost||0;
+    row["Giá Bán (đ)"]=p.price||0; row["Tồn Kho"]=p.stock||0; row["Ghi Chú"]=p.note||"";
     return row;
   });
   var ws=XLSX.utils.json_to_sheet(rows);
@@ -2314,19 +2314,19 @@ function exportProducts(){
   XLSX.utils.book_append_sheet(wb,ws,"San Pham");
   var d=new Date(),dn=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
   XLSX.writeFile(wb,"SanPham_"+dn+".xlsx");
-  toast("ÄÃ£ xuáº¥t Excel sáº£n pháº©m!");
+  toast("Đã xuất Excel sản phẩm!");
 }
 function exportRepairs(){
-  if(!DB.repairs||!DB.repairs.length){toast("KhÃ´ng cÃ³ phiáº¿u Äá» xuáº¥t!","er");return;}
+  if(!DB.repairs||!DB.repairs.length){toast("Không có phiếu để xuất!","er");return;}
   var rows=DB.repairs.map(function(r){
     var rc=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
     var rem=Math.max(0,rc-(r.deposit||0)-(r.deliveryPaid||0));
-    return {"MÃ£ Phiáº¿u":r.id||"","KhÃ¡ch HÃ ng":r.customerName||"","SÄT":r.phone||"",
-      "Äá»a Chá»":r.address||"","Thiáº¿t Bá»":r.device||"","Serial":r.serial||"",
-      "TÃ¬nh Tráº¡ng":r.issue||"","NgÃ y Nháº­n":r.receivedDate?isoToDisplay(r.receivedDate):"",
-      "NgÃ y Giao":r.deliveredDate?isoToDisplay(r.deliveredDate):"","Tráº¡ng ThÃ¡i":r.status||"",
-      "Chi PhÃ­ (Ä)":rc,"Tiá»n Cá» (Ä)":r.deposit||0,"CÃ²n Láº¡i (Ä)":rem,
-      "BH (thÃ¡ng)":r.warrantyMonths||0,"KTV":r.techName||"","Ghi ChÃº":r.note||""};
+    return {"Mã Phiếu":r.id||"","Khách Hàng":r.customerName||"","SĐT":r.phone||"",
+      "Địa Chỉ":r.address||"","Thiết Bị":r.device||"","Serial":r.serial||"",
+      "Tình Trạng":r.issue||"","Ngày Nhận":r.receivedDate?isoToDisplay(r.receivedDate):"",
+      "Ngày Giao":r.deliveredDate?isoToDisplay(r.deliveredDate):"","Trạng Thái":r.status||"",
+      "Chi Phí (đ)":rc,"Tiền Cọ (đ)":r.deposit||0,"Còn Lại (đ)":rem,
+      "BH (tháng)":r.warrantyMonths||0,"KTV":r.techName||"","Ghi Chú":r.note||""};
   });
   var ws=XLSX.utils.json_to_sheet(rows);
   ws["!cols"]=[{wch:12},{wch:22},{wch:14},{wch:20},{wch:20},{wch:16},{wch:30},{wch:13},{wch:13},{wch:14},{wch:13},{wch:13},{wch:13},{wch:10},{wch:14},{wch:25}];
@@ -2334,7 +2334,7 @@ function exportRepairs(){
   XLSX.utils.book_append_sheet(wb,ws,"Sua Chua");
   var d=new Date(),dn=d.getDate()+"-"+(d.getMonth()+1)+"-"+d.getFullYear();
   XLSX.writeFile(wb,"SuaChua_"+dn+".xlsx");
-  toast("ÄÃ£ xuáº¥t Excel sá»¯a chá»¯a!");
+  toast("Đã xuất Excel sữa chữa!");
 }
 
 function wBadge(r){
@@ -2342,9 +2342,9 @@ function wBadge(r){
   var exp=new Date(r.deliveredDate);
   exp.setMonth(exp.getMonth()+parseInt(r.warrantyMonths));
   var d=Math.ceil((exp-new Date())/(864e5));
-  if(d<=0)return '<span style="color:var(--gy)">ð¡ï¸ Háº¿t BH</span>';
-  if(d<=30)return '<span style="color:var(--ac)">ð¡ï¸ CÃ²n '+d+' ngÃ y BH</span>';
-  return '<span style="color:var(--ok)">ð¡ï¸ BH Äáº¿n '+isoToDisplay(exp.toISOString().slice(0,10))+'</span>';
+  if(d<=0)return '<span style="color:var(--gy)">🛡️ Hết BH</span>';
+  if(d<=30)return '<span style="color:var(--ac)">🛡️ Còn '+d+' ngày BH</span>';
+  return '<span style="color:var(--ok)">🛡️ BH đến '+isoToDisplay(exp.toISOString().slice(0,10))+'</span>';
 }
 function importRepairsCSV(inp){
   var f=inp.files[0];if(!f)return;inp.value='';
@@ -2354,38 +2354,38 @@ function importRepairsCSV(inp){
       var wb=XLSX.read(e.target.result,{type:'array'});
       var ws=wb.Sheets[wb.SheetNames[0]];
       var rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(!rows.length){toast('File trá»ng hoáº·c khÃ´ng Äá»c ÄÆ°á»£c!','er');return;}
+      if(!rows.length){toast('File trống hoặc không đọc được!','er');return;}
       var imported=0,skipped=0;
       rows.forEach(function(row){
-        var name=String(row['KhÃ¡ch HÃ ng']||row['Ho Ten']||row['Ten KH']||row['customerName']||'').trim();
-        var phone=String(row['SÄT']||row['SDT']||row['phone']||row['So DT']||'').trim();
+        var name=String(row['Khách Hàng']||row['Ho Ten']||row['Ten KH']||row['customerName']||'').trim();
+        var phone=String(row['SĐT']||row['SDT']||row['phone']||row['So DT']||'').trim();
         if(!name&&!phone){skipped++;return;}
         var r={};
         r.id='SC'+Date.now()+String(Math.floor(Math.random()*9000)+1000);
         r.customerName=name;
         r.phone=phone;
-        r.address=String(row['Äá»a Chá»']||row['Dia Chi']||row['address']||'').trim();
-        r.device=String(row['Thiáº¿t Bá»']||row['Thiet Bi']||row['device']||'').trim();
+        r.address=String(row['Địa Chỉ']||row['Dia Chi']||row['address']||'').trim();
+        r.device=String(row['Thiết Bị']||row['Thiet Bi']||row['device']||'').trim();
         r.serial=String(row['Serial']||row['serial']||'').trim();
-        r.issue=String(row['TÃ¬nh Tráº¡ng']||row['Tinh Trang']||row['issue']||'').trim();
-        r.status=String(row['Tráº¡ng ThÃ¡i']||row['Trang Thai']||row['status']||'Má»i nháº­n').trim();
-        var validSt=['Má»i nháº­n','Äang kiá»m tra','Äang sá»­a','Chá» linh kiá»n','HoÃ n thÃ nh','ÄÃ£ giao'];
-        if(!validSt.includes(r.status))r.status='Má»i nháº­n';
-        r.receivedDate=parseDateImport(row['NgÃ y Nháº­n']||row['Ngay Nhan']||row['receivedDate']||'');
-        r.deliveredDate=parseDateImport(row['NgÃ y Giao']||row['Ngay Giao']||row['deliveredDate']||'');
-        r.cost=parseFloat(String(row['Chi PhÃ­ (Ä)']||row['Chi Phi']||row['cost']||0).replace(/[^\d.]/g,''))||0;
-        r.deposit=parseFloat(String(row['Tiá»n Cá» (Ä)']||row['Tien Coc']||row['deposit']||0).replace(/[^\d.]/g,''))||0;
-        r.warrantyMonths=parseInt(String(row['BH (thÃ¡ng)']||row['Bao Hanh']||row['warrantyMonths']||0))||0;
+        r.issue=String(row['Tình Trạng']||row['Tinh Trang']||row['issue']||'').trim();
+        r.status=String(row['Trạng Thái']||row['Trang Thai']||row['status']||'Mới nhận').trim();
+        var validSt=['Mới nhận','Đang kiểm tra','Đang sửa','Chờ linh kiện','Hoàn thành','Đã giao'];
+        if(!validSt.includes(r.status))r.status='Mới nhận';
+        r.receivedDate=parseDateImport(row['Ngày Nhận']||row['Ngay Nhan']||row['receivedDate']||'');
+        r.deliveredDate=parseDateImport(row['Ngày Giao']||row['Ngay Giao']||row['deliveredDate']||'');
+        r.cost=parseFloat(String(row['Chi Phí (đ)']||row['Chi Phi']||row['cost']||0).replace(/[^\d.]/g,''))||0;
+        r.deposit=parseFloat(String(row['Tiền Cọ (đ)']||row['Tien Coc']||row['deposit']||0).replace(/[^\d.]/g,''))||0;
+        r.warrantyMonths=parseInt(String(row['BH (tháng)']||row['Bao Hanh']||row['warrantyMonths']||0))||0;
         r.techName=String(row['KTV']||row['techName']||'').trim();
-        r.note=String(row['Ghi ChÃº']||row['Ghi Chu']||row['note']||'').trim();
-        r.capital=parseFloat(String(row['Vá»n']||row['Von']||row['capital']||0).replace(/[^d.]/g,''))||0;
-        r.processNote=String(row['MÃ´ Táº£ Xá»­ LÃ­']||row['Mo Ta']||row['processNote']||'').trim();
-        r.deliveryItems=r.cost>0?[{name:'Dá»ch vá»¥',qty:1,price:r.cost}]:[];
+        r.note=String(row['Ghi Chú']||row['Ghi Chu']||row['note']||'').trim();
+        r.capital=parseFloat(String(row['Vốn']||row['Von']||row['capital']||0).replace(/[^d.]/g,''))||0;
+        r.processNote=String(row['Mô Tả Xử Lí']||row['Mo Ta']||row['processNote']||'').trim();
+        r.deliveryItems=r.cost>0?[{name:'Dịch vụ',qty:1,price:r.cost}]:[];
         DB.repairs.push(r);imported++;
       });
-      if(imported>0){DB.repairs=DB.repairs;renderRepairs();toast('ÄÃ£ nháº­p '+imported+' phiáº¿u'+(skipped>0?', bá» qua '+skipped+' dÃ²ng trá»ng':'')+'!');}
-      else toast('KhÃ´ng cÃ³ dá»¯ liá»u há»£p lá»! Cá»t cáº§n cÃ³: KhÃ¡ch HÃ ng, SÄT','er');
-    }catch(err){toast('Lá»i Äá»c file: '+err.message,'er');}
+      if(imported>0){DB.repairs=DB.repairs;renderRepairs();toast('Đã nhập '+imported+' phiếu'+(skipped>0?', bỏ qua '+skipped+' dòng trống':'')+'!');}
+      else toast('Không có dữ liệu hợp lệ! Cột cần có: Khách Hàng, SĐT','er');
+    }catch(err){toast('Lỗi đọc file: '+err.message,'er');}
   };
   reader.readAsArrayBuffer(f);
 }
@@ -2399,12 +2399,13 @@ function parseDateImport(v){
   return '';
 }
 function downloadImportTemplate(){
-  var ws=XLSX.utils.json_to_sheet([{'KhÃ¡ch HÃ ng':'Nguyá»n VÄn A','SÄT':'0901234567','Äá»a Chá»':'123 ÄÆ°á»ng ABC','Thiáº¿t Bá»':'Laptop Dell','Serial':'ABC123','TÃ¬nh Tráº¡ng':'MÃ n hÃ¬nh vá»¡','NgÃ y Nháº­n':'01/04/2026','NgÃ y Giao':'05/04/2026','Tráº¡ng ThÃ¡i':'ÄÃ£ giao','Chi PhÃ­ (Ä)':500000,'Tiá»n Cá» (Ä)':200000,'BH (thÃ¡ng)':3,'KTV':'','Ghi ChÃº':''}]);
+  var ws=XLSX.utils.json_to_sheet([{'Khách Hàng':'Nguyễn Văn A','SĐT':'0901234567','Địa Chỉ':'123 Đường ABC','Thiết Bị':'Laptop Dell','Serial':'ABC123','Tình Trạng':'Màn hình vỡ','Ngày Nhận':'01/04/2026','Ngày Giao':'05/04/2026','Trạng Thái':'Đã giao','Chi Phí (đ)':500000,'Tiền Cọ (đ)':200000,'BH (tháng)':3,'KTV':'','Ghi Chú':''}]);
   ws['!cols']=[{wch:22},{wch:14},{wch:22},{wch:20},{wch:14},{wch:25},{wch:13},{wch:13},{wch:14},{wch:13},{wch:13},{wch:10},{wch:10},{wch:20}];
   var wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'PhieuSuaChua');
   XLSX.writeFile(wb,'Mau_NhapPhieu.xlsx');
-  toast('Táº£i máº«u thÃ nh cÃ´ng!');
+  toast('Tải mẫu thành công!');
 }
 </script>
+<script src="patch.js?v=3"></script>
 </body>
 </html>
