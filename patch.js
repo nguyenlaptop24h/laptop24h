@@ -10,6 +10,14 @@ function injectCSS(){
   document.head.appendChild(s);
 }
 function setNavH(){var n=document.querySelector('nav');if(n)document.documentElement.style.setProperty('--_navH',n.offsetHeight+'px');}
+window._showPN=function(s){return s==='Đang sửa'||s==='Chờ linh kiện'||s==='Hoàn thành';};
+window.saveProcessNote=function(id,val){
+  if(!window.DB||!DB.repairs)return;
+  var idx=DB.repairs.findIndex(function(x){return x&&x.id===id;});
+  if(idx<0)return;
+  DB.repairs[idx].processNote=val||null;
+  try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}
+};
 window.renderRepairs=function(){
   setNavH();
   var q=(document.getElementById('rep-search')||{value:''}).value.toLowerCase();
@@ -52,14 +60,16 @@ window.renderRepairs=function(){
     var locked=!isAdmin&&r.status==='&#272;&#227; giao';
     var wDate=addMonths(r.deliveredDate,r.warrantyMonths);
     var delivRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+toDisp(r.deliveredDate)+(wDate?' &#8226; &#128737;&#65039; BH &#273;&#7871;n '+toDisp(wDate):'')+' </div>':'';
-    var statusSel='<select onchange="setRepairStatus(\''+r.id+'\',this.value)" style="margin-top:10px;width:100%;padding:9px 14px;border-radius:8px;border:2px solid var(--pr,#5c6bc0);background:var(--bg,#fff);color:var(--tx,#222);font-size:14px;font-weight:600;cursor:pointer">'
+    var noteShow=window._showPN(r.status)?'block':'none';
+    var statusSel='<select onchange="setRepairStatus(\''+r.id+'\',this.value);var _p=document.getElementById(\'_pn_'+r.id+'\');if(_p)_p.style.display=window._showPN(this.value)?\'block\':\'none\';" style="margin-top:10px;width:100%;padding:9px 14px;border-radius:8px;border:2px solid var(--pr,#5c6bc0);background:var(--bg,#fff);color:var(--tx,#222);font-size:14px;font-weight:600;cursor:pointer">'
       +(window.STATUSES||_STAT).map(function(s){return '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('')
-      +'</select>';
+      +'</select>'
+      +'<textarea id="_pn_'+r.id+'" data-orig="'+(r.processNote||'')+'" style="display:'+noteShow+';width:100%;margin-top:6px;padding:8px 10px;border-radius:6px;border:1.5px solid var(--pr,#5c6bc0);font-size:13px;resize:vertical;min-height:60px;background:var(--bg,#fff);color:var(--tx,#222);box-sizing:border-box" placeholder="Mô tả xử lý..." onblur="if(this.value!==this.dataset.orig){window.saveProcessNote(\''+r.id+'\',this.value);this.dataset.orig=this.value;}">'+(r.processNote||'')+'</textarea>';
     return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
-      +(!locked?'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\')">' + '&#9999;&#65039;</button>':'')
+      +(!locked?'<button class="btn bg2 bsm" onclick="openRepairStatus(\''+r.id+'\')">' + '&#9999;&#65039;</button>':'')
       +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\';}))">&#128424;&#65039; In</button>'
       +(!locked?'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\')">' + '&#128465;&#65039;</button>':'')
       +'</div></div>'
@@ -72,7 +82,7 @@ window.renderRepairs=function(){
       +'<div><b>&#128176;</b> Ph&#237;: '+fmtN(repCost)+' &#273; | C&#7885;c: '+fmtN(r.deposit||0)+' &#273; | C&#242;n: <strong style="color:'+(remaining>0?'var(--er)':'var(--ok)')+'">'+fmtN(remaining)+' &#273;</strong></div>'
       +(r.techName?'<div><b>&#128104;&#8205;&#128295;</b> KTV: '+r.techName+'</div>':'')
       +(r.deliveryItems&&r.deliveryItems.length?'<div style="grid-column:1/-1"><b>&#128203;</b> '+r.deliveryItems.length+' h&#7841;ng m&#7909;c</div>':'')
-      +(r.processNote?'<div style="grid-column:1/-1"><b>&#128296;</b> '+r.processNote+'</div>':'')
+      +(locked&&r.processNote?'<div style="grid-column:1/-1"><b>&#128296;</b> '+r.processNote+'</div>':'')
       +'</div>'
       +(!locked?statusSel:'')
       +'</div>';
@@ -83,7 +93,7 @@ window.renderRepairs=function(){
     return '<div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:'+(top?'6':'18')+'px 0;flex-wrap:wrap">'
       +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="window._repPage='+(page-1)+';renderRepairs();'+rl+'">&#9664; Tr&#432;&#7899;c</button>'
       +'<span style="font-size:13px;color:var(--gy)">Trang <b>'+page+'</b> / '+totalPages+' &nbsp;&#183;&nbsp; <b>'+total+'</b> phi&#7871;u</span>'
-      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="window._repPage='+(page+1)+';renderRepairs();'+rl+'">Sau &#9654;</button>'
+      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="window._repPage='+(page+1)+';renderRepairs();'+rl+'">Sau &#9654; </button>'
       +'</div>';
   }
   list.innerHTML=mkPagin(true)+cardsHTML+mkPagin(false);
