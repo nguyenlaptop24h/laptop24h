@@ -57,9 +57,8 @@ window.renderRepairs=function(){
       +'</select>';
     return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
-      +'<div><span class="bx b-bl">'+r.id+'</span><span class="bx '+stCls+'" style="margin-left:6px">'+r.status+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
+      +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
-      +(!locked&&canDeliver?'<button class="btn bs bsm" onclick="openDeliverModal(\''+r.id+'\')">' + '&#128640; Giao m&#225;y</button>':'')
       +(!locked?'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\')">' + '&#9999;&#65039;</button>':'')
       +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\';}))">&#128424;&#65039; In</button>'
       +(!locked?'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\')">' + '&#128465;&#65039;</button>':'')
