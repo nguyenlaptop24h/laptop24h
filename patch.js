@@ -153,7 +153,7 @@ function injectBillEditModal(){
   if(document.getElementById('mo-bill-edit'))return;
   var inp='style="padding:7px 10px;border:1px solid var(--pr,#5c6bc0);border-radius:7px;background:var(--bg,#fff);color:var(--tx,#222);font-size:13px;width:100%;box-sizing:border-box"';
   var ta=inp.replace('border-box"','border-box;resize:vertical"');
-  var lbl='style="display:flex;flex-direction:column;gap:4px;font-size:12px;font-weight:600"';
+  var lbl='style="display:flex;flex-direction:column;gap:4px;font-size:13px;font-weight:600;color:var(--tx,#333)"';
   var r2='style="display:grid;grid-template-columns:1fr 1fr;gap:10px"';
   var mo=document.createElement('div');
   mo.id='mo-bill-edit';mo.className='mo';
