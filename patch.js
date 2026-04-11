@@ -16,7 +16,7 @@ window.saveProcessNote=function(id,val){
   var idx=DB.repairs.findIndex(function(x){return x&&x.id===id;});
   if(idx<0)return;
   DB.repairs[idx].processNote=val||null;
-  try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}
+  setTimeout(function(){try{firebase.database().ref('repairs/'+idx+'/processNote').set(val||null);}catch(e){}},0);
 };
 
 window._showPNDisplay=function(id,val){
