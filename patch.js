@@ -47,6 +47,8 @@ window.renderRepairs=function(){
     var repCost=r.deliveryItems&&r.deliveryItems.length?r.deliveryItems.reduce(function(s,it){return s+(it&&it.qty&&it.price?it.qty*it.price:0);},0):(r.cost||0);
     var remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
     var isNV=window.currentUser&&window.currentUser.role==='nhanvien';
+    var isAdmin=!isNV;
+    var isAdmin=!isNV;
     var locked=isNV&&r.status==='Đã giao';
     var wDate=addMonths(r.deliveredDate,r.warrantyMonths);
     var delivRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+toDisp(r.deliveredDate)+(wDate?' &#8226; &#128737;&#65039; BH đến '+toDisp(wDate):'')+' </div>':'';
