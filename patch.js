@@ -61,7 +61,6 @@ window.renderRepairs=function(){
       +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; Đã khóa</span>':'')+' </div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
       +(locked?''  :'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\'  )">&#9999;&#65039;</button>')
-      +'<button class="btn b-or bsm" onclick="openBillModal(\''+r.id+'\'  )">&#128203; Bill</button>'
       +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\'  ;}))">&#128424;&#65039; In</button>'
       +(locked?''  :'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\'  )">&#128465;&#65039;</button>')
       +'</div></div>'
@@ -149,100 +148,7 @@ setTimeout(function(){
 },1000);
 
 // BILL EDIT
-window._billEditId=null;
-function _beGetItems(){
-  var rows=document.querySelectorAll('#be-rows .be-row');
-  return Array.from(rows).map(function(row){
-    return{name:(row.querySelector('.be-name')||{value:''}).value.trim(),
-      qty:Math.max(1,parseInt((row.querySelector('.be-qty')||{value:'1'}).value)||1),
-      price:Math.max(0,parseInt((row.querySelector('.be-price')||{value:'0'}).value)||0)};
-  });
-}
-function _beRenderRows(items){
-  var c=document.getElementById('be-rows');if(!c)return;
-  var total=(items||[]).reduce(function(s,it){return s+(it.qty||1)*(it.price||0);},0);
-  var rows=(items&&items.length)
-    ?items.map(function(it,i){
-      return '<div class="be-row" data-i="'+i+'">'
-        +'<input class="be-name" placeholder="Tên dịch vụ / linh kiện" value="'+(  (it.name||''  ).replace(/"/g,'&quot;')  )+'"/>'
-        +'<input class="be-qty" type="number" min="1" value="'+(it.qty||1)+'"/>'
-        +'<input class="be-price" type="number" min="0" step="1000" value="'+(it.price||0)+'"/>'
-        +'<button class="btn bd2" style="padding:3px 8px;font-size:13px" onclick="removeBillRow('  +i+'  )">&#10005;</button>'
-        +'</div>';
-    }).join('')
-    :'<div style="color:var(--gy);text-align:center;padding:14px;font-size:13px">Chưa có hạng mục nào</div>';
-  c.innerHTML=rows+'<div style="text-align:right;font-weight:700;padding:8px 4px 2px;border-top:1px solid var(--bdr,#e0e0e0)">Tổng: <span style="color:var(--pr)">'+fmtN(total)+' đ</span></div>';
-}
-window.openBillModal=function(id){
-  if(!window.DB||!id)return;
-  var r=(DB.repairs||[]).find(function(x){return x&&x.id===id;});
-  if(!r){typeof toast==='function'&&toast('Không tìm thấy phiếu!','er');return;}
-  window._billEditId=id;
-  var el=document.getElementById('be-id');if(el)el.textContent=id+' – '+(r.customerName||''  );
-  var el2=document.getElementById('be-device');if(el2)el2.textContent=(r.device||''  );
-  _beRenderRows(r.deliveryItems||[]);
-  if(typeof openMo==='function'  )openMo('mo-bill-edit');
-};
-window.addBillItem=function(){
-  var items=_beGetItems();items.push({name:'',qty:1,price:0});_beRenderRows(items);
-  var inputs=document.querySelectorAll('#be-rows .be-row .be-name');
-  if(inputs.length)inputs[inputs.length-1].focus();
-};
-window.removeBillRow=function(i){var items=_beGetItems();items.splice(i,1);_beRenderRows(items);};
-window.saveBillEdit=function(){
-  var id=window._billEditId;if(!id||!window.DB)return;
-  var items=_beGetItems().filter(function(it){return it.name||it.price>0;});
-  var reps=(DB.repairs||[]).slice();
-  var idx=reps.findIndex(function(r){return r&&r.id===id;});
-  if(idx<0){typeof toast==='function'&&toast('Không tìm thấy phiếu!','er');return;}
-  var total=items.reduce(function(s,it){return s+(it.qty||1)*(it.price||0);},0);
-  reps[idx]=Object.assign({},reps[idx],{deliveryItems:items});
-  if(total>0)reps[idx]=Object.assign({},reps[idx],{cost:total});
-  DB.repairs=reps;
-  if(typeof closeMo==='function'  )closeMo('mo-bill-edit');
-  setTimeout(function(){if(typeof renderRepairs==='function'  )renderRepairs();},200);
-  if(typeof toast==='function'  )toast('✅ Đã lưu bill '+id,'ok');
-};
-function injectBillModal(){
-  if(document.getElementById('mo-bill-edit'))return;
-  var div=document.createElement('div');
-  div.id='mo-bill-edit';div.className='mo';
-  div.innerHTML=''
-    +'<div class="mo-box" style="max-width:640px;width:96vw">'
-    +'<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">'
-    +'<h3 style="margin:0">&#128203; Bill &ndash; <span id="be-id" style="color:var(--pr)"></span></h3>'
-    +'<button onclick="closeMo(\' mo-bill-edit\'  )" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--gy);padding:0 4px">&times;</button>'
-    +'</div>'
-    +'<div style="font-size:12px;color:var(--gy);margin-bottom:10px" id="be-device"></div>'
-    +'<div style="display:grid;grid-template-columns:1fr 64px 110px 34px;gap:5px;font-weight:700;font-size:12px;padding:4px 0 6px;border-bottom:2px solid var(--pr,#5c6bc0);color:var(--gy)">'
-    +'<span>Nội dung dịch vụ / linh kiện</span><span style="text-align:center">Số lượng</span><span style="text-align:right">Giá (đ)</span><span></span>'
-    +'</div>'
-    +'<div id="be-rows" style="max-height:260px;overflow-y:auto;margin:8px 0 4px"></div>'
-    +'<button class="btn bg2" style="width:100%;margin-top:6px" onclick="addBillItem()">&#43; Thêm hạng mục</button>'
-    +'<hr style="margin:14px 0;border:none;border-top:1px solid var(--bdr,#e0e0e0)">'
-    +'<div style="display:flex;gap:10px;justify-content:flex-end">'
-    +'<button class="btn bp" style="padding:10px 30px" onclick="saveBillEdit()">&#128190; Lưu</button>'
-    +'<button class="btn" style="padding:10px 18px" onclick="closeMo(\' mo-bill-edit\'  )">Hủy</button>'
-    +'</div></div>';
-  document.body.appendChild(div);
-}
-function addScrollBtns(){
-  if(document.getElementById('_btnTop'))return;
-  var t=document.createElement('button'),b=document.createElement('button');
-  t.id='_btnTop';t.innerHTML='&#8593;';t.title='Lên đầu';
-  b.id='_btnBot';b.innerHTML='&#8595;';b.title='Xuống cuối';
-  var base='position:fixed;right:18px;z-index:9999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:var(--pr,#5c6bc0);color:#fff;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25)';
-  t.style.cssText=base+';bottom:80px;display:none';
-  b.style.cssText=base+';bottom:28px';
-  function getList(){return document.getElementById('repair-list');}
-  t.onclick=function(){var l=getList();if(l)l.scrollTo({top:0,behavior:'smooth'});else window.scrollTo({top:0,behavior:'smooth'});};
-  b.onclick=function(){var l=getList();if(l)l.scrollTo({top:l.scrollHeight,behavior:'smooth'});else window.scrollTo({top:document.body.scrollHeight,behavior:'smooth'});};
-  document.body.appendChild(t);document.body.appendChild(b);
-  function onScr(){var l=getList();var sT=l?l.scrollTop:window.scrollY;var sH=l?l.scrollHeight:document.body.scrollHeight;var cH=l?l.clientHeight:window.innerHeight;t.style.display=sT>200?'block':'none';b.style.display=(sT+cH)>=sH-50?'none':'block';}
-  document.addEventListener('scroll',onScr,{passive:true,capture:true});
-  var rl=getList();if(rl)rl.addEventListener('scroll',onScr,{passive:true});
-}
-injectCSS();injectBillModal();addScrollBtns();
+injectCSS();addScrollBtns();
 var attempts=0,iv=setInterval(function(){
   attempts++;var dbOk=false;try{dbOk=typeof DB!=='undefined'&&!!DB;}catch(e){}
   if(dbOk&&window.renderRepairs&&attempts<60){clearInterval(iv);
