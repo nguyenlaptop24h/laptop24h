@@ -120,7 +120,7 @@
         var device=(document.getElementById('rm-device')||{value:''}).value.trim();
         if(!name||!device){typeof toast==='function'&&toast('Nhập tên KH và thiết bị!','er');return;}
         if(window.DB&&DB._d&&Array.isArray(DB._d['repairs'])){DB._d['repairs']=DB._d['repairs'].filter(function(x){return x!=null;});}
-        try{_origSR();}catch(e){console.warn('saveRepair err:',e);if(typeof closeMo==='function')closeMo('mo-repair');setTimeout(function(){try{if(typeof renderRepairs==='function')renderRepairs();}catch(e2){}if(typeof toast===\u0027function\u0027)toast(\u0027✅ Đã lưu phiếu','ok');},200);}
+        try{_origSR();}catch(e){console.warn('saveRepair err:',e);if(typeof closeMo==='function')closeMo('mo-repair');setTimeout(function(){try{if(typeof renderRepairs==='function')renderRepairs();}catch(e2){}if(typeof toast==='function')toast('✅ Đã lưu phiếu','ok');},200);}
       };
     }
   },1000);
