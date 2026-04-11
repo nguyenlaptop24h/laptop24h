@@ -6,7 +6,7 @@ function addMonths(ds,m){if(!ds||!m)return null;var d=new Date(ds);d.setMonth(d.
 function injectCSS(){
   if(document.getElementById('_patchCSS'))return;
   var s=document.createElement('style');s.id='_patchCSS';
-  s.textContent='body:has(#pg-repair.on){overflow:hidden}#pg-repair.on{display:flex!important;flex-direction:column;height:calc(100vh - var(--_navH,87px));overflow:hidden;box-sizing:border-box}#pg-repair.on #repair-list{flex:1;min-height:0;overflow-y:auto;padding-bottom:10px}';
+  s.textContent='body:has(#pg-repair.on){overflow:hidden}#pg-repair.on{display:flex!important;flex-direction:column;height:calc(100vh - var(--_navH,87px));overflow:hidden;box-sizing:border-box}#pg-repair.on #repair-list{flex:1;min-height:0;overflow-y:auto;padding-bottom:10px}#rsf-select{width:auto!important;min-width:120px;max-width:160px}.step{pointer-events:auto!important}';
   document.head.appendChild(s);
 }
 function setNavH(){var n=document.querySelector('nav');if(n)document.documentElement.style.setProperty('--_navH',n.offsetHeight+'px');}
