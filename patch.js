@@ -1,6 +1,6 @@
 // patch.js - pagination top+bottom + scrollable repair-list
 (function(){
-var _repPage=1,_repPrevFilter='';
+window._repPage=window._repPage||1;window._repPrevFilter=window._repPrevFilter||'';
 function toDisp(s){if(!s)return'';var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
 function addMonths(ds,m){if(!ds||!m)return null;var d=new Date(ds);d.setMonth(d.getMonth()+m);return d.toISOString().slice(0,10);}
 function injectCSS(){
@@ -16,7 +16,7 @@ window.renderRepairs=function(){
   var sf=(document.getElementById('rep-filter')||{value:''}).value;
   var rsf=(document.getElementById('rsf-select')||{value:''}).value;
   var fKey=q+'|'+sf+'|'+rsf;
-  if(fKey!==_repPrevFilter){_repPage=1;_repPrevFilter=fKey;}
+  if(fKey!==_repPrevFilter){window._repPage=1;window._repPrevFilter=fKey;}
   var todayStr=new Date().toISOString().slice(0,10);
   function inRange(ds){
     if(!rsf)return true;if(!ds)return false;
@@ -35,8 +35,8 @@ window.renderRepairs=function(){
   var total=reps.length;
   var PAGE_SIZE=50;
   var totalPages=Math.max(1,Math.ceil(total/PAGE_SIZE));
-  var page=Math.max(1,Math.min(_repPage,totalPages));
-  _repPage=page;
+  var page=Math.max(1,Math.min(window._repPage,totalPages));
+  window._repPage=page;
   var pageReps=reps.slice((page-1)*PAGE_SIZE,page*PAGE_SIZE);
   var list=document.getElementById('repair-list');
   if(!list)return;
@@ -82,9 +82,9 @@ window.renderRepairs=function(){
     var rl="";
     if(totalPages<=1)return '<div style="text-align:center;padding:'+(top?'6':'10')+'px 0;font-size:13px;color:var(--gy)"><b>'+total+'</b> phi&#7871;u</div>';
     return '<div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:'+(top?'6':'18')+'px 0;flex-wrap:wrap">'
-      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="_repPage='+(page-1)+';renderRepairs();'+rl+'">&#9664; Tr&#432;&#7899;c</button>'
+      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="window._repPage='+(page-1)+';renderRepairs();'+rl+'">&#9664; Tr&#432;&#7899;c</button>'
       +'<span style="font-size:13px;color:var(--gy)">Trang <b>'+page+'</b> / '+totalPages+' &nbsp;&#183;&nbsp; <b>'+total+'</b> phi&#7871;u</span>'
-      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="_repPage='+(page+1)+';renderRepairs();'+rl+'">Sau &#9654;</button>'
+      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="window._repPage='+(page+1)+';renderRepairs();'+rl+'">Sau &#9654;</button>'
       +'</div>';
   }
   list.innerHTML=mkPagin(true)+cardsHTML+mkPagin(false);
