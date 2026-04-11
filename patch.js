@@ -60,9 +60,9 @@ window.renderRepairs=function(){
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; Đã khóa</span>':'')+' </div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
-      +(locked?''  :'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\'  )">&#9999;&#65039;</button>')
-      +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\'  ;}))">&#128424;&#65039; In</button>'
-      +(locked?''  :'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\'  )">&#128465;&#65039;</button>')
+      +(locked?'':'<button class="btn bg2 bsm" onclick="openRepairModal(this.dataset.id)" data-id="'+r.id+'" title="S\u1EEDa ph\u1ECFu">&#9999;&#65039;</button>')
+      +(isAdmin?'<button class="btn bk bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===this.dataset.id;}.bind(this)))" data-id="'+r.id+'" title="In bill">&#128444;&#65039;</button>':'')
+      +(isAdmin?'<button class="btn br bsm" onclick="deleteRepair(this.dataset.id)" data-id="'+r.id+'" title="X\u00F3a">&#128465;&#65039;</button>':'')
       +'</div></div>'
       +'<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">'
       +'<div><b>&#128100;</b> '+r.customerName+' &#8211; '+(r.phone||'')+'</div>'
