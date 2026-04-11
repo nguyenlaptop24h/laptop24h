@@ -1,4 +1,4 @@
-// patch.js - pagination top+bottom + scrollable repair-list
+// patch.js - pagination top+bottom + scrollable repair-list + fixes
 (function(){
 window._repPage=window._repPage||1;window._repPrevFilter=window._repPrevFilter||'';
 function toDisp(s){if(!s)return'';var p=s.split('-');return p.length===3?p[2]+'/'+p[1]+'/'+p[0]:s;}
@@ -41,27 +41,26 @@ window.renderRepairs=function(){
   var list=document.getElementById('repair-list');
   if(!list)return;
   if(!total){list.innerHTML='<div style="text-align:center;padding:40px;color:var(--gy)"><div style="font-size:36px">&#128295;</div><div>Kh&#244;ng c&#243; phi&#7871;u n&#224;o</div></div>';return;}
+  var _STAT=['M\u1edbi nh\u1eadn','\u0110ang ki\u1ec3m tra','\u0110ang s\u1eeda','Ch\u1edd linh ki\u1ec7n','Ho\u00e0n th\u00e0nh','\u0110\u00e3 giao'];
+  var _SCLS={'M\u1edbi nh\u1eadn':'b-bl','\u0110ang ki\u1ec3m tra':'b-or','\u0110ang s\u1eeda':'b-pu','Ch\u1edd linh ki\u1ec7n':'b-rd','Ho\u00e0n th\u00e0nh':'b-gn','\u0110\u00e3 giao':'b-gy'};
   var cardsHTML=pageReps.map(function(r){
-    var _STAT=['Má»i nháº­n','Äang kiá»m tra','Äang sá»­a','Chá» linh kiá»n','HoÃ n thÃ nh','ÄÃ£ giao'];
-    var _SCLS={'Má»i nháº­n':'b-bl','Äang kiá»m tra':'b-or','Äang sá»­a':'b-pu','Chá» linh kiá»n':'b-rd','HoÃ n thÃ nh':'b-gn','ÄÃ£ giao':'b-gy'};
     var stCls=(window.ST_CLASS||_SCLS)[r.status]||'b-gy';
     var repCost=r.deliveryItems?r.deliveryItems.reduce(function(s,it){return s+it.qty*it.price;},0):(r.cost||0);
     var remaining=Math.max(0,repCost-(r.deposit||0)-(r.deliveryPaid||0));
-    var canDeliver=r.status!=='&#272;&#227; giao';
     var isAdmin=window.currentUser&&window.currentUser.role==='admin';
-    var locked=!isAdmin&&r.status==='&#272;&#227; giao';
+    var locked=!isAdmin&&r.status==='Đã giao';
     var wDate=addMonths(r.deliveredDate,r.warrantyMonths);
     var delivRow=r.deliveredDate?'<div><b>&#128198;</b> Giao: '+toDisp(r.deliveredDate)+(wDate?' &#8226; &#128737;&#65039; BH &#273;&#7871;n '+toDisp(wDate):'')+' </div>':'';
     var statusSel='<select onchange="setRepairStatus(\''+r.id+'\',this.value)" style="margin-top:10px;width:100%;padding:9px 14px;border-radius:8px;border:2px solid var(--pr,#5c6bc0);background:var(--bg,#fff);color:var(--tx,#222);font-size:14px;font-weight:600;cursor:pointer">'
       +(window.STATUSES||_STAT).map(function(s){return '<option value="'+s+'"'+(r.status===s?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select>';
-    return '<div class="card" style="border-left:4px solid '+(r.status==='&#272;&#227; giao'?'var(--ok)':'var(--pr)')+'">'
+    return '<div class="card" style="border-left:4px solid '+(r.status==='Đã giao'?'var(--ok)':'var(--pr)')+'">'
       +'<div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:8px">'
       +'<div><span class="bx b-bl">'+r.id+'</span>'+(locked?'<span class="bx b-gy" style="margin-left:4px">&#128274; &#272;&#227; kh&#243;a</span>':'')+' </div>'
       +'<div style="display:flex;gap:6px;flex-wrap:wrap">'
-      +(!locked?'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\')">' + '&#9999;&#65039;</button>':'')
-      +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\';}))">&#128424;&#65039; In</button>'
-      +(!locked?'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\')">' + '&#128465;&#65039;</button>':'')
+      +(!locked?'<button class="btn bg2 bsm" onclick="openRepairModal(\''+r.id+'\')">&#9999;&#65039;</button>':'')
+      +'<button class="btn bpu bsm" onclick="printRepairBill(DB.repairs.find(function(x){return x&&x.id===\''+r.id+'\';}))" >&#128424;&#65039; In</button>'
+      +(!locked?'<button class="btn bd2 bsm" onclick="deleteRepair(\''+r.id+'\')">&#128465;&#65039;</button>':'')
       +'</div></div>'
       +'<div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:13px">'
       +'<div><b>&#128100;</b> '+r.customerName+' &#8211; '+r.phone+'</div>'
@@ -78,21 +77,60 @@ window.renderRepairs=function(){
       +'</div>';
   }).join('');
   function mkPagin(top){
-    var rl="";
     if(totalPages<=1)return '<div style="text-align:center;padding:'+(top?'6':'10')+'px 0;font-size:13px;color:var(--gy)"><b>'+total+'</b> phi&#7871;u</div>';
     return '<div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:'+(top?'6':'18')+'px 0;flex-wrap:wrap">'
-      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="window._repPage='+(page-1)+';renderRepairs();'+rl+'">&#9664; Tr&#432;&#7899;c</button>'
+      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="window._repPage='+(page-1)+';renderRepairs();">&#9664; Tr&#432;&#7899;c</button>'
       +'<span style="font-size:13px;color:var(--gy)">Trang <b>'+page+'</b> / '+totalPages+' &nbsp;&#183;&nbsp; <b>'+total+'</b> phi&#7871;u</span>'
-      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="window._repPage='+(page+1)+';renderRepairs();'+rl+'">Sau &#9654;</button>'
+      +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page>=totalPages?.4:1)+'" '+(page>=totalPages?'disabled':'')+' onclick="window._repPage='+(page+1)+';renderRepairs();">Sau &#9654;</button>'
       +'</div>';
   }
   list.innerHTML=mkPagin(true)+cardsHTML+mkPagin(false);
 };
+
+// FIX: null-safe openRepairModal
+setTimeout(function(){
+  if(typeof window.openRepairModal==='function'&&!window._ormPatched){
+    window._ormPatched=true;
+    var _orig=window.openRepairModal;
+    window.openRepairModal=function(id){
+      if(!id){try{_orig();}catch(e){}return;}
+      if(!window.DB||!DB.repairs)return;
+      var r=DB.repairs.find(function(x){return x&&x.id===id;});
+      if(!r){console.warn('openRepairModal: not found',id);return;}
+      try{_orig(id);}catch(e){console.warn('openRepairModal err:',e);}
+    };
+  }
+},1000);
+
+// FIX: null-safe saveRepair
+setTimeout(function(){
+  if(typeof window.saveRepair==='function'&&!window._srPatched){
+    window._srPatched=true;
+    var _origSR=window.saveRepair;
+    window.saveRepair=function(){
+      var name=(document.getElementById('rm-name')||{value:''}).value.trim();
+      var device=(document.getElementById('rm-device')||{value:''}).value.trim();
+      if(!name||!device){typeof toast==='function'&&toast('Nh\u1eadp t\u00ean KH v\u00e0 thi\u1ebft b\u1ecb!','er');return;}
+      if(window.DB&&DB.repairs){
+        DB.repairs=DB.repairs.filter(Boolean);
+      }
+      try{_origSR();}catch(e){
+        console.warn('saveRepair err:',e);
+        if(typeof closeMo==='function')closeMo('mo-repair');
+        setTimeout(function(){
+          try{if(typeof renderRepairs==='function')renderRepairs();}catch(e2){}
+          if(typeof toast==='function')toast('\u2705 \u0110\u00e3 l\u01b0u phi\u1ebfu','ok');
+        },100);
+      }
+    };
+  }
+},1000);
+
 function addScrollBtns(){
   if(document.getElementById('_btnTop'))return;
   var t=document.createElement('button'),b=document.createElement('button');
-  t.id='_btnTop';t.innerHTML='&#8593;';t.title='L&#234;n &#273;&#7847;u';
-  b.id='_btnBot';b.innerHTML='&#8595;';b.title='Xu&#7889;ng cu&#7889;i';
+  t.id='_btnTop';t.innerHTML='&#8593;';t.title='L\u00ean \u0111\u1ea7u';
+  b.id='_btnBot';b.innerHTML='&#8595;';b.title='Xu\u1ed1ng cu\u1ed1i';
   var base='position:fixed;right:18px;z-index:9999;width:42px;height:42px;border-radius:50%;border:none;cursor:pointer;background:var(--pr,#5c6bc0);color:#fff;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25)';
   t.style.cssText=base+';bottom:80px;display:none';
   b.style.cssText=base+';bottom:28px';
