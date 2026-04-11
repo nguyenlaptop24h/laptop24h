@@ -170,3 +170,5 @@ var iv=setInterval(function(){
   }else if(attempts>=60)clearInterval(iv);
 },500);
 })();
+
+(function(){var _origORM=window.openRepairModal;if(!_origORM)return;window.openRepairModal=function(id){var orig=DB.repairs;var safe=(DB.repairs||[]).filter(function(x){return x;});var rep=safe.find(function(x){return x.id===id;});if(!rep)return;DB.repairs=safe;try{_origORM(id);}finally{DB.repairs=orig;};};})();
