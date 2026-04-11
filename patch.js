@@ -79,7 +79,7 @@ window.renderRepairs=function(){
       +'</div>';
   }).join('');
   function mkPagin(top){
-    var rl="var l=document.getElementById('repair-list');if(l)l.scrollTo(0,0)";
+    var rl="";
     if(totalPages<=1)return '<div style="text-align:center;padding:'+(top?'6':'10')+'px 0;font-size:13px;color:var(--gy)"><b>'+total+'</b> phi&#7871;u</div>';
     return '<div style="display:flex;justify-content:center;align-items:center;gap:10px;padding:'+(top?'6':'18')+'px 0;flex-wrap:wrap">'
       +'<button class="btn bp" style="padding:7px 16px;opacity:'+(page<=1?.4:1)+'" '+(page<=1?'disabled':'')+' onclick="_repPage='+(page-1)+';renderRepairs();'+rl+'">&#9664; Tr&#432;&#7899;c</button>'
