@@ -737,3 +737,32 @@
 
   setTimeout(transformAll,500);
 })();
+
+
+// v30: Fix ID collision bug - use max-based ID instead of count-based
+(function(){
+  var _origSR = window.saveRepair;
+  if(!_origSR){ setTimeout(function(){ if(window.saveRepair&&!window.saveRepair._v30){ window.saveRepair._v30=true; var orig=window.saveRepair; window.saveRepair=function(){ var repairs=JSON.parse(localStorage.getItem('l24_repairs')||'[]'); var maxSeq=0; repairs.forEach(function(r){ var m=r.id&&r.id.match(/^SC(\d{1,5})$/); if(m){var n=parseInt(m[1]);if(n>maxSeq)maxSeq=n;} }); if(maxSeq>=repairs.length){ var padded=repairs.slice(); while(padded.length<maxSeq) padded.push({id:'__pad__'+padded.length}); localStorage.setItem('l24_repairs',JSON.stringify(padded)); } var result=orig.apply(this,arguments); setTimeout(function(){ var current=JSON.parse(localStorage.getItem('l24_repairs')||'[]'); var clean=current.filter(function(r){return !r.id||!r.id.startsWith('__pad__');}); if(clean.length!==current.length) localStorage.setItem('l24_repairs',JSON.stringify(clean)); },300); return result; }; } },1500); return; }
+  if(_origSR._v30) return;
+  _origSR._v30 = true;
+  window.saveRepair = function(){
+    var repairs = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+    var maxSeq = 0;
+    repairs.forEach(function(r){
+      var m = r.id && r.id.match(/^SC(\d{1,5})$/);
+      if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
+    });
+    if(maxSeq >= repairs.length){
+      var padded = repairs.slice();
+      while(padded.length < maxSeq) padded.push({id:'__pad__'+padded.length});
+      localStorage.setItem('l24_repairs', JSON.stringify(padded));
+    }
+    var result = _origSR.apply(this, arguments);
+    setTimeout(function(){
+      var current = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+      var clean = current.filter(function(r){ return !r.id||!r.id.startsWith('__pad__'); });
+      if(clean.length!==current.length) localStorage.setItem('l24_repairs', JSON.stringify(clean));
+    }, 300);
+    return result;
+  };
+})();
