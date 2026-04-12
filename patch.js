@@ -538,3 +538,54 @@
     setTimeout(function(){patchUI(window._srpP||'day');},500);
   }
 })();
+
+// v26: fix status selects always showing Mới nhận - read real status from localStorage
+(function(){
+  function applyAllStatuses(){
+    var repairs=JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+    var rMap={};
+    repairs.forEach(function(r){rMap[r.id]=r;});
+    document.querySelectorAll('select').forEach(function(sel){
+      var oc=sel.getAttribute('onchange')||'';
+      var m=oc.match(/setRepairStatus\(['"]([^'"]+)['"]/);
+      if(!m) return;
+      var rid=m[1];
+      var rep=rMap[rid];
+      if(!rep) return;
+      var st=(window._pendingStatus&&window._pendingStatus[rid])?window._pendingStatus[rid]:rep.status;
+      if(sel.value!==st) sel.value=st;
+      if(st==='Đã giao'){sel.style.color='red';sel.style.fontWeight='bold';}
+      else{sel.style.color='';sel.style.fontWeight='';}
+    });
+  }
+  if(typeof renderRepairs==='function'&&!renderRepairs._v26){
+    var _oriRR=renderRepairs._ori||renderRepairs;
+    window.renderRepairs=function(){
+      var r=_oriRR.apply(this,arguments);
+      setTimeout(applyAllStatuses,120);
+      return r;
+    };
+    window.renderRepairs._v26=true;window.renderRepairs._v23=true;window.renderRepairs._ori=_oriRR;
+  }
+  if(typeof setRepairStatus==='function'&&!setRepairStatus._v26){
+    var _oriSRS=setRepairStatus._ori||setRepairStatus;
+    window.setRepairStatus=function(id,status){
+      if(!window._pendingStatus)window._pendingStatus={};
+      window._pendingStatus[id]=status;
+      try{
+        var repairs=JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+        var i=repairs.findIndex(function(r){return r.id===id;});
+        if(i>=0){
+          repairs[i].status=status;
+          if(status==='Đã giao'&&!repairs[i].deliveredDate)
+            repairs[i].deliveredDate=new Date().toISOString().slice(0,10);
+          localStorage.setItem('l24_repairs',JSON.stringify(repairs));
+        }
+      }catch(e){}
+      return _oriSRS.apply(this,arguments);
+    };
+    window.setRepairStatus._v26=true;window.setRepairStatus._v23=true;window.setRepairStatus._ori=_oriSRS;
+  }
+  window._applyAllStatuses=applyAllStatuses;
+  setTimeout(applyAllStatuses,600);
+})();
