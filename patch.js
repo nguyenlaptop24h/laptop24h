@@ -477,3 +477,64 @@
     setTimeout(function(){patchUI(window._srpP||'day');},500);
   }
 })();
+
+// v25: fix calcProfit to read from localStorage (window.DB does not exist)
+(function(){
+  function toV(n){
+    return Math.round(n).toLocaleString('vi-VN')+' đ';
+  }
+  function calcProfit(period){
+    var repairs=JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+    var products=JSON.parse(localStorage.getItem('l24_products')||'[]');
+    var now=new Date();
+    var todayStr=now.toISOString().slice(0,10);
+    var monthStr=now.toISOString().slice(0,7);
+    var weekAgo=new Date(now.getTime()-6*86400000).toISOString().slice(0,10);
+    var list=repairs.filter(function(r){
+      if(r.status!=='Đã giao'||!r.deliveredDate) return false;
+      var d=r.deliveredDate.slice(0,10);
+      if(period==='day') return d===todayStr;
+      if(period==='week') return d>=weekAgo&&d<=todayStr;
+      if(period==='month') return d.slice(0,7)===monthStr;
+      return false;
+    });
+    var loi=0;
+    list.forEach(function(r){
+      var itemsTotal=(r.deliveryItems||[]).reduce(function(s,it){return s+(it.qty||1)*(it.price||0);},0);
+      var thu=(r.deliveryItems&&r.deliveryItems.length>0)?itemsTotal:(r.cost||0);
+      var catCost=(r.deliveryItems||[]).reduce(function(s,it){
+        var p=products.find(function(pp){return pp.name===it.desc;});
+        return s+(p?(p.cost||0)*(it.qty||1):0);
+      },0);
+      loi+=thu-Math.max(r.capital||0,catCost);
+    });
+    return loi;
+  }
+  function patchUI(period){
+    var correct=calcProfit(period);
+    document.querySelectorAll('div,span').forEach(function(el){
+      if(el.children.length===0&&el.textContent.trim()==='Lợi nhuận'){
+        var par=el.parentElement;
+        if(par){
+          var numEl=Array.from(par.children).find(function(c){
+            return c!==el&&/[d]/.test(c.textContent)&&c.textContent.includes('đ');
+          });
+          if(numEl) numEl.textContent=toV(correct);
+        }
+      }
+    });
+  }
+  if(typeof showRepairProfit==='function'&&!showRepairProfit._v25){
+    var _ori=(showRepairProfit._ori||showRepairProfit);
+    window.showRepairProfit=function(period){
+      window._srpP=period||window._srpP||'day';
+      var r=_ori.apply(this,arguments);
+      setTimeout(function(){patchUI(window._srpP);},200);
+      return r;
+    };
+    window.showRepairProfit._v25=true;
+    window.showRepairProfit._v24=true;
+    window.showRepairProfit._ori=_ori;
+    setTimeout(function(){patchUI(window._srpP||'day');},500);
+  }
+})();
