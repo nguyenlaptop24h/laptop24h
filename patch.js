@@ -589,3 +589,46 @@
   window._applyAllStatuses=applyAllStatuses;
   setTimeout(applyAllStatuses,600);
 })();
+
+// v27: lock status select + edit button for staff when status = Đã giao
+(function(){
+  function isStaff(){
+    try{ var s=JSON.parse(localStorage.getItem('l24_session')||'{}'); return s.role==='staff'; }
+    catch(e){ return false; }
+  }
+  function lockDelivered(){
+    if(!isStaff()) return;
+    var repairs=JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+    var rMap={};
+    repairs.forEach(function(r){ rMap[r.id]=r; });
+    document.querySelectorAll('select').forEach(function(sel){
+      var oc=sel.getAttribute('onchange')||'';
+      var m=oc.match(/setRepairStatus\(['"]([^'"]+)['"]/);
+      if(!m) return;
+      var rid=m[1];
+      var rep=rMap[rid];
+      if(!rep) return;
+      var pst=window._pendingStatus&&window._pendingStatus[rid];
+      var st=pst||rep.status;
+      if(st==='Đã giao'){
+        sel.disabled=true;
+        sel.style.opacity='0.65';
+        sel.style.cursor='not-allowed';
+        var editBtn=document.querySelector('button.btn.bg2[data-id="'+rid+'"]');
+        if(editBtn){
+          editBtn.disabled=true;
+          editBtn.style.opacity='0.4';
+          editBtn.style.cursor='not-allowed';
+          editBtn.title='Phiếu đã giao – không thể sửa';
+        }
+      }
+    });
+  }
+  var _rr27=window.renderRepairs;
+  if(_rr27) window.renderRepairs=function(){
+    _rr27.apply(this,arguments);
+    setTimeout(lockDelivered,200);
+  };
+  window._lockDelivered=lockDelivered;
+  setTimeout(lockDelivered,900);
+})();
