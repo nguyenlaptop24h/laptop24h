@@ -796,3 +796,37 @@
     return _ori(key, value);
   };
 })();
+// v31: Fix SC ID collision at DB.s level (before Firebase write)
+(function(){
+  if(window._v31DBsFix) return;
+  window._v31DBsFix = true;
+  var _tryWrap = setInterval(function(){
+    if(!window.DB || typeof DB.s !== 'function') return;
+    clearInterval(_tryWrap);
+    var _origDBS = DB.s.bind(DB);
+    DB.s = function(key, val) {
+      if (key === 'repairs' && Array.isArray(val)) {
+        var maxSeq = 0;
+        val.forEach(function(r) {
+          if(!r || typeof r.id !== 'string') return;
+          var m = r.id.match(/^SC(\d{1,5})$/);
+          if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
+        });
+        var countId = 'SC' + (val.length + 1);
+        if(maxSeq >= val.length + 1) {
+          for(var i=0; i<val.length; i++) {
+            var r = val[i];
+            if(r && r.id === countId && r.ts && (Date.now()-r.ts) < 15000) {
+              val = val.slice();
+              var entry = Object.assign({}, r, {id: 'SC'+(maxSeq+1)});
+              val.splice(i, 1);
+              val.push(entry);
+              break;
+            }
+          }
+        }
+      }
+      return _origDBS(key, val);
+    };
+  }, 50);
+})();
