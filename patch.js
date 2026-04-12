@@ -653,3 +653,87 @@
   window._lockDelete=lockDelete;
   setTimeout(lockDelete,1000);
 })();
+
+// v29: search sale product by name (Ten SP) instead of code (Ma SP)
+(function(){
+  function getProds(){ return JSON.parse(localStorage.getItem('l24_products')||'[]'); }
+
+  function transformRow(row){
+    if(row.dataset.v29) return;
+    row.dataset.v29='1';
+    var prods=getProds();
+    var codeInp=row.querySelector('input[placeholder="Mã SP"]');
+    var nameInp=row.querySelector('input[placeholder="Tên SP"]');
+    if(!codeInp||!nameInp) return;
+
+    // Chuyển datalist sang dùng tên sản phẩm làm value
+    var dlId=codeInp.getAttribute('list');
+    var dl=dlId?document.getElementById(dlId):null;
+    if(dl){
+      dl.innerHTML=prods.map(function(p){
+        return '<option value="'+p.name.replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'"></option>';
+      }).join('');
+      nameInp.setAttribute('list',dlId);
+      codeInp.removeAttribute('list');
+    }
+
+    // Mã SP -> readonly, nhỏ lại
+    codeInp.readOnly=true;
+    codeInp.removeAttribute('oninput');
+    codeInp.placeholder='Mã';
+    codeInp.style.color='#999';
+    codeInp.style.fontSize='11px';
+    codeInp.style.cursor='default';
+
+    // Tên SP -> editable, là ô chính
+    nameInp.readOnly=false;
+    nameInp.removeAttribute('readonly');
+    nameInp.className='';
+
+    function doSelect(){
+      var val=nameInp.value.trim().toLowerCase();
+      var p=prods.find(function(x){ return x.name.toLowerCase()===val; });
+      if(!p) return;
+      var rows=document.querySelectorAll('#bill-items .bi');
+      var idx=Array.from(rows).indexOf(row);
+      if(idx<0) return;
+      codeInp.value=p.id;
+      if(window.updCode) window.updCode(idx,p.id);
+      // Giữ lại tên sau khi updCode chạy
+      setTimeout(function(){ if(nameInp.value===''||nameInp.readOnly) nameInp.value=p.name; },30);
+    }
+
+    nameInp.addEventListener('input', doSelect);
+    nameInp.addEventListener('change', doSelect);
+
+    // Xóa tên thì xóa mã
+    nameInp.addEventListener('input', function(){
+      if(!this.value.trim()) codeInp.value='';
+    });
+  }
+
+  function transformAll(){
+    document.querySelectorAll('#bill-items .bi').forEach(transformRow);
+  }
+
+  // Watch rows mới thêm vào
+  var container=document.getElementById('bill-items');
+  if(container){
+    new MutationObserver(function(muts){
+      muts.forEach(function(m){
+        m.addedNodes.forEach(function(n){
+          if(n.nodeType===1&&n.classList&&n.classList.contains('bi')){
+            setTimeout(function(){ transformRow(n); },30);
+          }
+        });
+      });
+    }).observe(container,{childList:true});
+  }
+
+  // Chạy khi vào tab Bán Hàng
+  document.querySelectorAll('.tb').forEach(function(btn){
+    btn.addEventListener('click',function(){ setTimeout(transformAll,200); });
+  });
+
+  setTimeout(transformAll,500);
+})();
