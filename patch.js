@@ -373,3 +373,47 @@
   },500);
   setTimeout(function(){ clearInterval(_bt2); },15000);
 })();
+
+// v23: Fix repair status UI not updating after setRepairStatus()
+(function(){
+  var _pending={};
+  function applyStatus(){
+    var ids=Object.keys(_pending);
+    if(!ids.length) return;
+    ids.forEach(function(id){
+      var p=_pending[id];
+      if(Date.now()-p.t>10000){delete _pending[id];return;}
+      document.querySelectorAll('#repair-list .card').forEach(function(c){
+        if(c.querySelector('button[data-id="'+id+'"]')){
+          var sel=c.querySelector('select');
+          if(sel){
+            sel.value=p.s;
+            sel.style.color=p.s==='Đã giao'?'#c0392b':'var(--tx,#222)';
+            sel.style.fontWeight=p.s==='Đã giao'?'700':'600';
+          }
+        }
+      });
+    });
+  }
+  if(typeof setRepairStatus==='function'&&!setRepairStatus._v23){
+    var _oriSRS=setRepairStatus;
+    window.setRepairStatus=function(id,status){
+      _pending[id]={s:status,t:Date.now()};
+      var r=_oriSRS.apply(this,arguments);
+      setTimeout(applyStatus,100);
+      return r;
+    };
+    window.setRepairStatus._v23=true;
+    window.setRepairStatus._ori=_oriSRS;
+  }
+  if(typeof renderRepairs==='function'&&!renderRepairs._v23){
+    var _oriRR=renderRepairs;
+    window.renderRepairs=function(){
+      var r=_oriRR.apply(this,arguments);
+      setTimeout(applyStatus,80);
+      return r;
+    };
+    window.renderRepairs._v23=true;
+    window.renderRepairs._ori=_oriRR;
+  }
+})();
