@@ -632,3 +632,24 @@
   window._lockDelivered=lockDelivered;
   setTimeout(lockDelivered,900);
 })();
+
+// v28: lock delete button for staff on all repairs
+(function(){
+  function lockDelete(){
+    try{ var s=JSON.parse(localStorage.getItem('l24_session')||'{}'); if(s.role!=='staff') return; }
+    catch(e){ return; }
+    document.querySelectorAll('button.btn.br.bsm[data-id]').forEach(function(btn){
+      btn.disabled=true;
+      btn.style.opacity='0.3';
+      btn.style.cursor='not-allowed';
+      btn.title='Không có quyền xóa phiếu';
+    });
+  }
+  var _rr28=window.renderRepairs;
+  if(_rr28) window.renderRepairs=function(){
+    _rr28.apply(this,arguments);
+    setTimeout(lockDelete,250);
+  };
+  window._lockDelete=lockDelete;
+  setTimeout(lockDelete,1000);
+})();
