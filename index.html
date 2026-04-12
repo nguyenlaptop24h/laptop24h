@@ -12,7 +12,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{
-  --pr:#1a56db;--pr-d:#1e3a8a;--pr-l:#dbeafe;
+  --pr:#1a56db;--pr-d:#1e3a8a;--pr-l:#dbeafe;h
   --ac:#f59e0b;--ok:#10b981;--er:#ef4444;--pu:#7c3aed;
   --gy:#6b7280;--gy-l:#f3f4f6;--bd:#e5e7eb;
   --sh:0 1px 3px rgba(0,0,0,.12);--sh-lg:0 10px 25px rgba(0,0,0,.1);
@@ -2366,7 +2366,6 @@ function importRepairsCSV(inp){
         r.deposit=parseFloat(String(row['Tiền Cọ (đ)']||row['Tien Coc']||row['deposit']||0).replace(/[^\d.]/g,''))||0;
         r.warrantyMonths=parseInt(String(row['BH (tháng)']||row['Bao Hanh']||row['warrantyMonths']||0))||0;
         r.techName=String(row['KTV']||row['techName']||'').trim();
-        r.note=String(row['Ghi Chú']||row['Ghi Chu']||row['note']||'').trim();
         r.capital=parseFloat(String(row['Vốn']||row['Von']||row['capital']||0).replace(/[^d.]/g,''))||0;
         r.processNote=String(row['Mô Tả Xử Lí']||row['Mo Ta']||row['processNote']||'').trim();
         r.deliveryItems=r.cost>0?[{name:'Dịch vụ',qty:1,price:r.cost}]:[];
@@ -2395,7 +2394,7 @@ function downloadImportTemplate(){
   toast('Tải mẫu thành công!');
 }
 </script>
-<script src="patch.js?v=31"></script>
+<script src="patch.js?v=32"></script>
 <script>
 document.addEventListener('click',function(e){var t=e.target;if(t&&(t.id==='btn-bill-edit'||t.closest&&t.closest('#btn-bill-edit'))){setTimeout(function(){var mo=document.getElementById('mo-bill-edit');if(mo)mo.querySelectorAll('label').forEach(function(l){l.style.setProperty('color','#111','important');l.style.setProperty('font-size','13px','important');l.style.setProperty('font-weight','700','important');});},300);}});
 </script>
