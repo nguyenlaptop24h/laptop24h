@@ -830,3 +830,150 @@
     };
   }, 50);
 })();
+
+// v32: Thêm dòng giảm giá vào modal giao máy + bill in + card
+(function(){
+  if(window._v32Discount) return;
+  window._v32Discount = true;
+  function fN(n){ return Math.round(n||0).toLocaleString('vi-VN'); }
+
+  // ── 1. Inject ô Giảm giá vào modal giao máy ──────────────────────────
+  function injectDiscountField(){
+    var mo = document.getElementById('mo-deliver');
+    if(!mo || mo.dataset.v32d) return;
+    mo.dataset.v32d = '1';
+    var dvPaid = document.getElementById('dv-paid');
+    if(!dvPaid) return;
+    var paidRow = dvPaid.closest('.tot') || dvPaid.parentElement;
+    paidRow.insertAdjacentHTML('beforebegin',
+      '<div class="tot" style="padding-top:8px;border-top:1px dashed var(--bd)">' +
+      '<span style="font-weight:700;color:#e53935">🎁 Giảm giá (đ)</span>' +
+      '<input id="dv-discount" type="number" min="0" value="0" ' +
+      'style="width:130px;padding:6px 10px;border:1px solid #e53935;border-radius:8px;' +
+      'background:var(--bg);color:#e53935;font-size:14px;font-weight:700;text-align:right">' +
+      '</div>'
+    );
+  }
+
+  // ── 2. Patch openDeliverModal: reset + điền lại giảm giá ─────────────
+  var _tiODM = setInterval(function(){
+    if(!window.openDeliverModal || openDeliverModal._v32d) return;
+    clearInterval(_tiODM);
+    var _orig = window.openDeliverModal;
+    window.openDeliverModal = function(id){
+      _orig(id);
+      setTimeout(function(){
+        injectDiscountField();
+        var el = document.getElementById('dv-discount');
+        if(el){
+          var reps = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+          var rep = reps.find(function(r){ return r&&r.id===id; });
+          el.value = (rep && rep.discount) ? rep.discount : 0;
+        }
+      }, 350);
+    };
+    window.openDeliverModal._v32d = true;
+  }, 300);
+
+  // ── 3. Patch saveDeliver: đọc giảm giá và lưu vào Firebase ──────────
+  var _tiSD = setInterval(function(){
+    if(!window.saveDeliver || saveDeliver._v32d) return;
+    clearInterval(_tiSD);
+    var _orig = window.saveDeliver;
+    window.saveDeliver = function(){
+      var discEl = document.getElementById('dv-discount');
+      var discount = discEl ? (+(discEl.value)||0) : 0;
+      var repId = (document.getElementById('dv-repid')||{value:''}).value;
+      _orig.apply(this, arguments);
+      if(repId){
+        setTimeout(function(){
+          var reps = DB.repairs;
+          var rep = reps.find(function(r){ return r&&r.id===repId; });
+          if(rep){
+            rep.discount = discount;
+            DB.repairs = reps;
+          }
+        }, 750);
+      }
+    };
+    window.saveDeliver._v32d = true;
+  }, 300);
+
+  // ── 4. Patch printRepairBill: chèn dòng giảm giá vào bill in ─────────
+  var _tiPRB = setInterval(function(){
+    if(!window.printRepairBill || printRepairBill._v32d) return;
+    clearInterval(_tiPRB);
+    var _orig = window.printRepairBill;
+    window.printRepairBill = function(rep){
+      var discount = (rep && rep.discount) ? +rep.discount : 0;
+      if(!discount) return _orig(rep);
+      // Chặn window.open tạm thời để can thiệp document.write
+      var _origOpen = window.open;
+      window.open = function(){
+        var win = _origOpen.apply(window, arguments);
+        if(win){
+          var chunks = [];
+          var _dw = win.document.write.bind(win.document);
+          var _dc = win.document.close.bind(win.document);
+          win.document.write = function(html){ chunks.push(html||''); };
+          win.document.close = function(){
+            var full = chunks.join('');
+            var discRow =
+              '<tr style="color:#e53935"><td colspan="3" style="padding:3px 8px;text-align:right;font-weight:700">🎁 Giảm giá</td>' +
+              '<td style="padding:3px 8px;text-align:right;font-weight:700">-' + fN(discount) + '&nbsp;đ</td></tr>';
+            // Chèn trước dòng "Còn lại"
+            var re = /(<tr(?:[^>]*)>(?:(?!<\/tr>)[\s\S])*?[Cc]òn\s*l[ạa]i(?:(?!<\/tr>)[\s\S])*?<\/tr>)/;
+            if(re.test(full)){
+              full = full.replace(re, discRow + '$1');
+            } else {
+              // Fallback: chèn trước </table> cuối cùng
+              var lastTable = full.lastIndexOf('</table>');
+              if(lastTable >= 0) full = full.slice(0, lastTable) + discRow + full.slice(lastTable);
+            }
+            win.document.write = _dw;
+            win.document.close = _dc;
+            _dw(full);
+            _dc();
+          };
+        }
+        window.open = _origOpen;
+        return win;
+      };
+      return _orig(rep);
+    };
+    window.printRepairBill._v32d = true;
+  }, 300);
+
+  // ── 5. Patch renderRepairs: hiển thị giảm giá trong card ─────────────
+  var _tiRR = setInterval(function(){
+    if(!window.renderRepairs || renderRepairs._v32d) return;
+    clearInterval(_tiRR);
+    var _orig = window.renderRepairs;
+    window.renderRepairs = function(){
+      _orig.apply(this, arguments);
+      setTimeout(function(){
+        var repairs = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
+        var rMap = {};
+        repairs.forEach(function(r){ if(r) rMap[r.id]=r; });
+        document.querySelectorAll('#repair-list .card').forEach(function(card){
+          var btn = card.querySelector('button[data-id]');
+          if(!btn) return;
+          var rid = btn.dataset.id;
+          var rep = rMap[rid];
+          if(!rep || !rep.discount || rep.discount <= 0) return;
+          // Tìm dòng "Còn:" để thêm thông tin giảm giá
+          var costDivs = card.querySelectorAll('div');
+          costDivs.forEach(function(d){
+            if(d.textContent.includes('Phí:') && d.textContent.includes('Còn:')){
+              if(!d.dataset.v32d){
+                d.dataset.v32d = '1';
+                d.innerHTML += ' <span style="color:#e53935;font-weight:700">| 🎁 Giảm: ' + fN(rep.discount) + ' đ</span>';
+              }
+            }
+          });
+        });
+      }, 150);
+    };
+    window.renderRepairs._v32d = true;
+  }, 300);
+})();
