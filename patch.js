@@ -739,36 +739,39 @@
 })();
 
 
-// v30: Fix ID collision bug – use max-based repair ID
+// v30: Fix ID collision – hook localStorage.setItem to fix count-based SC ID
 (function(){
-  function applyV30(orig){
-    var wrapper = function(){
-      var repairs = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
-      var maxSeq = 0;
-      repairs.forEach(function(r){
-        var m = r.id && r.id.match(/^SC(\d{1,5})$/);
-        if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
-      });
-      if(maxSeq >= repairs.length){
-        var padded = repairs.slice();
-        while(padded.length < maxSeq) padded.push({id:'__pad__'+padded.length});
-        localStorage.setItem('l24_repairs', JSON.stringify(padded));
-      }
-      var result = orig.apply(this, arguments);
-      setTimeout(function(){
-        var current = JSON.parse(localStorage.getItem('l24_repairs')||'[]');
-        var clean = current.filter(function(r){ return !r.id || r.id.indexOf('__pad__') !== 0; });
-        if(clean.length !== current.length) localStorage.setItem('l24_repairs', JSON.stringify(clean));
-      }, 300);
-      return result;
-    };
-    wrapper._v30 = true;
-    window.saveRepair = wrapper;
-  }
-  if(window.saveRepair && !window.saveRepair._v30){ applyV30(window.saveRepair); }
-  else if(!window.saveRepair){
-    setTimeout(function(){
-      if(window.saveRepair && !window.saveRepair._v30) applyV30(window.saveRepair);
-    }, 1500);
-  }
+  if(window._v30LSHook) return;
+  window._v30LSHook = true;
+  var _origSetItem = localStorage.setItem.bind(localStorage);
+  localStorage.setItem = function(key, value){
+    if(key === 'l24_repairs'){
+      try {
+        var arr = JSON.parse(value);
+        if(Array.isArray(arr) && arr.length > 0){
+          var last = arr[arr.length - 1];
+          if(last && last.id && /^SC\d{1,5}$/.test(last.id)){
+            // Check if this ID already exists in previous entries
+            var newId = last.id;
+            var collision = false;
+            for(var i = 0; i < arr.length - 1; i++){
+              if(arr[i] && arr[i].id === newId){ collision = true; break; }
+            }
+            if(collision){
+              // Find max sequential ID and assign next
+              var maxSeq = 0;
+              for(var j = 0; j < arr.length - 1; j++){
+                var m = arr[j] && arr[j].id && arr[j].id.match(/^SC(\d{1,5})$/);
+                if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
+              }
+              var safeId = 'SC' + (maxSeq + 1);
+              arr[arr.length - 1] = Object.assign({}, last, {id: safeId});
+              value = JSON.stringify(arr);
+            }
+          }
+        }
+      } catch(e) {}
+    }
+    return _origSetItem(key, value);
+  };
 })();
