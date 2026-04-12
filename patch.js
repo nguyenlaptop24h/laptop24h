@@ -331,3 +331,45 @@
   }, 500);
   setTimeout(function(){ clearInterval(_bt); }, 15000);
 })();
+
+// v22: Fix bill edit modal - fill from getBillSettings() + sync on save
+(function(){
+  function fillBillForm(){
+    var mo=document.getElementById('mo-bill-edit');
+    if(!mo||typeof getBillSettings!=='function') return;
+    var s=getBillSettings(); if(!s) return;
+    var map={
+      'set-shopname':s.shopname||'','set-slogan':s.slogan||'','set-addr':s.addr||'',
+      'set-phone':s.phone||'','set-social':s.social||'','set-web':s.web||'',
+      'set-logo':s.logo||'','set-footer-sale':s.footerSale||'',
+      'set-footer-repair':s.footerRepair||'','set-wterm-sale':s.wtermSale||'',
+      'set-wterm-repair':s.wtermRepair||'','set-fontsize':s.fontsize||'',
+      'set-billcolor':s.billcolor||''
+    };
+    Object.keys(map).forEach(function(id){
+      var el=mo.querySelector('#'+id); if(el) el.value=map[id];
+    });
+  }
+  function syncAndSave(){
+    var mo=document.getElementById('mo-bill-edit');
+    if(mo){
+      ['set-shopname','set-slogan','set-addr','set-phone','set-social','set-web',
+       'set-logo','set-footer-sale','set-footer-repair','set-wterm-sale',
+       'set-wterm-repair','set-fontsize','set-billcolor'].forEach(function(id){
+        var mEl=mo.querySelector('#'+id),dEl=document.getElementById(id);
+        if(mEl&&dEl&&dEl!==mEl) dEl.value=mEl.value;
+      });
+    }
+    if(typeof saveBillSettings==='function') saveBillSettings();
+    if(mo) mo.classList.remove('on');
+  }
+  window._saveBillEdit=syncAndSave;
+  var _bt2=setInterval(function(){
+    var btn=document.getElementById('btn-bill-edit');
+    if(btn&&!btn._v22){
+      btn._v22=true;
+      btn.addEventListener('click',function(){ setTimeout(fillBillForm,200); });
+    }
+  },500);
+  setTimeout(function(){ clearInterval(_bt2); },15000);
+})();
