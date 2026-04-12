@@ -257,3 +257,77 @@
     else if(attempts>=60)clearInterval(iv);
   },500);
 })();
+
+// v21: Sale product picker uses NAME not code; bill edit modal robustness
+(function(){
+  // ── SALE PAGE: product picker searches/shows by product name ────────────
+  var _ou = window.updCode;
+  if(_ou) window.updCode = function(i, v){
+    var ps = (window.DB && DB.products)||[];
+    if(v && ps.length){
+      var p = ps.find(function(p){ return p.name.toLowerCase()===v.toLowerCase(); });
+      if(p) return _ou(i, p.id);
+    }
+    return _ou(i, v);
+  };
+
+  function patchSalePicker(){
+    var w = document.getElementById('bill-items');
+    if(!w) return;
+    var ps = (window.DB && DB.products)||[];
+    if(!ps.length) return;
+    var opts = ps.map(function(p){ return '<option value="'+p.name+'">'+p.id+'</option>'; }).join('');
+    w.querySelectorAll('.bi').forEach(function(r){
+      var ci = r.querySelector('input[type=text]:not(.ro-inp)');
+      var ni = r.querySelector('input.ro-inp');
+      var dl = r.querySelector('datalist');
+      if(!ci||!dl) return;
+      dl.innerHTML = opts;
+      ci.placeholder = 'Tên SP';
+      if(ci.value){
+        var byCode = ps.find(function(p){ return p.id===ci.value; });
+        if(byCode) ci.value = byCode.name;
+      }
+      if(ni){
+        ni.placeholder = 'Mã SP';
+        var byName = ps.find(function(p){ return p.name.toLowerCase()===ci.value.toLowerCase(); });
+        ni.value = byName ? byName.id : '';
+      }
+    });
+    var hdr = w.previousElementSibling;
+    if(hdr && !hdr.dataset.v21hdr){
+      hdr.dataset.v21hdr = '1';
+      var spans = hdr.querySelectorAll('span');
+      if(spans[0] && spans[0].textContent.trim()==='Mã SP') spans[0].textContent = 'Tên SP';
+      if(spans[1] && spans[1].textContent.trim()==='Tên SP') spans[1].textContent = 'Mã SP';
+    }
+  }
+
+  var _ori = window.renderItems;
+  if(_ori) window.renderItems = function(){ _ori(); patchSalePicker(); };
+  setTimeout(patchSalePicker, 2000);
+
+  // ── BILL EDIT MODAL: global save handler + ensure overlay on open ───────
+  window._saveBillEdit = function(){
+    if(typeof saveBillSettings==='function') saveBillSettings();
+    var mo = document.getElementById('mo-bill-edit');
+    if(mo) mo.classList.remove('on');
+  };
+  var _bt = setInterval(function(){
+    var btn = document.getElementById('btn-bill-edit');
+    if(btn && !btn._v21){
+      btn._v21 = true;
+      btn.addEventListener('click', function(){
+        setTimeout(function(){
+          var mo = document.getElementById('mo-bill-edit');
+          if(mo){
+            mo.classList.add('on');
+            var sb = mo.querySelector('button.btn.bp');
+            if(sb && !sb._v21){ sb._v21=true; sb.onclick = window._saveBillEdit; }
+          }
+        }, 80);
+      });
+    }
+  }, 500);
+  setTimeout(function(){ clearInterval(_bt); }, 15000);
+})();
