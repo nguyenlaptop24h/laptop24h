@@ -739,39 +739,60 @@
 })();
 
 
-// v30: Fix ID collision – hook localStorage.setItem to fix count-based SC ID
+// v30: Fix SC ID collision – intercept localStorage.setItem
 (function(){
   if(window._v30LSHook) return;
   window._v30LSHook = true;
-  var _origSetItem = localStorage.setItem.bind(localStorage);
+  var _ori = localStorage.setItem.bind(localStorage);
   localStorage.setItem = function(key, value){
     if(key === 'l24_repairs'){
       try {
         var arr = JSON.parse(value);
-        if(Array.isArray(arr) && arr.length > 0){
-          var last = arr[arr.length - 1];
-          if(last && last.id && /^SC\d{1,5}$/.test(last.id)){
-            // Check if this ID already exists in previous entries
-            var newId = last.id;
-            var collision = false;
-            for(var i = 0; i < arr.length - 1; i++){
-              if(arr[i] && arr[i].id === newId){ collision = true; break; }
-            }
-            if(collision){
-              // Find max sequential ID and assign next
-              var maxSeq = 0;
-              for(var j = 0; j < arr.length - 1; j++){
-                var m = arr[j] && arr[j].id && arr[j].id.match(/^SC(\d{1,5})$/);
-                if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
-              }
+        if(!Array.isArray(arr) || !arr.length) return _ori(key, value);
+        // Compute max sequential SC ID and count-based next ID
+        var maxSeq = 0;
+        arr.forEach(function(r){
+          if(!r || typeof r.id !== 'string') return;
+          var m = r.id.match(/^SC(\d{1,5})$/);
+          if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
+        });
+        var countId = 'SC' + (arr.length + 1);
+        // Only act if there is an ID gap (maxSeq >= arr.length+1 means countId already taken)
+        if(maxSeq >= arr.length + 1){
+          // Case 1: replace – fresh entry exists at collision position (anywhere in array)
+          for(var i=0; i<arr.length; i++){
+            var r = arr[i];
+            if(r && r.id === countId && r.ts && (Date.now()-r.ts) < 15000){
+              // This entry was just created with the colliding ID → fix it
               var safeId = 'SC' + (maxSeq + 1);
-              arr[arr.length - 1] = Object.assign({}, last, {id: safeId});
-              value = JSON.stringify(arr);
+              var fixed = arr.slice();
+              var entry = Object.assign({}, r, {id: safeId});
+              fixed.splice(i, 1);   // remove from collision spot
+              fixed.push(entry);     // append at end with safe ID
+              value = JSON.stringify(fixed);
+              break;
             }
           }
         }
-      } catch(e) {}
+        // Case 2: append – last element has duplicate ID anywhere earlier
+        var arr2 = JSON.parse(value);
+        var last = arr2[arr2.length-1];
+        if(last && last.id && /^SC\d{1,5}$/.test(last.id)){
+          for(var j=0; j<arr2.length-1; j++){
+            if(arr2[j] && arr2[j].id === last.id){
+              var ms=0;
+              for(var k=0; k<arr2.length-1; k++){
+                var mm=arr2[k]&&arr2[k].id&&arr2[k].id.match(/^SC(\d{1,5})$/);
+                if(mm){var nn=parseInt(mm[1]);if(nn>ms)ms=nn;}
+              }
+              arr2[arr2.length-1]=Object.assign({},last,{id:'SC'+(ms+1)});
+              value=JSON.stringify(arr2);
+              break;
+            }
+          }
+        }
+      } catch(e){}
     }
-    return _origSetItem(key, value);
+    return _ori(key, value);
   };
 })();
