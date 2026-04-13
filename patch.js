@@ -796,39 +796,72 @@
     return _ori(key, value);
   };
 })();
-// v31: Fix SC ID collision at DB.s level (before Firebase write)
+// v33: Fix SC ID collision – saveRepair coord + DB.s restore (replaces v31)
 (function(){
-  if(window._v31DBsFix) return;
-  window._v31DBsFix = true;
-  var _tryWrap = setInterval(function(){
-    if(!window.DB || typeof DB.s !== 'function') return;
-    clearInterval(_tryWrap);
-    var _origDBS = DB.s.bind(DB);
-    DB.s = function(key, val) {
-      if (key === 'repairs' && Array.isArray(val)) {
-        var maxSeq = 0;
-        val.forEach(function(r) {
-          if(!r || typeof r.id !== 'string') return;
-          var m = r.id.match(/^SC(\d{1,5})$/);
-          if(m){ var n=parseInt(m[1]); if(n>maxSeq) maxSeq=n; }
-        });
-        var countId = 'SC' + (val.length + 1);
-        if(maxSeq >= val.length + 1) {
-          for(var i=0; i<val.length; i++) {
-            var r = val[i];
-            if(r && r.id === countId && r.ts && (Date.now()-r.ts) < 15000) {
-              val = val.slice();
-              var entry = Object.assign({}, r, {id: 'SC'+(maxSeq+1)});
-              val.splice(i, 1);
-              val.push(entry);
-              break;
+  if(window._v33ColFix) return;
+  window._v33ColFix = true;
+
+  // ── A. Wrap saveRepair: detect collision trước khi original chạy ────────
+  var _tiSR = setInterval(function(){
+    try{ if(typeof saveRepair==='undefined') return; }catch(e){ return; }
+    clearInterval(_tiSR);
+    var _origSR = window.saveRepair;
+    window.saveRepair = function(){
+      window._patchNextId = null;
+      window._patchSavedEntry = null;
+      var editId = window.editRepairId || '';
+      if(!editId){
+        try{
+          var arr = DB.repairs || [];
+          var count = arr.filter(function(r){return r;}).length;
+          var maxSeq = 0;
+          arr.forEach(function(r){
+            if(!r||typeof r.id!=='string') return;
+            var m=r.id.match(/^SC(\d{1,5})$/);
+            if(m){var n=parseInt(m[1]);if(n>maxSeq)maxSeq=n;}
+          });
+          if(maxSeq >= count + 1){
+            var colId = 'SC' + (count + 1);
+            var victim = arr.find(function(r){return r&&r.id===colId;});
+            if(victim){
+              window._patchSavedEntry = JSON.parse(JSON.stringify(victim));
+              window._patchNextId = 'SC' + (maxSeq + 1);
             }
           }
+        }catch(e){ console.warn('[v33] saveRepair hook err:',e); }
+      }
+      return _origSR.apply(this, arguments);
+    };
+    window.saveRepair._v33c = true;
+  }, 200);
+
+  // ── B. Wrap DB.s: dùng _patchNextId để fix ID + restore entry bị xóa ─
+  var _tiDB = setInterval(function(){
+    try{ if(typeof DB==='undefined'||typeof DB.s!=='function') return; }catch(e){ return; }
+    clearInterval(_tiDB);
+    var _origDBS = DB.s.bind(DB);
+    DB.s = function(key, val){
+      if(key==='repairs' && Array.isArray(val) && window._patchNextId){
+        var fixId = window._patchNextId;
+        var saved = window._patchSavedEntry;
+        window._patchNextId = null;
+        window._patchSavedEntry = null;
+        var now = Date.now();
+        val = val.slice();
+        for(var i=0; i<val.length; i++){
+          var r=val[i];
+          if(!r||!r.ts||(now-r.ts)>30000) continue;
+          val[i] = Object.assign({},r,{id:fixId});
+          if(saved && !val.some(function(x){return x&&x.id===saved.id;})){
+            val.push(saved);
+          }
+          break;
         }
       }
       return _origDBS(key, val);
     };
-  }, 50);
+    window.DB.s = DB.s;
+  }, 200);
 })();
 
 // v32: Thêm dòng giảm giá vào modal giao máy + bill in + card
