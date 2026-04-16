@@ -1010,3 +1010,33 @@
     window.renderRepairs._v32d = true;
   }, 300);
 })();
+
+
+// v34: Mở khóa nhập vốn linh kiện cho nhân viên (unlock #rm-capital)
+(function(){
+  if(window._v34CapUnlock) return;
+  window._v34CapUnlock = true;
+
+  // CSS: force show container của #rm-capital dù có class admin-only
+  var st = document.createElement('style');
+  st.id = '_v34CapCSS';
+  st.textContent = '.fg.admin-only:has(#rm-capital){display:flex!important}';
+  document.head.appendChild(st);
+
+  // JS: wrap applyRoleUI để re-show sau khi nó ẩn admin-only elements
+  var _ti = setInterval(function(){
+    try{ if(typeof applyRoleUI !== 'function') return; }catch(e){ return; }
+    clearInterval(_ti);
+    var _orig = window.applyRoleUI;
+    window.applyRoleUI = function(){
+      _orig.apply(this, arguments);
+      var inp = document.getElementById('rm-capital');
+      if(inp){
+        var wrap = inp.closest('.admin-only') || inp.parentElement;
+        if(wrap) wrap.style.display = 'flex';
+        inp.removeAttribute('disabled');
+        inp.removeAttribute('readonly');
+      }
+    };
+  }, 200);
+})();
