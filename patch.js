@@ -1040,3 +1040,59 @@
     };
   }, 200);
 })();
+
+
+// v35: Wire dv-discount vào calcDelivery + printDeliverBill
+// Công thức: CÒN LẠI = tổng hạng mục - cọc - giảm giá
+(function(){
+  if(window._v35DiscWire) return;
+  window._v35DiscWire = true;
+
+  function getDisc(){
+    var el = document.getElementById('dv-discount');
+    return el ? Math.max(0, parseFloat(el.value)||0) : 0;
+  }
+
+  // ── A. Wrap calcDelivery: sau khi gốc tính remaining, trừ tiếp discount
+  var _tiCalc = setInterval(function(){
+    try{ if(typeof calcDelivery!=='function') return; }catch(e){ return; }
+    clearInterval(_tiCalc);
+    var _origCalc = window.calcDelivery;
+    window.calcDelivery = function(){
+      _origCalc.apply(this, arguments);
+      var disc = getDisc();
+      if(!disc) return;
+      var remEl = document.getElementById('dv-remaining');
+      if(!remEl) return;
+      // Parse remaining hiện tại (đã trừ cọc bởi hàm gốc)
+      var curRem = parseInt((remEl.textContent+'').replace(/[^0-9]/g,'')) || 0;
+      var newRem = Math.max(0, curRem - disc);
+      remEl.textContent = newRem.toLocaleString('vi-VN') + ' đ';
+    };
+  }, 200);
+
+  // ── B. Wrap printDeliverBill: chèn discount vào tmp trước khi in
+  var _tiPDB = setInterval(function(){
+    try{ if(typeof printDeliverBill!=='function') return; }catch(e){ return; }
+    clearInterval(_tiPDB);
+    var _origPDB = window.printDeliverBill;
+    window.printDeliverBill = function(){
+      var disc = getDisc();
+      if(disc > 0){
+        var _curPRB = window.printRepairBill;
+        window.printRepairBill = function(rep){
+          window.printRepairBill = _curPRB;
+          return _curPRB(Object.assign({}, rep, {discount: disc}));
+        };
+      }
+      return _origPDB.apply(this, arguments);
+    };
+  }, 200);
+
+  // ── C. Event: nhập giảm giá → cập nhật CÒN LẠI ngay lập tức
+  document.addEventListener('input', function(e){
+    if(e.target && e.target.id==='dv-discount'){
+      try{ if(typeof calcDelivery==='function') calcDelivery(); }catch(err){}
+    }
+  });
+})();
